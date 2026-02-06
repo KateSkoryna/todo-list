@@ -18,7 +18,7 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
     e.preventDefault();
     if (newListName.trim()) {
       onSubmit(newListName.trim());
-      setNewListName(''); // Clear input after submission
+      setNewListName('');
     }
   };
 

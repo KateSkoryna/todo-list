@@ -3,7 +3,7 @@ import Text from './Text';
 import Loader from './Loader';
 import ErrorFallback from './ErrorFallback';
 import Container from './Container';
-import { TodoList as TodoListType } from '@fyltura/types'; // Import TodoListType
+import { TodoList as TodoListType } from '@fyltura/types';
 
 interface TodoListsProps {
   todoLists: TodoListType[] | undefined;
