@@ -19,9 +19,9 @@ describe('TodoRepository', () => {
     expect(todo).toBeDefined();
     expect(todo.name).toBe('New Todo');
     expect(todo.isDone).toBe(false);
-    expect(todo.todolistId.toString()).toBe(todolistId.toString());
+    expect(todo.todolistId).toBe(todolistId.toString());
 
-    const foundTodo = await Todo.findById(todo._id);
+    const foundTodo = await Todo.findById(todo.id);
     expect(foundTodo).toBeDefined();
   });
 
@@ -37,7 +37,7 @@ describe('TodoRepository', () => {
 
   it('should find a todo by id', async () => {
     const todo = await TodoRepository.create(todolistId.toString(), 'Find Me');
-    const foundTodo = await TodoRepository.findById(todo._id.toString());
+    const foundTodo = await TodoRepository.findById(todo.id);
     expect(foundTodo).toBeDefined();
     expect(foundTodo?.name).toBe('Find Me');
   });
@@ -55,9 +55,9 @@ describe('TodoRepository', () => {
       'Old Name',
       false
     );
-    await TodoRepository.update(todo._id.toString(), 'Updated Name', true);
+    await TodoRepository.update(todo.id, { name: 'Updated Name', isDone: true });
 
-    const foundTodo = await Todo.findById(todo._id);
+    const foundTodo = await Todo.findById(todo.id);
     expect(foundTodo).toBeDefined();
     expect(foundTodo?.name).toBe('Updated Name');
     expect(foundTodo?.isDone).toBe(true);
@@ -66,8 +66,7 @@ describe('TodoRepository', () => {
   it('should return null if todo not found for update', async () => {
     const updatedTodo = await TodoRepository.update(
       new mongoose.Types.ObjectId().toString(),
-      'Non Existent',
-      false
+      { name: 'Non Existent', isDone: false }
     );
     expect(updatedTodo).toBeNull();
   });
@@ -77,9 +76,9 @@ describe('TodoRepository', () => {
       todolistId.toString(),
       'Delete Me'
     );
-    await TodoRepository.delete(todo._id.toString());
+    await TodoRepository.delete(todo.id);
 
-    const foundTodo = await Todo.findById(todo._id);
+    const foundTodo = await Todo.findById(todo.id);
     expect(foundTodo).toBeNull();
   });
 

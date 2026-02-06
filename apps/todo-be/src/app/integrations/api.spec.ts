@@ -38,16 +38,16 @@ describe('API Integration Tests', () => {
     it('should return 400 if missing name or userId for creating todolist', async () => {
       let res = await request(app).post('/api/todolists').send({ userId: 1 });
       expect(res.statusCode).toEqual(400);
-      expect(res.body.message).toBe('Missing required fields: name, userId');
+      expect(res.body.fields).toEqual([{ field: 'name', value: '' }]);
 
       res = await request(app).post('/api/todolists').send({ name: 'Test' });
       expect(res.statusCode).toEqual(400);
-      expect(res.body.message).toBe('Missing required fields: name, userId');
+      expect(res.body.fields).toEqual([{ field: 'userId', value: '' }]);
     });
 
-    it('should get all todolists', async () => {
+    it('should get all todolists for user 123', async () => {
       await Todolist.create({ name: 'Another List', userId: 123 });
-      const res = await request(app).get('/api/todolists');
+      const res = await request(app).get('/api/todolists?userId=123');
 
       expect(res.statusCode).toEqual(200);
       expect(res.body.length).toBeGreaterThanOrEqual(2); // Includes the beforeEach todolist
@@ -120,7 +120,7 @@ describe('API Integration Tests', () => {
         .send({}); // Missing name
 
       expect(res.statusCode).toEqual(400);
-      expect(res.body.message).toBe('Missing required field: name');
+      expect(res.body.fields).toEqual([{ field: 'name', value: '' }]);
     });
 
     it('should delete a todolist', async () => {
@@ -170,15 +170,11 @@ describe('API Integration Tests', () => {
     it('should return 400 if missing name or todolistId for creating todo', async () => {
       let res = await request(app).post('/api/todos').send({ todolistId });
       expect(res.statusCode).toEqual(400);
-      expect(res.body.message).toBe(
-        'Missing required fields: todolistId, name'
-      );
+      expect(res.body.fields).toEqual([{ field: 'name', value: '' }]);
 
       res = await request(app).post('/api/todos').send({ name: 'Test' });
       expect(res.statusCode).toEqual(400);
-      expect(res.body.message).toBe(
-        'Missing required fields: todolistId, name'
-      );
+      expect(res.body.fields).toEqual([{ field: 'todolistId', value: '' }]);
     });
 
     it('should get all todos', async () => {
@@ -244,7 +240,7 @@ describe('API Integration Tests', () => {
       const res = await request(app).put(`/api/todos/${todoId}`).send({}); // No fields to update
 
       expect(res.statusCode).toEqual(400);
-      expect(res.body.message).toBe('No fields provided for update');
+      expect(res.body.fields).toEqual([{ field: '', value: '' }]);
     });
 
     it('should delete a todo', async () => {

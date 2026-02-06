@@ -11,15 +11,15 @@ describe('TodolistRepository', () => {
     expect(todolist.name).toBe('New Todolist');
     expect(todolist.userId).toBe(1);
 
-    const foundTodolist = await Todolist.findById(todolist._id);
+    const foundTodolist = await Todolist.findById(todolist.id);
     expect(foundTodolist).toBeDefined();
   });
 
-  it('should find all todolists', async () => {
+  it('should find all todolists for user 1', async () => {
     await TodolistRepository.create('Todolist 1', 1);
-    await TodolistRepository.create('Todolist 2', 2);
+    await TodolistRepository.create('Todolist 2', 1);
 
-    const todolists = await TodolistRepository.findAll();
+    const todolists = await TodolistRepository.findAll(1);
     expect(todolists.length).toBe(2);
     expect(todolists[0].name).toBe('Todolist 1');
     expect(todolists[1].name).toBe('Todolist 2');
@@ -37,9 +37,7 @@ describe('TodolistRepository', () => {
 
   it('should find a todolist by id', async () => {
     const todolist = await TodolistRepository.create('Find Me', 1);
-    const foundTodolist = await TodolistRepository.findById(
-      todolist._id.toString()
-    );
+    const foundTodolist = await TodolistRepository.findById(todolist.id);
     expect(foundTodolist).toBeDefined();
     expect(foundTodolist?.name).toBe('Find Me');
   });
@@ -53,9 +51,9 @@ describe('TodolistRepository', () => {
 
   it('should update a todolist', async () => {
     const todolist = await TodolistRepository.create('Old Name', 1);
-    await TodolistRepository.update(todolist._id.toString(), 'Updated Name');
+    await TodolistRepository.update(todolist.id, 'Updated Name');
 
-    const foundTodolist = await Todolist.findById(todolist._id);
+    const foundTodolist = await Todolist.findById(todolist.id);
     expect(foundTodolist).toBeDefined();
     expect(foundTodolist?.name).toBe('Updated Name');
   });
@@ -70,9 +68,9 @@ describe('TodolistRepository', () => {
 
   it('should delete a todolist', async () => {
     const todolist = await TodolistRepository.create('Delete Me', 1);
-    await TodolistRepository.delete(todolist._id.toString());
+    await TodolistRepository.delete(todolist.id);
 
-    const foundTodolist = await Todolist.findById(todolist._id);
+    const foundTodolist = await Todolist.findById(todolist.id);
     expect(foundTodolist).toBeNull();
   });
 
@@ -87,16 +85,14 @@ describe('TodolistRepository', () => {
     const todolist = await TodolistRepository.create('Populate Test', 1);
     await Todo.create({
       name: 'Todo 1',
-      todolistId: new mongoose.Types.ObjectId(todolist._id),
+      todolistId: todolist.id,
     });
     await Todo.create({
       name: 'Todo 2',
-      todolistId: new mongoose.Types.ObjectId(todolist._id),
+      todolistId: todolist.id,
     });
 
-    const foundTodolist: TodoList = await TodolistRepository.findById(
-      todolist._id.toString()
-    );
+    const foundTodolist: TodoList = await TodolistRepository.findById(todolist.id);
     expect(foundTodolist?.todos).toBeDefined();
     expect(foundTodolist?.todos.length).toBe(2);
     expect(foundTodolist?.todos[0].name).toBe('Todo 1');
