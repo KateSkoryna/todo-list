@@ -13,7 +13,7 @@ import { TodoController } from './app/controllers/todo.controller';
 const app = express();
 
 // --- Database Connection ---
-const mongoUri = process.env.MONGODB_URL;
+const mongoUri = process.env.MONGODB_URI;
 const dbName = process.env.DATABASE_NAME;
 
 if (!mongoUri) {
