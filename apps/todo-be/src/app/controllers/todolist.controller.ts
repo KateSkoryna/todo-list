@@ -1,10 +1,23 @@
 import { Request, Response } from 'express';
 import { TodolistRepository } from '../repositories/todolist.repository';
+import { createValidationError } from '../utils/errors';
+import mongoose from 'mongoose';
 
 export const TodolistController = {
   getAll: async (req: Request, res: Response) => {
     try {
-      const userId = req.query.userId ? Number(req.query.userId) : undefined;
+      const userIdParam = req.query.userId;
+
+      if (!userIdParam) {
+        return res.status(400).json(createValidationError([{ field: 'userId', value: userIdParam }]));
+      }
+
+      const userId = Number(userIdParam);
+
+      if (isNaN(userId)) {
+        return res.status(400).json(createValidationError([{ field: 'userId', value: userIdParam }]));
+      }
+
       const lists = await TodolistRepository.findAll(userId);
       res.json(lists);
     } catch (error) {
@@ -18,6 +31,11 @@ export const TodolistController = {
   getById: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json(createValidationError([{ field: 'id', value: id }]));
+      }
+
       const list = await TodolistRepository.findById(id);
       if (!list) {
         return res.status(404).json({ message: 'Todolist not found' });
@@ -34,11 +52,19 @@ export const TodolistController = {
   create: async (req: Request, res: Response) => {
     try {
       const { name, userId } = req.body;
-      if (!name || !userId) {
-        return res
-          .status(400)
-          .json({ message: 'Missing required fields: name, userId' });
+      const errors = [];
+
+      if (!name) {
+        errors.push({ field: 'name', value: name });
       }
+      if (!userId) {
+        errors.push({ field: 'userId', value: userId });
+      }
+
+      if (errors.length > 0) {
+        return res.status(400).json(createValidationError(errors));
+      }
+
       const newList = await TodolistRepository.create(name, userId);
       res.status(201).json(newList);
     } catch (error) {
@@ -53,11 +79,15 @@ export const TodolistController = {
     try {
       const { id } = req.params;
       const { name } = req.body;
-      if (!name) {
-        return res
-          .status(400)
-          .json({ message: 'Missing required field: name' });
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json(createValidationError([{ field: 'id', value: id }]));
       }
+
+      if (!name) {
+        return res.status(400).json(createValidationError([{ field: 'name', value: name }]));
+      }
+
       const updatedList = await TodolistRepository.update(id, name);
       if (!updatedList) {
         return res.status(404).json({ message: 'Todolist not found' });
@@ -74,6 +104,11 @@ export const TodolistController = {
   delete: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json(createValidationError([{ field: 'id', value: id }]));
+      }
+
       const deletedList = await TodolistRepository.delete(id);
       if (!deletedList) {
         return res.status(404).json({ message: 'Todolist not found' });

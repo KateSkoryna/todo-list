@@ -2,9 +2,8 @@ import { Todolist } from '../models/todoList.model';
 import { TodoList } from '@fyltura/types';
 
 export const TodolistRepository = {
-  findAll: async (userId?: number): Promise<TodoList[]> => {
-    const query = userId ? { userId } : {};
-    const docs = await Todolist.find(query).populate('todos');
+  findAll: async (userId: number): Promise<TodoList[]> => {
+    const docs = await Todolist.find({ userId }).populate('todos');
     return docs.map(doc => doc.toJSON()) as TodoList[];
   },
 
@@ -16,19 +15,26 @@ export const TodolistRepository = {
     return doc.toJSON() as TodoList;
   },
 
-  create: async (name: string, userId: number) => {
-    return await Todolist.create({ name, userId });
-  },
-
-  update: async (id: string, name: string): Promise<TodoList | null> => {
-    const doc = await Todolist.findByIdAndUpdate(id, { name }, { new: true });
-    if (!doc) {
-      return null;
-    }
+  create: async (name: string, userId: number): Promise<TodoList> => {
+    const doc = await Todolist.create({ name, userId });
     return doc.toJSON() as TodoList;
   },
 
-  delete: async (id: string) => {
-    return await Todolist.findByIdAndDelete(id);
+  update: async (id: string, name: string): Promise<TodoList | null> => {
+    const doc = await Todolist.findByIdAndUpdate(id, { name }, { new: true }).exec();
+    if (!doc) {
+      return null;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (doc as any).toJSON() as TodoList;
+  },
+
+  delete: async (id: string): Promise<TodoList | null> => {
+    const doc = await Todolist.findByIdAndDelete(id).exec();
+    if (!doc) {
+      return null;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (doc as any).toJSON() as TodoList;
   },
 };
