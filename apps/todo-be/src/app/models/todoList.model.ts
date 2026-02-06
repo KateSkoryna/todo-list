@@ -1,6 +1,12 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
+import { TodoList, TodoItem } from '@fyltura/types'; // Correct import name and alias
 
-const todolistSchema = new Schema(
+interface ITodolistDocument extends Omit<TodoList, 'id'>, Document {
+  _id: Types.ObjectId;
+  userId: number;
+}
+
+const todolistSchema = new Schema<ITodolistDocument>(
   {
     name: { type: String, required: true },
     userId: { type: Number, required: true },
@@ -8,10 +14,14 @@ const todolistSchema = new Schema(
   {
     toJSON: {
       virtuals: true,
-      transform: (_, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
+      transform: (_, ret: ITodolistDocument) => {
+        const todolist: TodoList = {
+          id: ret._id.toString(),
+          name: ret.name,
+          userId: ret.userId,
+          todos: (ret.todos as TodoItem[]) || [],
+        };
+        return todolist;
       },
     },
     toObject: { virtuals: true },
@@ -24,7 +34,4 @@ todolistSchema.virtual('todos', {
   foreignField: 'todolistId',
 });
 
-todolistSchema.set('toJSON', { virtuals: true });
-todolistSchema.set('toObject', { virtuals: true });
-
-export const Todolist = model('Todolist', todolistSchema);
+export const Todolist = model<ITodolistDocument>('Todolist', todolistSchema);
