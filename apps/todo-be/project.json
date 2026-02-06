@@ -1,0 +1,57 @@
+{
+  "name": "todo-be",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/todo-be/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/todo-be",
+        "main": "apps/todo-be/src/main.ts",
+        "tsConfig": "apps/todo-be/tsconfig.app.json",
+        "assets": ["apps/todo-be/src/assets"],
+        "target": "node",
+        "compiler": "tsc",
+        "webpackConfig": "apps/todo-be/webpack.config.js"
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "apps/todo-be/src/environments/environment.ts",
+              "with": "apps/todo-be/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "options": {
+        "buildTarget": "todo-be:build"
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "todo-be:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/todo-be"],
+      "options": {
+        "jestConfig": "apps/todo-be/jest.config.ts"
+      }
+    }
+  },
+  "tags": []
+}

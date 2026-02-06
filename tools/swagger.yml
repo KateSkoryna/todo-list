@@ -1,0 +1,321 @@
+openapi: 3.0.3
+info:
+  title: Todolist RESTful API
+  version: '1'
+paths:
+  /api/todolists:
+    get:
+      tags:
+        - Todolists
+      summary: Get all Todolists
+      responses:
+        default:
+          $ref: '#/components/responses/default'
+        200:
+          $ref: '#/components/responses/Todolists'
+    post:
+      tags:
+        - Todolists
+      summary: Create new Todolist
+      requestBody:
+        $ref: '#/components/requestBodies/NewTodolist'
+      responses:
+        200:
+          $ref: '#/components/responses/Todolist'
+  /api/todolists/{id}:
+    get:
+      tags:
+        - Todolists
+      summary: Get a single Todolist
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        default:
+          $ref: '#/components/responses/default'
+        400:
+          $ref: '#/components/responses/Errors'
+        200:
+          $ref: '#/components/responses/Todolist'
+    put:
+      tags:
+        - Todolists
+      summary: Update existing Todolist
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateTodolist'
+      responses:
+        default:
+          $ref: '#/components/responses/default'
+        400:
+          $ref: '#/components/responses/Errors'
+        200:
+          $ref: '#/components/responses/Todolist'
+    delete:
+      tags:
+        - Todolists
+      summary: Delete existing todolist
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        204:
+          $ref: '#/components/responses/204'
+        default:
+          $ref: '#/components/responses/default'
+  /api/todos:
+    get:
+      tags:
+        - Todos
+      summary: Get all Todos
+      responses:
+        default:
+          $ref: '#/components/responses/default'
+        400:
+          $ref: '#/components/responses/Errors'
+        200:
+          $ref: '#/components/responses/Todos'
+    post:
+      tags:
+        - Todos
+      summary: Create new Todo
+      requestBody:
+        $ref: '#/components/requestBodies/NewTodo'
+      responses:
+        200:
+          $ref: '#/components/responses/Todo'
+  /api/todos/{id}:
+    put:
+      tags:
+        - Todos
+      summary: Update existing Todo
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateTodo'
+      responses:
+        default:
+          $ref: '#/components/responses/default'
+        400:
+          $ref: '#/components/responses/Errors'
+        200:
+          $ref: '#/components/responses/Todo'
+    delete:
+      tags:
+        - Todos
+      summary: Delete existing todolist
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        204:
+          $ref: '#/components/responses/204'
+        default:
+          $ref: '#/components/responses/default'
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      description: id to update
+      required: true
+      schema:
+        type: integer
+        format: int64
+  requestBodies:
+    Todolist:
+      content:
+        application/json:
+          schema:
+              $ref: '#/components/schemas/Todolist'
+    UpdateTodolist:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateTodolist'
+    NewTodolist:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewTodolist'
+    Todo:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Todo'
+    UpdateTodo:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateTodo'
+    NewTodo:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewTodo'
+  responses:
+    default:
+      description: >-
+        default status codes for type of request. numbered responses are 204,
+        400 or 404
+    204:
+      description: No Content, returned on successful delete
+    404:
+      description: No Content, returned if object not found
+    Todolists:
+      content:
+        application/json:
+          schema:
+            items:
+              $ref: '#/components/schemas/Todolist'
+            type: array
+      description: Array of Todolist
+    Todos:
+      content:
+        application/json:
+          schema:
+            items:
+              $ref: '#/components/schemas/Todo'
+            type: array
+      description: Array of Todos
+    Todolist:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Todolist'
+      description: Single Todolist
+    UpdateTodolist:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateTodolist'
+      description: Single Todolist
+    NewTodolist:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewTodolist'
+      description: Single Todolist
+    Todo:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Todo'
+      description: Single Todo
+    UpdateTodo:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateTodo'
+      description: Single Todo
+    Errors:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errors'
+      description: Validation Failed, incoming data cannot be saved
+  schemas:
+    Errors:
+      properties:
+        fields:
+          items:
+            $ref: '#/components/schemas/FieldError'
+          nullable: false
+          type: array
+      type: object
+    FieldError:
+      properties:
+        field:
+          description: >
+            Field name that is in state error. The field name can be an empty
+            string in case the error is not field related, e.g. a json parse
+            error.
+          nullable: false
+          type: string
+        value:
+          description: The supplied value that is wrong as a string representation.
+          nullable: false
+          type: string
+      type: object
+    Todolist:
+      type: object
+      description: A list that contains multiple todos
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+      example:
+        name: Shopping List
+        id: 1
+    NewTodolist:
+      type: object
+      description: A list that contains multiple todos
+      properties:
+        name:
+          type: string
+      example:
+        name: Shopping List
+      required:
+        - name
+    UpdateTodolist:
+      type: object
+      description: A list that contains multiple todos
+      properties:
+        name:
+          type: string
+      example:
+        name: Shopping List
+    Todo:
+      type: object
+      description: A todo
+      properties:
+        id:
+          type: number
+        todolistId:
+          description: related Todolist id
+          type: number
+        name:
+          type: string
+        isDone:
+          type: boolean
+          nullable: false
+      example:
+        name: Buy cheese
+        id: 1
+        todolistId: 2
+        isDone: false
+    UpdateTodo:
+      type: object
+      description: A todo
+      properties:
+        todolistId:
+          description: related Todolist id
+          type: number
+        name:
+          type: string
+        isDone:
+          type: boolean
+          nullable: false
+      example:
+        name: Buy cheese
+        id: 1
+        todolistId: 2
+        isDone: false
+    NewTodo:
+      type: object
+      description: A new todo
+      properties:
+        todolistId:
+          description: related Todolist id
+          type: number
+        name:
+          type: string
+        isDone:
+          type: boolean
+          nullable: false
+      required:
+        - todolistId
+        - name
+      example:
+        name: Buy cheese
+        todolistId: 2
+        isDone: false
