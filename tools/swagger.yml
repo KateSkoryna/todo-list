@@ -8,6 +8,12 @@ paths:
       tags:
         - Todolists
       summary: Get all Todolists
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: integer
       responses:
         default:
           $ref: '#/components/responses/default'
@@ -125,7 +131,7 @@ components:
       content:
         application/json:
           schema:
-              $ref: '#/components/schemas/Todolist'
+            $ref: '#/components/schemas/Todolist'
     UpdateTodolist:
       content:
         application/json:
@@ -240,22 +246,34 @@ components:
       description: A list that contains multiple todos
       properties:
         id:
-          type: number
+          type: string
         name:
           type: string
+        userId:
+          type: integer
+        todos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Todo'
       example:
+        id: "65c2f..."
         name: Shopping List
-        id: 1
-    NewTodolist:
+        userId: 1
+        todos: []
+      NewTodolist:
       type: object
       description: A list that contains multiple todos
       properties:
         name:
           type: string
-      example:
-        name: Shopping List
+        userId:
+          type: integer
       required:
         - name
+        - userId
+      example:
+        name: Shopping List
+        userId: 1
     UpdateTodolist:
       type: object
       description: A list that contains multiple todos
@@ -263,59 +281,52 @@ components:
         name:
           type: string
       example:
-        name: Shopping List
+        name: Grocery List
     Todo:
       type: object
       description: A todo
       properties:
         id:
-          type: number
+          type: string
         todolistId:
           description: related Todolist id
-          type: number
+          type: string
         name:
           type: string
         isDone:
           type: boolean
-          nullable: false
       example:
+        id: "65c2g..."
+        todolistId: "65c2f..."
         name: Buy cheese
-        id: 1
-        todolistId: 2
         isDone: false
     UpdateTodo:
       type: object
       description: A todo
       properties:
-        todolistId:
-          description: related Todolist id
-          type: number
         name:
           type: string
         isDone:
           type: boolean
-          nullable: false
       example:
         name: Buy cheese
-        id: 1
-        todolistId: 2
-        isDone: false
+        isDone: true
     NewTodo:
       type: object
       description: A new todo
       properties:
         todolistId:
           description: related Todolist id
-          type: number
+          type: string
         name:
           type: string
         isDone:
           type: boolean
-          nullable: false
+          default: false
       required:
         - todolistId
         - name
       example:
+        todolistId: "65c2f..."
         name: Buy cheese
-        todolistId: 2
         isDone: false
