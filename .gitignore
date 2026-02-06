@@ -39,3 +39,10 @@ testem.log
 Thumbs.db
 
 .nx/cache
+
+# Project planning (private notes)
+PLAN.md
+NX_GENERATORS_GUIDE.md
+SETUP.md
+
+# Keep DECISIONS.md tracked - it explains our choices to reviewers
