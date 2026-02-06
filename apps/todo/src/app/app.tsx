@@ -1,19 +1,47 @@
-import TodoLists from './TodoLists';
+import TodoLists from './component/TodoLists';
+import TodoListForm from './component/TodoListForm';
+import { useTodoListsData } from './hooks/useTodoListsData';
+import Container from './component/Container';
+import Header from './component/Header';
 
-export function App() {
+function App() {
+  const {
+    todoLists,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    handleCreateList,
+    handleDeleteList,
+    handleAddTodo,
+    handleToggleTodo,
+    handleDeleteTodo,
+    createListMutationIsPending,
+  } = useTodoListsData();
+
   return (
     <div className="min-h-screen bg-base-bg py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <header className="mb-8 text-center">
-          <h1 className="text-5xl font-bold text-dark-bg mb-2">
-            Todo Lists
-          </h1>
-          <p className="text-secondary-dark-bg text-lg">
-            Organize your tasks efficiently
-          </p>
-        </header>
-        <TodoLists />
-      </div>
+      <main className="max-w-6xl mx-auto px-4">
+        <Header />
+        <Container className="space-y-6">
+          <TodoListForm
+            onSubmit={handleCreateList}
+            isSubmitting={createListMutationIsPending}
+          />
+
+          <TodoLists
+            todoLists={todoLists}
+            isLoading={isLoading}
+            isError={isError}
+            error={error}
+            refetch={refetch}
+            handleDeleteList={handleDeleteList}
+            handleAddTodo={handleAddTodo}
+            handleToggleTodo={handleToggleTodo}
+            handleDeleteTodo={handleDeleteTodo}
+          />
+        </Container>
+      </main>
     </div>
   );
 }
