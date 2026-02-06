@@ -1,6 +1,12 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document, Types } from 'mongoose';
+import { TodoItem } from '@fyltura/types';
 
-const todoSchema = new Schema(
+interface ITodoDocument extends Omit<TodoItem, 'id' | 'todolistId'>, Document {
+    _id: Types.ObjectId;
+    todolistId: Types.ObjectId;
+}
+
+const todoSchema = new Schema<ITodoDocument>(
   {
     name: { type: String, required: true },
     isDone: { type: Boolean, default: false },
@@ -12,13 +18,19 @@ const todoSchema = new Schema(
   },
   {
     toJSON: {
-      transform: (_, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
+      transform: (_, ret: ITodoDocument) => {
+        const todoItem: TodoItem = {
+          id: ret._id.toString(),
+          name: ret.name,
+          isDone: ret.isDone,
+          todolistId: ret.todolistId.toString(),
+        };
+        return todoItem;
       },
+      virtuals: true,
     },
+    toObject: { virtuals: true },
   }
 );
 
-export const Todo = model('Todo', todoSchema);
+export const Todo = model<ITodoDocument>('Todo', todoSchema);
