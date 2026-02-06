@@ -115,7 +115,9 @@ describe('TodoController', () => {
 
     expect(TodoRepository.create).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Missing required fields: todolistId, name' });
+    expect(res.json).toHaveBeenCalledWith({
+      fields: [{ field: 'name', value: '' }]
+    });
   });
 
   it('should return 400 if missing todolistId in create', async () => {
@@ -124,7 +126,9 @@ describe('TodoController', () => {
 
     expect(TodoRepository.create).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Missing required fields: todolistId, name' });
+    expect(res.json).toHaveBeenCalledWith({
+      fields: [{ field: 'todolistId', value: '' }]
+    });
   });
 
   it('should handle error when creating todo', async () => {
@@ -148,7 +152,7 @@ describe('TodoController', () => {
 
     await TodoController.update(req, res);
 
-    expect(TodoRepository.update).toHaveBeenCalledWith(todoId, 'Updated Name', true);
+    expect(TodoRepository.update).toHaveBeenCalledWith(todoId, { name: 'Updated Name', isDone: true });
     expect(res.json).toHaveBeenCalledWith(updatedTodo);
   });
 
@@ -159,7 +163,7 @@ describe('TodoController', () => {
 
     await TodoController.update(req, res);
 
-    expect(TodoRepository.update).toHaveBeenCalledWith(todoId, 'Updated Name', undefined);
+    expect(TodoRepository.update).toHaveBeenCalledWith(todoId, { name: 'Updated Name' });
     expect(res.status).toHaveBeenCalledWith(404);
     expect(res.json).toHaveBeenCalledWith({ message: 'Todo not found' });
   });
@@ -171,7 +175,9 @@ describe('TodoController', () => {
 
     expect(TodoRepository.update).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ message: 'No fields provided for update' });
+    expect(res.json).toHaveBeenCalledWith({
+      fields: [{ field: '', value: '' }]
+    });
   });
 
   it('should handle error when updating todo', async () => {
@@ -182,7 +188,7 @@ describe('TodoController', () => {
 
     await TodoController.update(req, res);
 
-    expect(TodoRepository.update).toHaveBeenCalledWith(todoId, 'Updated Name', undefined);
+    expect(TodoRepository.update).toHaveBeenCalledWith(todoId, { name: 'Updated Name' });
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ message: 'Error updating todo', error: errorMessage });
   });

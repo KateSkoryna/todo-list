@@ -36,15 +36,14 @@ describe('TodolistController', () => {
   });
 
 
-  it('should get all todolists', async () => {
-    const todolists = [{ id: todolistId, name: 'Test Todolist', userId: 1 }];
-    (TodolistRepository.findAll as jest.Mock).mockResolvedValue(todolists);
-
+  it('should return 400 if userId not provided', async () => {
     await TodolistController.getAll(req, res);
 
-    expect(TodolistRepository.findAll).toHaveBeenCalledWith(undefined);
-    expect(res.json).toHaveBeenCalledWith(todolists);
-    expect(res.status).not.toHaveBeenCalledWith(500);
+    expect(TodolistRepository.findAll).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      fields: [{ field: 'userId', value: '' }]
+    });
   });
 
   it('should get all todolists filtered by userId', async () => {
@@ -59,12 +58,13 @@ describe('TodolistController', () => {
   });
 
   it('should handle error when getting all todolists', async () => {
+    req.query.userId = '1';
     const errorMessage = 'Database error';
     (TodolistRepository.findAll as jest.Mock).mockRejectedValue(new Error(errorMessage));
 
     await TodolistController.getAll(req, res);
 
-    expect(TodolistRepository.findAll).toHaveBeenCalledWith(undefined);
+    expect(TodolistRepository.findAll).toHaveBeenCalledWith(1);
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ message: 'Error fetching todolists', error: errorMessage });
   });
@@ -123,7 +123,9 @@ describe('TodolistController', () => {
 
     expect(TodolistRepository.create).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Missing required fields: name, userId' });
+    expect(res.json).toHaveBeenCalledWith({
+      fields: [{ field: 'name', value: '' }]
+    });
   });
 
   it('should return 400 if missing userId in create', async () => {
@@ -132,7 +134,9 @@ describe('TodolistController', () => {
 
     expect(TodolistRepository.create).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Missing required fields: name, userId' });
+    expect(res.json).toHaveBeenCalledWith({
+      fields: [{ field: 'userId', value: '' }]
+    });
   });
 
   it('should handle error when creating todolist', async () => {
@@ -179,7 +183,9 @@ describe('TodolistController', () => {
 
     expect(TodolistRepository.update).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Missing required field: name' });
+    expect(res.json).toHaveBeenCalledWith({
+      fields: [{ field: 'name', value: '' }]
+    });
   });
 
   it('should handle error when updating todolist', async () => {
