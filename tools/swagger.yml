@@ -124,8 +124,7 @@ components:
       description: id to update
       required: true
       schema:
-        type: integer
-        format: int64
+        type: string
   requestBodies:
     Todolist:
       content:

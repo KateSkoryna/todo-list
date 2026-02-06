@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { TodoRepository } from '../repositories/todo.repository';
+import { createValidationError } from '../utils/errors';
+import mongoose from 'mongoose';
 
 export const TodoController = {
   getAll: async (req: Request, res: Response) => {
@@ -14,6 +16,11 @@ export const TodoController = {
   getById: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json(createValidationError([{ field: 'id', value: id }]));
+      }
+
       const todo = await TodoRepository.findById(id);
       if (!todo) {
         return res.status(404).json({ message: 'Todo not found' });
@@ -27,9 +34,22 @@ export const TodoController = {
   create: async (req: Request, res: Response) => {
     try {
       const { todolistId, name, isDone } = req.body;
-      if (!todolistId || !name) {
-        return res.status(400).json({ message: 'Missing required fields: todolistId, name' });
+      const errors = [];
+
+      if (!todolistId) {
+        errors.push({ field: 'todolistId', value: todolistId });
+      } else if (!mongoose.Types.ObjectId.isValid(todolistId)) {
+        errors.push({ field: 'todolistId', value: todolistId });
       }
+
+      if (!name) {
+        errors.push({ field: 'name', value: name });
+      }
+
+      if (errors.length > 0) {
+        return res.status(400).json(createValidationError(errors));
+      }
+
       const newTodo = await TodoRepository.create(todolistId, name, isDone);
       res.status(201).json(newTodo);
     } catch (error) {
@@ -41,11 +61,20 @@ export const TodoController = {
     try {
       const { id } = req.params;
       const { name, isDone } = req.body;
-      // Partial update check: at least one field should be present for update
-      if (name === undefined && isDone === undefined) {
-        return res.status(400).json({ message: 'No fields provided for update' });
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json(createValidationError([{ field: 'id', value: id }]));
       }
-      const updatedTodo = await TodoRepository.update(id, name, isDone);
+
+      if (name === undefined && isDone === undefined) {
+        return res.status(400).json(createValidationError([{ field: '', value: '' }]));
+      }
+
+      const updates: { name?: string; isDone?: boolean } = {};
+      if (name !== undefined) updates.name = name;
+      if (isDone !== undefined) updates.isDone = isDone;
+
+      const updatedTodo = await TodoRepository.update(id, updates);
       if (!updatedTodo) {
         return res.status(404).json({ message: 'Todo not found' });
       }
@@ -58,6 +87,11 @@ export const TodoController = {
   delete: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+
+      if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json(createValidationError([{ field: 'id', value: id }]));
+      }
+
       const deletedTodo = await TodoRepository.delete(id);
       if (!deletedTodo) {
         return res.status(404).json({ message: 'Todo not found' });
