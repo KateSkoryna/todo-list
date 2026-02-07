@@ -16,7 +16,8 @@
     "test:unit:be": "nx test todo-be",
     "test:unit": "nx run-many --target=test",
     "test:e2e:watch": "nx e2e todo-e2e --watch",
-    "lint": "nx lint"
+    "lint": "nx lint",
+    "all": "npm run docker:mongodb & npm run serve:be & npm run serve:fe"
   },
   "private": true,
   "dependencies": {
@@ -28,6 +29,7 @@
     "mongoose": "7.6.8",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-router-dom": "^7.13.0",
     "regenerator-runtime": "0.13.11",
     "swagger-ui-express": "^5.0.1",
     "tslib": "2.5.0",
