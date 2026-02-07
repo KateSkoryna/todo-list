@@ -7,17 +7,15 @@ interface User {
 
 interface DropdownProps {
   users: User[];
-  onSelectUser: (userId: string) => void;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ users, onSelectUser }) => {
+const Dropdown: React.FC<DropdownProps> = ({ users }) => {
   const navigate = useNavigate();
   const { userId } = useParams<{ userId: string }>();
 
   const selectedUser = users.find((u) => u.id === userId);
 
   const handleItemClick = (user: User) => {
-    onSelectUser(user.id);
     navigate(`/users/${user.id}`);
 
     const detailsElement = document.querySelector('details');
@@ -51,7 +49,10 @@ const Dropdown: React.FC<DropdownProps> = ({ users, onSelectUser }) => {
               onClick={() => handleItemClick(user)}
               className="hover:bg-gray-100 transition-colors"
             >
-              <label className="flex items-center px-4 py-2 text-sm text-dark-bg cursor-pointer w-full">
+              <label
+                htmlFor={user.id}
+                className="flex items-center px-4 py-2 text-sm text-dark-bg cursor-pointer w-full"
+              >
                 <input
                   type="radio"
                   name="user-selection"
