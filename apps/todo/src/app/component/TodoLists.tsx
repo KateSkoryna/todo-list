@@ -15,6 +15,7 @@ interface TodoListsProps {
   handleAddTodo: (todolistId: string, name: string) => void;
   handleToggleTodo: (id: string) => void;
   handleDeleteTodo: (id: string) => void;
+  handleEditTodo: (id: string, newName: string) => void;
 }
 
 function TodoLists({
@@ -27,6 +28,7 @@ function TodoLists({
   handleAddTodo,
   handleToggleTodo,
   handleDeleteTodo,
+  handleEditTodo,
 }: TodoListsProps) {
   if (isLoading) {
     return <Loader message="Loading todo lists..." />;
@@ -46,7 +48,11 @@ function TodoLists({
     <Container className="space-y-6">
       {todoLists?.length === 0 ? (
         <Container className="bg-white rounded-lg shadow-lg p-12 text-center border-2 border-secondary-bg">
-          <Text as="p" className="text-xl text-dark-bg">
+          <Text
+            as="p"
+            className="text-xl text-dark-bg"
+            dataTestId="empty-todolists-message"
+          >
             No todo lists yet. Create one above to get started!
           </Text>
         </Container>
@@ -60,6 +66,8 @@ function TodoLists({
               onToggleTodo={handleToggleTodo}
               onDeleteTodo={handleDeleteTodo}
               onDeleteList={handleDeleteList}
+              onEditTodo={handleEditTodo}
+              dataTestId={'todolist-item-' + list.id}
             />
           ))}
         </Container>
