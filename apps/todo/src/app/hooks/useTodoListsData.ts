@@ -1,6 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
-import { TodoList as TodoListType } from '@fyltura/types';
-import { getTodoListsFetcher } from '../fetchers/todolist';
 import {
   useCreateListMutation,
   useDeleteListMutation,
@@ -8,6 +5,7 @@ import {
   useToggleTodoMutation,
   useDeleteTodoMutation,
   useEditTodoMutation,
+  useTodoListsQuery,
 } from '../fetchers/api';
 
 export const useTodoListsData = (userId: number) => {
@@ -17,10 +15,7 @@ export const useTodoListsData = (userId: number) => {
     isError,
     error,
     refetch,
-  } = useQuery<TodoListType[], Error>({
-    queryKey: ['todoLists', userId],
-    queryFn: () => getTodoListsFetcher(userId),
-  });
+  } = useTodoListsQuery(userId);
 
   const createListMutation = useCreateListMutation(userId);
   const deleteListMutation = useDeleteListMutation(userId);
