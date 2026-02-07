@@ -1,47 +1,31 @@
-import TodoLists from './component/TodoLists';
-import TodoListForm from './component/TodoListForm';
-import { useTodoListsData } from './hooks/useTodoListsData';
-import Container from './component/Container';
-import Header from './component/Header';
+import { useParams, useNavigate } from 'react-router-dom';
+import Container from './component/elements/Container';
+import Header from './component/elements/Header';
+import Dropdown from './component/elements/Dropdown';
+import TodoContainer from './component/todo/todoContainer';
 
 function App() {
-  const {
-    todoLists,
-    isLoading,
-    isError,
-    error,
-    refetch,
-    handleCreateList,
-    handleDeleteList,
-    handleAddTodo,
-    handleToggleTodo,
-    handleDeleteTodo,
-    handleEditTodo,
-    createListMutationIsPending,
-  } = useTodoListsData();
+  const { userId } = useParams<{ userId: string }>();
+  const navigate = useNavigate();
+  const parsedUserId = userId ? parseInt(userId) : undefined;
+
+  // Dummy user data for demonstration
+  const users = [
+    { id: '1', name: 'Alice' },
+    { id: '2', name: 'Bob' },
+    { id: '3', name: 'Charlie' },
+  ];
 
   return (
     <div className="min-h-screen bg-base-bg py-8">
       <main className="max-w-6xl mx-auto px-4">
         <Header />
         <Container className="space-y-6">
-          <TodoListForm
-            onSubmit={handleCreateList}
-            isSubmitting={createListMutationIsPending}
+          <Dropdown
+            users={users}
+            onSelectUser={(id) => navigate(`/users/${id}`)}
           />
-
-          <TodoLists
-            todoLists={todoLists}
-            isLoading={isLoading}
-            isError={isError}
-            error={error}
-            refetch={refetch}
-            handleDeleteList={handleDeleteList}
-            handleAddTodo={handleAddTodo}
-            handleToggleTodo={handleToggleTodo}
-            handleDeleteTodo={handleDeleteTodo}
-            handleEditTodo={handleEditTodo}
-          />
+          {parsedUserId && <TodoContainer userId={parsedUserId} />}
         </Container>
       </main>
     </div>
