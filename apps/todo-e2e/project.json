@@ -9,12 +9,24 @@
       "options": {
         "cypressConfig": "apps/todo-e2e/cypress.config.ts",
         "devServerTarget": "todo:serve:development",
-        "testingType": "e2e"
+        "testingType": "e2e",
+        "webServerCommands": {
+          "default": "nx run todo-be:serve"
+        }
       },
       "configurations": {
         "production": {
           "devServerTarget": "todo:serve:production"
         }
+      }
+    },
+    "e2e-ci": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/todo-e2e/cypress.config.ts",
+        "testingType": "e2e",
+        "baseUrl": "http://localhost:4200",
+        "spec": "apps/todo-e2e/src/e2e/todolist.cy.ts,apps/todo-e2e/src/e2e/todo.cy.ts"
       }
     },
     "lint": {
