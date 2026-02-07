@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Input from '../elements/Input';
 import Button from '../elements/Button';
 import Text from '../elements/Text';
+import { useParams } from 'react-router-dom';
 
 type TodoListFormProps = {
   onSubmit: (name: string) => void;
@@ -14,6 +15,7 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
 }: TodoListFormProps) => {
   const [newListName, setNewListName] = useState('');
   const [error, setError] = useState('');
+  const { userId } = useParams<{ userId: string }>();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +28,11 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
     setNewListName('');
   };
 
+  useEffect(() => {
+    setNewListName('');
+    setError('');
+  }, [userId]);
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -35,9 +42,9 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
         Create New List
       </Text>
       <div className="flex flex-col sm:flex-row gap-3 items-baseline">
-        <label htmlFor="new-list-name" className="text-dark-bg font-medium">
-          New List Name:
-        </label>
+        <Text as="p" className="text-dark-bg font-medium">
+          List Name:
+        </Text>
         <Input
           type="text"
           value={newListName}
@@ -48,6 +55,7 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
           placeholder="Enter list name..."
           className="flex-1 px-4 py-3 rounded-lg border-2 border-secondary-bg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent bg-base-bg text-dark-bg placeholder-secondary-dark-bg"
           inputTestId="todolist-form-input"
+          id="todolist-form-input"
         />
         <Button
           type="submit"
