@@ -10,9 +10,7 @@ import {
   useEditTodoMutation,
 } from '../fetchers/api';
 
-const USER_ID = 1;
-
-export const useTodoListsData = () => {
+export const useTodoListsData = (userId: number) => {
   const {
     data: todoLists,
     isLoading,
@@ -20,16 +18,16 @@ export const useTodoListsData = () => {
     error,
     refetch,
   } = useQuery<TodoListType[], Error>({
-    queryKey: ['todoLists', USER_ID],
-    queryFn: () => getTodoListsFetcher(USER_ID),
+    queryKey: ['todoLists', userId],
+    queryFn: () => getTodoListsFetcher(userId),
   });
 
-  const createListMutation = useCreateListMutation(USER_ID);
-  const deleteListMutation = useDeleteListMutation(USER_ID);
-  const addTodoMutation = useAddTodoMutation(USER_ID);
-  const toggleTodoMutation = useToggleTodoMutation(USER_ID);
-  const deleteTodoMutation = useDeleteTodoMutation(USER_ID);
-  const editTodoMutation = useEditTodoMutation(USER_ID);
+  const createListMutation = useCreateListMutation(userId);
+  const deleteListMutation = useDeleteListMutation(userId);
+  const addTodoMutation = useAddTodoMutation(userId);
+  const toggleTodoMutation = useToggleTodoMutation(userId);
+  const deleteTodoMutation = useDeleteTodoMutation(userId);
+  const editTodoMutation = useEditTodoMutation(userId);
 
   const handleCreateList = (name: string) => {
     createListMutation.mutate(name);
