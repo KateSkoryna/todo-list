@@ -108,7 +108,7 @@ paths:
     delete:
       tags:
         - Todos
-      summary: Delete existing todolist
+      summary: Delete existing Todo
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -116,136 +116,86 @@ paths:
           $ref: '#/components/responses/204'
         default:
           $ref: '#/components/responses/default'
+
 components:
   parameters:
     id:
       name: id
       in: path
-      description: id to update
+      description: ID of the resource
       required: true
       schema:
-        type: string
+        type: integer
+        format: int64
+
   requestBodies:
-    Todolist:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Todolist'
-    UpdateTodolist:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UpdateTodolist'
     NewTodolist:
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/NewTodolist'
-    Todo:
+    UpdateTodolist:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Todo'
-    UpdateTodo:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UpdateTodo'
+            $ref: '#/components/schemas/UpdateTodolist'
     NewTodo:
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/NewTodo'
-  responses:
-    default:
-      description: >-
-        default status codes for type of request. numbered responses are 204,
-        400 or 404
-    204:
-      description: No Content, returned on successful delete
-    404:
-      description: No Content, returned if object not found
-    Todolists:
-      content:
-        application/json:
-          schema:
-            items:
-              $ref: '#/components/schemas/Todolist'
-            type: array
-      description: Array of Todolist
-    Todos:
-      content:
-        application/json:
-          schema:
-            items:
-              $ref: '#/components/schemas/Todo'
-            type: array
-      description: Array of Todos
-    Todolist:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Todolist'
-      description: Single Todolist
-    UpdateTodolist:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UpdateTodolist'
-      description: Single Todolist
-    NewTodolist:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NewTodolist'
-      description: Single Todolist
-    Todo:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Todo'
-      description: Single Todo
     UpdateTodo:
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/UpdateTodo'
-      description: Single Todo
+
+  responses:
+    default:
+      description: Unexpected error
+    204:
+      description: No Content, successful deletion
+    Todolists:
+      description: A list of Todolists
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Todolist'
+    Todolist:
+      description: A single Todolist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Todolist'
+    Todos:
+      description: A list of Todos
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Todo'
+    Todo:
+      description: A single Todo
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Todo'
     Errors:
+      description: Validation failed
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Errors'
-      description: Validation Failed, incoming data cannot be saved
+
   schemas:
-    Errors:
-      properties:
-        fields:
-          items:
-            $ref: '#/components/schemas/FieldError'
-          nullable: false
-          type: array
-      type: object
-    FieldError:
-      properties:
-        field:
-          description: >
-            Field name that is in state error. The field name can be an empty
-            string in case the error is not field related, e.g. a json parse
-            error.
-          nullable: false
-          type: string
-        value:
-          description: The supplied value that is wrong as a string representation.
-          nullable: false
-          type: string
-      type: object
     Todolist:
       type: object
-      description: A list that contains multiple todos
       properties:
         id:
-          type: string
+          type: integer
         name:
           type: string
         userId:
@@ -254,78 +204,70 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Todo'
-      example:
-        id: "65c2f..."
-        name: Shopping List
-        userId: 1
-        todos: []
-      NewTodolist:
+
+    NewTodolist:
       type: object
-      description: A list that contains multiple todos
+      required:
+        - name
+        - userId
       properties:
         name:
           type: string
         userId:
           type: integer
-      required:
-        - name
-        - userId
-      example:
-        name: Shopping List
-        userId: 1
+
     UpdateTodolist:
       type: object
-      description: A list that contains multiple todos
       properties:
         name:
           type: string
-      example:
-        name: Grocery List
+
     Todo:
       type: object
-      description: A todo
       properties:
         id:
-          type: string
+          type: integer
         todolistId:
-          description: related Todolist id
-          type: string
+          type: integer
         name:
           type: string
         isDone:
           type: boolean
-      example:
-        id: "65c2g..."
-        todolistId: "65c2f..."
-        name: Buy cheese
-        isDone: false
-    UpdateTodo:
-      type: object
-      description: A todo
-      properties:
-        name:
-          type: string
-        isDone:
-          type: boolean
-      example:
-        name: Buy cheese
-        isDone: true
+
     NewTodo:
       type: object
-      description: A new todo
+      required:
+        - todolistId
+        - name
       properties:
         todolistId:
-          description: related Todolist id
-          type: string
+          type: integer
         name:
           type: string
         isDone:
           type: boolean
           default: false
-      required:
-        - todolistId
-        - name
-      example:
-        todolistId: "65c2f..."
-        name: Buy cheese
-        isDone: false
+
+    UpdateTodo:
+      type: object
+      properties:
+        name:
+          type: string
+        isDone:
+          type: boolean
+
+    Errors:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldError'
+
+    FieldError:
+      type: object
+      properties:
+        field:
+          type: string
+        value:
+          type: string
