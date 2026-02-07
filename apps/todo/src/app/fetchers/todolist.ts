@@ -61,12 +61,12 @@ export const createTodoFetcher = async (
 // Toggle todo completion
 export const updateTodoFetcher = async (
   id: string,
-  isDone: boolean
+  data: { name?: string; isDone?: boolean }
 ): Promise<TodoItemType> => {
   const response = await fetch(`${API_BASE}/todos/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ isDone }),
+    body: JSON.stringify(data),
   });
   if (!response.ok) {
     throw new Error('Failed to update todo');

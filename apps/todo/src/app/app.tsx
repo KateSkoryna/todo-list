@@ -16,6 +16,7 @@ function App() {
     handleAddTodo,
     handleToggleTodo,
     handleDeleteTodo,
+    handleEditTodo,
     createListMutationIsPending,
   } = useTodoListsData();
 
@@ -39,6 +40,7 @@ function App() {
             handleAddTodo={handleAddTodo}
             handleToggleTodo={handleToggleTodo}
             handleDeleteTodo={handleDeleteTodo}
+            handleEditTodo={handleEditTodo}
           />
         </Container>
       </main>

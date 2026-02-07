@@ -55,12 +55,25 @@ export const useAddTodoMutation = (userId: number) => {
 export const useToggleTodoMutation = (userId: number) => {
   const queryClient = useQueryClient();
   return useMutation<TodoItemType, Error, { id: string; isDone: boolean }>({
-    mutationFn: ({ id, isDone }) => updateTodoFetcher(id, isDone),
+    mutationFn: ({ id, isDone }) => updateTodoFetcher(id, { isDone }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todoLists', userId] });
     },
     onError: (err) => {
       console.error('Error updating todo:', err);
+    },
+  });
+};
+
+export const useEditTodoMutation = (userId: number) => {
+  const queryClient = useQueryClient();
+  return useMutation<TodoItemType, Error, { id: string; name: string }>({
+    mutationFn: ({ id, name }) => updateTodoFetcher(id, { name }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todoLists', userId] });
+    },
+    onError: (err) => {
+      console.error('Error editing todo:', err);
     },
   });
 };

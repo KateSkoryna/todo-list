@@ -7,6 +7,7 @@ import {
   useAddTodoMutation,
   useToggleTodoMutation,
   useDeleteTodoMutation,
+  useEditTodoMutation,
 } from '../fetchers/api';
 
 const USER_ID = 1;
@@ -28,6 +29,7 @@ export const useTodoListsData = () => {
   const addTodoMutation = useAddTodoMutation(USER_ID);
   const toggleTodoMutation = useToggleTodoMutation(USER_ID);
   const deleteTodoMutation = useDeleteTodoMutation(USER_ID);
+  const editTodoMutation = useEditTodoMutation(USER_ID);
 
   const handleCreateList = (name: string) => {
     createListMutation.mutate(name);
@@ -54,6 +56,10 @@ export const useTodoListsData = () => {
     deleteTodoMutation.mutate(id);
   };
 
+  const handleEditTodo = (id: string, name: string) => {
+    editTodoMutation.mutate({ id, name });
+  };
+
   return {
     todoLists,
     isLoading,
@@ -65,6 +71,7 @@ export const useTodoListsData = () => {
     handleAddTodo,
     handleToggleTodo,
     handleDeleteTodo,
+    handleEditTodo,
     createListMutationIsPending: createListMutation.isPending,
   };
 };
