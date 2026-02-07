@@ -13,13 +13,17 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
   isSubmitting,
 }: TodoListFormProps) => {
   const [newListName, setNewListName] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newListName.trim()) {
-      onSubmit(newListName.trim());
-      setNewListName('');
+    if (!newListName.trim()) {
+      setError('Todo list name cannot be empty.');
+      return;
     }
+    setError('');
+    onSubmit(newListName.trim());
+    setNewListName('');
   };
 
   return (
@@ -37,18 +41,28 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
         <Input
           type="text"
           value={newListName}
-          onChange={(e) => setNewListName(e.target.value)}
+          onChange={(e) => {
+            setNewListName(e.target.value);
+            setError('');
+          }}
           placeholder="Enter list name..."
           className="flex-1 px-4 py-3 rounded-lg border-2 border-secondary-bg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent bg-base-bg text-dark-bg placeholder-secondary-dark-bg"
+          inputTestId="todolist-form-input"
         />
         <Button
           type="submit"
           className="px-6 py-3 bg-accent text-black font-semibold rounded-lg hover:bg-dark-bg hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
           disabled={isSubmitting}
+          dataTestId="todolist-form-submit-button"
         >
           {isSubmitting ? 'Creating...' : 'Create List'}
         </Button>
       </div>
+      {error && (
+        <Text as="p" className="text-red-500 mt-2" dataTestId="todolist-form-error">
+          {error}
+        </Text>
+      )}
     </form>
   );
 };
