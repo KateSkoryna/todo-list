@@ -14,10 +14,16 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
 }) => {
   return (
     <div className={`bg-dark-bg text-white p-6 rounded-lg ${className}`}>
-      <Text as="h2" className="text-xl font-bold mb-2">
+      <Text
+        as="h2"
+        className="text-xl font-bold mb-2"
+        dataTestId="error-title"
+      >
         Something went wrong!
       </Text>
-      <Text as="p">{error.message}</Text>
+      <Text as="p" dataTestId="error-message">
+        {error.message}
+      </Text>
       {resetErrorBoundary && (
         <Button
           onClick={resetErrorBoundary}

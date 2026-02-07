@@ -4,6 +4,7 @@ type ButtonProps = {
   children: React.ReactNode;
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
+  dataTestId?: string;
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -12,6 +13,7 @@ const Button: React.FC<ButtonProps> = ({
   children,
   type = 'button',
   disabled = false,
+  dataTestId,
 }) => {
   return (
     <button
@@ -19,6 +21,7 @@ const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
       className={className}
       disabled={disabled}
+      data-testid={dataTestId}
     >
       {children}
     </button>

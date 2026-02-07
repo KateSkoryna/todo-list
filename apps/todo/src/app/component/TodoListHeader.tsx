@@ -29,19 +29,26 @@ const TodoListHeader: React.FC<TodoListHeaderProps> = ({
         >
           {isExpanded ? '▼' : '▶'}
         </Button>
-        <Text as="h2" className="text-2xl font-bold">
+        <Text
+          as="h2"
+          className="text-2xl font-bold"
+          dataTestId="todolist-title"
+        >
           {todoList.name}
         </Text>
         <Text as="span" className="text-white text-sm">
           {completedCount}/{totalCount} completed
         </Text>
       </div>
-      <Button
-        onClick={() => onDeleteList(todoList.id)}
-        className="px-4 py-2 bg-secondary-bg text-black rounded hover:bg-accent hover:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-dark-bg"
-      >
-        Delete List
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button
+          onClick={() => onDeleteList(todoList.id)}
+          className="px-4 py-2 bg-secondary-bg text-black rounded hover:bg-accent hover:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-dark-bg"
+          dataTestId="todolist-item-delete-button"
+        >
+          Delete List
+        </Button>
+      </div>
     </div>
   );
 };
