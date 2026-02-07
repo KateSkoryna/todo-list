@@ -1,8 +1,8 @@
 import TodoList from './TodoList';
-import Text from './Text';
-import Loader from './Loader';
-import ErrorFallback from './ErrorFallback';
-import Container from './Container';
+import Text from '../elements/Text';
+import Loader from '../elements/Loader';
+import ErrorFallback from '../elements/ErrorFallback';
+import Container from '../elements/Container';
 import { TodoList as TodoListType } from '@fyltura/types';
 
 interface TodoListsProps {

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import Input from './Input';
-import Button from './Button';
-import Text from './Text';
+import { useState } from 'react';
+import Input from '../elements/Input';
+import Button from '../elements/Button';
+import Text from '../elements/Text';
 
 type TodoListFormProps = {
   onSubmit: (name: string) => void;
@@ -59,7 +59,11 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
         </Button>
       </div>
       {error && (
-        <Text as="p" className="text-red-500 mt-2" dataTestId="todolist-form-error">
+        <Text
+          as="p"
+          className="text-red-500 mt-2"
+          dataTestId="todolist-form-error"
+        >
           {error}
         </Text>
       )}

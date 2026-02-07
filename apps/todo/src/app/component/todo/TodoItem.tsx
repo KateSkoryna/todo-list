@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { TodoItem as TodoItemType } from '@fyltura/types';
-import Button from './Button';
-import Text from './Text';
-import Input from './Input';
+import Button from '../elements/Button';
+import Text from '../elements/Text';
+import Input from '../elements/Input';
 
 interface TodoItemProps {
   todo: TodoItemType;

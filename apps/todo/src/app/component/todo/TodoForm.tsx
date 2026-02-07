@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import Input from './Input';
-import Button from './Button';
+import Input from '../elements/Input';
+import Button from '../elements/Button';
 
 type FormProps = {
   onAddTodo: (name: string) => void;

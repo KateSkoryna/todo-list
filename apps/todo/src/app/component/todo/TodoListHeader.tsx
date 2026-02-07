@@ -1,7 +1,7 @@
 import React from 'react';
 import { TodoList as TodoListType } from '@fyltura/types';
-import Button from './Button';
-import Text from './Text';
+import Button from '../elements/Button';
+import Text from '../elements/Text';
 
 interface TodoListHeaderProps {
   todoList: TodoListType;

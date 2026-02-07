@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { TodoList as TodoListType } from '@fyltura/types';
 import TodoItem from './TodoItem';
 import TodoForm from './TodoForm';
-import Text from './Text';
+import Text from '../elements/Text';
 import TodoListHeader from './TodoListHeader';
 
 interface TodoListProps {
