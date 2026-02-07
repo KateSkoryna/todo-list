@@ -33,6 +33,7 @@ const Input: React.FC<InputProps> = ({
         <label
           className="block text-sm font-medium text-dark-bg mb-1"
           data-testid={labelTestId}
+          htmlFor={id}
         >
           {label}
         </label>
