@@ -1,3 +1,12 @@
+# My Project Notes
+
+- Styling: Used Tailwind CSS to simplify styling.
+- Data Fetching: Implemented TanstackReact Query for fetching data.
+- Navigation: Used React DOM for routing/navigation.
+- Database: Experimented with MongoDB as it was mentioned in the job description.
+- ToDo Functionality: Implemented an Edit ToDo feature. Attempted to write E2E tests for it, but the tests kept failing. Due to time constraints, E2E tests for editing functionality were not completed.
+- Thanks for this project!
+
 # Full-Stack React-Express Project
 
 This task covers React basics together with Node.js/Express as well as your testing skills.
