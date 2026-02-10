@@ -1,10 +1,10 @@
 {
-  "name": "fyltura",
+  "name": "todolist",
   "description": "Full-Stack Test with React and Express, build on Nx",
   "version": "0.1.1",
   "engines": {
-    "npm": ">=9.3.1 <=9.4.0",
-    "node": ">=18.14.0 <=19.6.0"
+    "npm": ">=9.3.1",
+    "node": "20.x"
   },
   "scripts": {
     "db:seed:mongodb": "ts-node tools/mongodb",
