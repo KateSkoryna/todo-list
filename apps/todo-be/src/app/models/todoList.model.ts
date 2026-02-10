@@ -1,5 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import { TodoList, TodoItem } from '@fyltura/types'; // Correct import name and alias
+import { TodoList, TodoItem } from '@fyltura/types';
 
 interface ITodolistDocument extends Omit<TodoList, 'id'>, Document {
   _id: Types.ObjectId;

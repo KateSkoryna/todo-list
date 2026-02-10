@@ -56,7 +56,7 @@ app.get('/api/todos/:id', TodoController.getById);
 app.put('/api/todos/:id', TodoController.update);
 app.delete('/api/todos/:id', TodoController.delete);
 
-const port = process.env.port || 3333;
+const port = process.env.PORT || 3333;
 const server = app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`);
   console.log(`Swagger docs available at http://localhost:${port}/api-docs`);

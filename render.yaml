@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: todo-backend
+    env: node
+    region: frankfurt
+    plan: free
+    buildCommand: npm install && npx nx build todo-be --configuration=production
+    startCommand: node dist/apps/todo-be/main.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: DATABASE_NAME
+        sync: false
+      - key: PORT
+        value: 3333
