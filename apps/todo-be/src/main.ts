@@ -27,7 +27,7 @@ mongoose
   .connect(mongoUri)
   .then(() =>
     console.log(`Successfully connected to MongoDB to database: ${dbName}`)
-  ) // Log the database name
+  )
   .catch((err) => {
     console.error('Connection error', err);
     process.exit();

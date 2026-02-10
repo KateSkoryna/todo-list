@@ -2,8 +2,9 @@ import {
   TodoList as TodoListType,
   TodoItem as TodoItemType,
 } from '@fyltura/types';
+import { environment } from '../../environments/environment';
 
-const API_BASE = 'http://localhost:3333/api';
+const API_BASE = environment.apiUrl;
 
 // Fetch all todolists
 export const getTodoListsFetcher = async (
