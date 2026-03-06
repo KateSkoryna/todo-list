@@ -44,11 +44,11 @@ Thumbs.db
 
 .nx/cache
 
+# Git worktrees directory
+.worktrees/
+
 # Project planning (private notes)
 PLAN.md
-NX_GENERATORS_GUIDE.md
-SETUP.md
-DEPLOYMENT.md
+Explanations.md
 CLAUDE.md
-
-# Keep DECISIONS.md tracked - it explains our choices to reviewers
+WORKTREE.md

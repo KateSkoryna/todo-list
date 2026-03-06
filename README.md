@@ -1,11 +1,116 @@
-# My Project Notes
+# Todo List Application - Quick Reference
+
+## Project Structure
+
+### Backend Architecture (apps/todo-be/src/app/)
+```
+apps/todo-be/src/app/
+├── controllers/      # HTTP request handling, validation
+├── repositories/     # Database operations
+├── models/          # Mongoose schemas and models
+└── utils/           # Helper functions (error handling)
+```
+
+### Frontend Architecture (apps/todo/src/app/)
+```
+apps/todo/src/app/
+├── component/
+│   ├── elements/          # Reusable UI primitives
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
+│   │   ├── Text.tsx
+│   │   ├── Header.tsx
+│   │   ├── Container.tsx
+│   │   ├── Loader.tsx
+│   │   ├── ErrorFallback.tsx
+│   │   └── Dropdown.tsx
+│   └── todo/             # Feature-specific components
+│       ├── todoContainer.tsx  # Smart component (data logic)
+│       ├── TodoLists.tsx      # Presentation
+│       ├── TodoList.tsx
+│       ├── TodoListHeader.tsx
+│       ├── TodoListForm.tsx
+│       ├── TodoItem.tsx
+│       └── TodoForm.tsx
+├── fetchers/         # API client functions
+├── hooks/            # Custom React hooks (useTodoListsData)
+└── app.tsx
+```
+
+### Shared Libraries
+```
+libs/types/           # Shared TypeScript types between FE/BE
+```
+
+## API Endpoints
+
+```
+POST   /api/todolists       - Create todolist
+GET    /api/todolists       - Get all todolists (filtered by userId)
+GET    /api/todolists/:id   - Get single todolist
+PUT    /api/todolists/:id   - Update todolist
+DELETE /api/todolists/:id   - Delete todolist
+
+POST   /api/todos           - Create todo
+GET    /api/todos           - Get all todos
+PUT    /api/todos/:id       - Update todo
+DELETE /api/todos/:id       - Delete todo
+```
+
+## Key Technologies
+
+### Frontend
+- React 18.2.0 - UI framework
+- @tanstack/react-query 5.90.20 - Server state management
+- react-router-dom 7.13.0 - Client-side routing
+- tailwindcss 3.4.19 - Utility-first CSS
+
+### Backend
+- express 4.18.2 - Web framework
+- mongoose 7.6.8 - MongoDB ODM
+- cors 2.8.6 - CORS middleware
+- swagger-ui-express 5.0.1 - API documentation
+
+### Testing
+- jest - Unit testing
+- cypress - E2E testing
+- mongodb-memory-server - In-memory DB for tests
+- supertest - HTTP assertions
+
+## Running the Project
+
+```bash
+# Install dependencies
+npm install
+
+# Start MongoDB (Docker)
+npm run docker:mongodb
+
+# Start backend
+npm run serve:be
+
+# Start frontend
+npm run serve:fe
+
+# Run all (frontend + backend)
+npm run all
+
+# Run backend tests
+npm run test:unit:be
+
+# Run E2E tests
+npm run test:e2e:watch
+```
+
+## Notes
 
 - Styling: Used Tailwind CSS to simplify styling.
 - Data Fetching: Implemented TanstackReact Query for fetching data.
 - Navigation: Used React DOM for routing/navigation.
 - Database: Experimented with MongoDB as it was mentioned in the job description.
 - ToDo Functionality: Implemented an Edit ToDo feature. Attempted to write E2E tests for it, but the tests kept failing. Due to time constraints, E2E tests for editing functionality were not completed.
-- Thanks for this project!
+
+---
 
 # Full-Stack React-Express Project
 
