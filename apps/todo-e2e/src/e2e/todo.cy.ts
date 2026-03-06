@@ -105,6 +105,15 @@ describe('Todo Application', () => {
     });
 
     cy.get('div[data-testid^="todolist-item-"]').should('not.exist');
+
+    cy.get('body').then(() => {
+      cy.get('[data-testid="todolist-title"]')
+        .contains(todolistName)
+        .parents('div[data-testid^="todolist-item-"]')
+        .within(() => {
+          cy.get('button[data-testid="todolist-item-delete-button"]').click();
+        });
+    });
   });
 
   it('should display an error when trying to add a todo with an empty name', () => {

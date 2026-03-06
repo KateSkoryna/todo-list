@@ -11,17 +11,13 @@ describe('Todolist Application', () => {
   afterEach(() => {
     if (createdTodolistName) {
       cy.visit('/');
-      cy.get('body').then(($body) => {
-        if ($body.text().includes(createdTodolistName)) {
-          cy.get('[data-testid="todolist-title"]')
-            .contains(createdTodolistName)
-            .parents('div[data-testid^="todolist-item-"]')
-            .within(() => {
-              cy.get(
-                'button[data-testid="todolist-item-delete-button"]'
-              ).click();
-            });
-        }
+      cy.get('body').then(() => {
+        cy.get('[data-testid="todolist-title"]')
+          .contains(createdTodolistName)
+          .parents('div[data-testid^="todolist-item-"]')
+          .within(() => {
+            cy.get('button[data-testid="todolist-item-delete-button"]').click();
+          });
       });
     }
   });
@@ -69,9 +65,10 @@ describe('Todolist Application', () => {
   });
 
   it('should allow deleting a todolist', () => {
-    const todolistName = `Delete Test ${Date.now()}`;
+    const todolistName = `Todo Test ${Date.now()}`;
 
     cy.get('input[data-testid="todolist-form-input"]').type(todolistName);
+    cy.timeout(10000);
     cy.get('button[data-testid="todolist-form-submit-button"]').click();
     cy.contains(todolistName).should('exist');
 
