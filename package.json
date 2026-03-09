@@ -7,7 +7,6 @@
     "node": "20.x"
   },
   "scripts": {
-    "db:seed:mongodb": "ts-node tools/mongodb",
     "docker:mongodb": "docker-compose -f tools/mongodb/docker-compose.yml up",
     "serve:fe": "nx serve todo",
     "serve:be": "nx serve todo-be",
