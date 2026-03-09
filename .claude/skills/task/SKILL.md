@@ -26,7 +26,8 @@ When you invoke `/task <task-id>`:
 3. **Creates branch**: `task/<task-id>` from current main
 4. **Creates worktree**: `.worktrees/<task-id>/`
 5. **Sets up symlinks** for node_modules and .nx/cache (saves 631MB)
-6. **Reports success** with next steps
+6. **Copies .env** from main worktree to new worktree
+7. **Reports success** with next steps
 
 ## Implementation Steps
 
@@ -111,6 +112,19 @@ mkdir -p .nx
 cd .nx
 ln -s ../../../.nx/cache cache
 cd ..
+```
+
+### 6. Copy .env file from main
+
+```bash
+# Copy .env from main worktree
+if [ -f "/Users/kate/todo-list/.env" ]; then
+  cp /Users/kate/todo-list/.env .env
+  echo "✅ Copied .env from main"
+else
+  echo "⚠️  Warning: .env file not found in main worktree"
+  echo "   Expected: /Users/kate/todo-list/.env"
+fi
 
 echo ""
 echo "✅ Worktree created successfully!"
@@ -120,6 +134,7 @@ echo "  📁 Path: .worktrees/$ARGUMENTS"
 echo "  🌿 Branch: task/$ARGUMENTS"
 echo "  🔗 Symlinks: node_modules → ../../node_modules"
 echo "  🔗 Symlinks: .nx/cache → ../../../.nx/cache"
+echo "  📄 Environment: .env copied from main"
 echo ""
 echo "Next steps:"
 echo "  cd .worktrees/$ARGUMENTS"
@@ -128,7 +143,7 @@ echo ""
 echo "To switch back to main: cd /Users/kate/todo-list"
 ```
 
-### 6. Detect package.json changes (warning)
+### 7. Detect package.json changes (warning)
 
 ```bash
 # Check if main branch has uncommitted package.json changes
