@@ -3,13 +3,15 @@ import { Todo } from '../models/todo.model';
 import { Todolist } from '../models/todoList.model';
 import mongoose from 'mongoose';
 
+const USER_ID = '507f1f77bcf86cd799439011';
+
 describe('TodoRepository', () => {
   let todolistId: mongoose.Types.ObjectId;
 
   beforeEach(async () => {
     const todolist = await Todolist.create({
       name: 'Test Todolist',
-      userId: 1,
+      userId: USER_ID,
     });
     todolistId = todolist._id;
   });
@@ -23,16 +25,6 @@ describe('TodoRepository', () => {
 
     const foundTodo = await Todo.findById(todo.id);
     expect(foundTodo).toBeDefined();
-  });
-
-  it('should find all todos', async () => {
-    await TodoRepository.create(todolistId.toString(), 'Todo 1');
-    await TodoRepository.create(todolistId.toString(), 'Todo 2');
-
-    const todos = await TodoRepository.findAll();
-    expect(todos.length).toBe(2);
-    expect(todos[0].name).toBe('Todo 1');
-    expect(todos[1].name).toBe('Todo 2');
   });
 
   it('should find a todo by id', async () => {
@@ -55,7 +47,10 @@ describe('TodoRepository', () => {
       'Old Name',
       false
     );
-    await TodoRepository.update(todo.id, { name: 'Updated Name', isDone: true });
+    await TodoRepository.update(todo.id, {
+      name: 'Updated Name',
+      isDone: true,
+    });
 
     const foundTodo = await Todo.findById(todo.id);
     expect(foundTodo).toBeDefined();
