@@ -17,7 +17,7 @@ export interface UpdateTodoItem {
 // --- TODOLIST TYPES ---
 export interface NewTodoList {
   name: string;
-  userId: number;
+  userId: string;
 }
 
 export interface TodoList extends NewTodoList {
