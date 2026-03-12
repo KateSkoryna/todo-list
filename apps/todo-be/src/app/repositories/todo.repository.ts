@@ -1,5 +1,5 @@
 import { Todo } from '../models/todo.model';
-import { TodoItem } from '@fyltura/types';
+import { NewTodoItem, TodoItem, UpdateTodoItem } from '@fyltura/types';
 
 export const TodoRepository = {
   findById: async (id: string): Promise<TodoItem | null> => {
@@ -12,18 +12,19 @@ export const TodoRepository = {
 
   create: async (
     todolistId: string,
-    name: string,
-    isDone: boolean = false
+    newTodo: Omit<NewTodoItem, 'id' | 'todolistId'>
   ): Promise<TodoItem> => {
-    const doc = await Todo.create({ todolistId, name, isDone });
+    const doc = await Todo.create({ todolistId, ...newTodo });
     return doc.toJSON() as TodoItem;
   },
 
   update: async (
     id: string,
-    updates: { name?: string; isDone?: boolean }
+    updatedTodo: UpdateTodoItem
   ): Promise<TodoItem | null> => {
-    const doc = await Todo.findByIdAndUpdate(id, updates, { new: true }).exec();
+    const doc = await Todo.findByIdAndUpdate(id, updatedTodo, {
+      new: true,
+    }).exec();
     if (!doc) {
       return null;
     }

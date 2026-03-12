@@ -158,7 +158,6 @@ describe('API Integration Tests', () => {
       const todo = await Todo.create({
         name: 'Initial Todo',
         todolistId: new mongoose.Types.ObjectId(todolistId),
-        isDone: false,
       });
       todoId = todo._id.toString();
     });
@@ -172,7 +171,7 @@ describe('API Integration Tests', () => {
       expect(res.body).toHaveProperty('id');
       expect(res.body.name).toBe('Buy groceries');
       expect(res.body.todolistId).toBe(todolistId);
-      expect(res.body.isDone).toBe(false);
+      expect(res.body.status).toBe('pending');
 
       const dbTodo = await Todo.findById(res.body.id);
       expect(dbTodo).toBeDefined();
@@ -209,18 +208,17 @@ describe('API Integration Tests', () => {
 
     it('should update a todo', async () => {
       const updatedName = 'Updated Initial Todo';
-      const updatedIsDone = true;
       const res = await request(app)
         .put(`/api/users/me/todolists/${todolistId}/todos/${todoId}`)
-        .send({ name: updatedName, isDone: updatedIsDone });
+        .send({ name: updatedName, status: 'successful' });
 
       expect(res.statusCode).toEqual(200);
       expect(res.body.name).toBe(updatedName);
-      expect(res.body.isDone).toBe(updatedIsDone);
+      expect(res.body.status).toBe('successful');
 
       const dbTodo = await Todo.findById(todoId);
       expect(dbTodo?.name).toBe(updatedName);
-      expect(dbTodo?.isDone).toBe(updatedIsDone);
+      expect(dbTodo?.status).toBe('successful');
     });
 
     it('should return 404 if todo not found for update', async () => {

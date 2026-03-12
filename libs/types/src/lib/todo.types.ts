@@ -1,17 +1,28 @@
 // --- TODO TYPES ---
+export type TodoStatus = 'pending' | 'successful' | 'failed';
+
 export interface NewTodoItem {
   name: string;
-  isDone: boolean;
+  status?: TodoStatus;
   todolistId: string;
+  dueDate?: string | null;
+  location?: string | null;
+  notes?: string | null;
+  completedAt?: string | null;
 }
 
 export interface TodoItem extends NewTodoItem {
   id: string;
+  status: TodoStatus;
 }
 
 export interface UpdateTodoItem {
   name?: string;
-  isDone?: boolean;
+  status?: TodoStatus;
+  dueDate?: string | null;
+  location?: string | null;
+  notes?: string | null;
+  completedAt?: string | null;
 }
 
 // --- TODOLIST TYPES ---

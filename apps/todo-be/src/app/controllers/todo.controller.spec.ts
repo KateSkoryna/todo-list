@@ -29,6 +29,18 @@ const mockResponse = () => {
   return res as Response;
 };
 
+const makeTodo = (id: string, todolistId: string, overrides = {}) => ({
+  id,
+  name: 'Test Todo',
+  status: 'pending',
+  todolistId,
+  dueDate: null,
+  location: null,
+  notes: null,
+  completedAt: null,
+  ...overrides,
+});
+
 describe('TodoController', () => {
   let req: Request;
   let res: Response;
@@ -47,7 +59,7 @@ describe('TodoController', () => {
   it('should get a todo by id', async () => {
     req.params.todolistId = todolistId;
     req.params.id = todoId;
-    const todo = { id: todoId, name: 'Test Todo', isDone: false, todolistId };
+    const todo = makeTodo(todoId, todolistId);
     (TodolistRepository.findById as jest.Mock).mockResolvedValue({
       id: todolistId,
     });
@@ -114,7 +126,7 @@ describe('TodoController', () => {
   it('should create a new todo', async () => {
     req.params.todolistId = todolistId;
     req.body = { name: 'New Todo' };
-    const newTodo = { id: todoId, name: 'New Todo', isDone: false, todolistId };
+    const newTodo = makeTodo(todoId, todolistId, { name: 'New Todo' });
     (TodolistRepository.findById as jest.Mock).mockResolvedValue({
       id: todolistId,
     });
@@ -126,11 +138,41 @@ describe('TodoController', () => {
       todolistId,
       TEST_USER_ID
     );
-    expect(TodoRepository.create).toHaveBeenCalledWith(
-      todolistId,
-      'New Todo',
-      undefined
-    );
+    expect(TodoRepository.create).toHaveBeenCalledWith(todolistId, {
+      name: 'New Todo',
+      status: undefined,
+      dueDate: null,
+      location: null,
+      notes: null,
+      completedAt: null,
+    });
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith(newTodo);
+  });
+
+  it('should create a todo with extended fields', async () => {
+    req.params.todolistId = todolistId;
+    req.body = {
+      name: 'Extended Todo',
+      status: 'successful',
+      dueDate: '2026-04-01T00:00:00.000Z',
+      location: 'Office',
+      notes: 'Some notes',
+    };
+    const newTodo = makeTodo(todoId, todolistId, {
+      name: 'Extended Todo',
+      status: 'successful',
+      dueDate: '2026-04-01T00:00:00.000Z',
+      location: 'Office',
+      notes: 'Some notes',
+    });
+    (TodolistRepository.findById as jest.Mock).mockResolvedValue({
+      id: todolistId,
+    });
+    (TodoRepository.create as jest.Mock).mockResolvedValue(newTodo);
+
+    await TodoController.create(req, res);
+
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith(newTodo);
   });
@@ -145,6 +187,48 @@ describe('TodoController', () => {
     expect(res.json).toHaveBeenCalledWith({
       fields: [{ field: 'name', value: '' }],
     });
+  });
+
+  it('should return 400 if invalid status in create', async () => {
+    req.params.todolistId = todolistId;
+    req.body = { name: 'New Todo', status: 'invalid' };
+    await TodoController.create(req, res);
+
+    expect(TodoRepository.create).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      fields: [{ field: 'status', value: 'invalid' }],
+    });
+  });
+
+  it('should return 400 if invalid dueDate in create', async () => {
+    req.params.todolistId = todolistId;
+    req.body = { name: 'New Todo', dueDate: 'not-a-date' };
+    await TodoController.create(req, res);
+
+    expect(TodoRepository.create).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      fields: [{ field: 'dueDate', value: 'not-a-date' }],
+    });
+  });
+
+  it('should return 400 if location exceeds max length in create', async () => {
+    req.params.todolistId = todolistId;
+    req.body = { name: 'New Todo', location: 'x'.repeat(201) };
+    await TodoController.create(req, res);
+
+    expect(TodoRepository.create).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
+
+  it('should return 400 if notes exceeds max length in create', async () => {
+    req.params.todolistId = todolistId;
+    req.body = { name: 'New Todo', notes: 'x'.repeat(2001) };
+    await TodoController.create(req, res);
+
+    expect(TodoRepository.create).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
   });
 
   it('should return 404 if todolist not found when creating todo', async () => {
@@ -172,11 +256,6 @@ describe('TodoController', () => {
 
     await TodoController.create(req, res);
 
-    expect(TodoRepository.create).toHaveBeenCalledWith(
-      todolistId,
-      'New Todo',
-      undefined
-    );
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({
       message: 'Error creating todo',
@@ -187,13 +266,11 @@ describe('TodoController', () => {
   it('should update a todo', async () => {
     req.params.todolistId = todolistId;
     req.params.id = todoId;
-    req.body = { name: 'Updated Name', isDone: true };
-    const updatedTodo = {
-      id: todoId,
+    req.body = { name: 'Updated Name', status: 'successful' };
+    const updatedTodo = makeTodo(todoId, todolistId, {
       name: 'Updated Name',
-      isDone: true,
-      todolistId,
-    };
+      status: 'successful',
+    });
     (TodolistRepository.findById as jest.Mock).mockResolvedValue({
       id: todolistId,
     });
@@ -207,9 +284,35 @@ describe('TodoController', () => {
     );
     expect(TodoRepository.update).toHaveBeenCalledWith(todoId, {
       name: 'Updated Name',
-      isDone: true,
+      status: 'successful',
     });
     expect(res.json).toHaveBeenCalledWith(updatedTodo);
+  });
+
+  it('should return 400 if invalid status in update', async () => {
+    req.params.todolistId = todolistId;
+    req.params.id = todoId;
+    req.body = { status: 'invalid' };
+    await TodoController.update(req, res);
+
+    expect(TodoRepository.update).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      fields: [{ field: 'status', value: 'invalid' }],
+    });
+  });
+
+  it('should return 400 if invalid dueDate in update', async () => {
+    req.params.todolistId = todolistId;
+    req.params.id = todoId;
+    req.body = { dueDate: 'bad-date' };
+    await TodoController.update(req, res);
+
+    expect(TodoRepository.update).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      fields: [{ field: 'dueDate', value: 'bad-date' }],
+    });
   });
 
   it('should return 404 if todolist not found for update', async () => {
@@ -283,12 +386,7 @@ describe('TodoController', () => {
   it('should delete a todo', async () => {
     req.params.todolistId = todolistId;
     req.params.id = todoId;
-    const deletedTodo = {
-      id: todoId,
-      name: 'Deleted Todo',
-      isDone: false,
-      todolistId,
-    };
+    const deletedTodo = makeTodo(todoId, todolistId, { name: 'Deleted Todo' });
     (TodolistRepository.findById as jest.Mock).mockResolvedValue({
       id: todolistId,
     });

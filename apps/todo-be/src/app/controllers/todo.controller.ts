@@ -3,7 +3,16 @@ import { TodoRepository } from '../repositories/todo.repository';
 import { TodolistRepository } from '../repositories/todolist.repository';
 import { createValidationError } from '../utils/errors';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { TodoStatus, UpdateTodoItem } from '@fyltura/types';
 import mongoose from 'mongoose';
+
+const VALID_STATUSES: TodoStatus[] = ['pending', 'successful', 'failed'];
+const MAX_LOCATION_LENGTH = 200;
+const MAX_NOTES_LENGTH = 2000;
+
+function isValidDate(value: string): boolean {
+  return !isNaN(new Date(value).getTime());
+}
 
 export const TodoController = {
   getById: async (req: Request, res: Response) => {
@@ -38,7 +47,7 @@ export const TodoController = {
   create: async (req: Request, res: Response) => {
     try {
       const { todolistId } = req.params;
-      const { name, isDone } = req.body;
+      const { name, status, dueDate, location, notes, completedAt } = req.body;
       const userId = (req as AuthRequest).userId;
       const errors = [];
 
@@ -50,6 +59,26 @@ export const TodoController = {
         errors.push({ field: 'name', value: name });
       }
 
+      if (status !== undefined && !VALID_STATUSES.includes(status)) {
+        errors.push({ field: 'status', value: status });
+      }
+
+      if (dueDate != null && !isValidDate(dueDate)) {
+        errors.push({ field: 'dueDate', value: dueDate });
+      }
+
+      if (completedAt != null && !isValidDate(completedAt)) {
+        errors.push({ field: 'completedAt', value: completedAt });
+      }
+
+      if (location != null && location.length > MAX_LOCATION_LENGTH) {
+        errors.push({ field: 'location', value: location });
+      }
+
+      if (notes != null && notes.length > MAX_NOTES_LENGTH) {
+        errors.push({ field: 'notes', value: notes });
+      }
+
       if (errors.length > 0) {
         return res.status(400).json(createValidationError(errors));
       }
@@ -59,7 +88,14 @@ export const TodoController = {
         return res.status(404).json({ message: 'Todolist not found' });
       }
 
-      const newTodo = await TodoRepository.create(todolistId, name, isDone);
+      const newTodo = await TodoRepository.create(todolistId, {
+        name,
+        status,
+        dueDate: dueDate ?? null,
+        location: location ?? null,
+        notes: notes ?? null,
+        completedAt: completedAt ?? null,
+      });
       res.status(201).json(newTodo);
     } catch (error) {
       res.status(500).json({
@@ -72,7 +108,7 @@ export const TodoController = {
   update: async (req: Request, res: Response) => {
     try {
       const { todolistId, id } = req.params;
-      const { name, isDone } = req.body;
+      const { name, status, dueDate, location, notes, completedAt } = req.body;
       const userId = (req as AuthRequest).userId;
 
       if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -81,10 +117,44 @@ export const TodoController = {
           .json(createValidationError([{ field: 'id', value: id }]));
       }
 
-      if (name === undefined && isDone === undefined) {
+      const hasFields = [
+        name,
+        status,
+        dueDate,
+        location,
+        notes,
+        completedAt,
+      ].some((v) => v !== undefined);
+      if (!hasFields) {
         return res
           .status(400)
           .json(createValidationError([{ field: '', value: '' }]));
+      }
+
+      const errors = [];
+
+      if (status !== undefined && !VALID_STATUSES.includes(status)) {
+        errors.push({ field: 'status', value: status });
+      }
+
+      if (dueDate != null && !isValidDate(dueDate)) {
+        errors.push({ field: 'dueDate', value: dueDate });
+      }
+
+      if (completedAt != null && !isValidDate(completedAt)) {
+        errors.push({ field: 'completedAt', value: completedAt });
+      }
+
+      if (location != null && location.length > MAX_LOCATION_LENGTH) {
+        errors.push({ field: 'location', value: location });
+      }
+
+      if (notes != null && notes.length > MAX_NOTES_LENGTH) {
+        errors.push({ field: 'notes', value: notes });
+      }
+
+      if (errors.length > 0) {
+        return res.status(400).json(createValidationError(errors));
       }
 
       const todolist = await TodolistRepository.findById(todolistId, userId);
@@ -92,9 +162,13 @@ export const TodoController = {
         return res.status(404).json({ message: 'Todolist not found' });
       }
 
-      const updates: { name?: string; isDone?: boolean } = {};
+      const updates: UpdateTodoItem = {};
       if (name !== undefined) updates.name = name;
-      if (isDone !== undefined) updates.isDone = isDone;
+      if (status !== undefined) updates.status = status;
+      if (dueDate !== undefined) updates.dueDate = dueDate;
+      if (location !== undefined) updates.location = location;
+      if (notes !== undefined) updates.notes = notes;
+      if (completedAt !== undefined) updates.completedAt = completedAt;
 
       const updatedTodo = await TodoRepository.update(id, updates);
       if (!updatedTodo) {

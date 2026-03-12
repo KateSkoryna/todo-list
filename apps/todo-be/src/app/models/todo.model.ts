@@ -1,20 +1,32 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import { TodoItem } from '@fyltura/types';
+import { TodoItem, TodoStatus } from '@fyltura/types';
 
-interface ITodoDocument extends Omit<TodoItem, 'id' | 'todolistId'>, Document {
-    _id: Types.ObjectId;
-    todolistId: Types.ObjectId;
+interface ITodoDocument
+  extends Omit<TodoItem, 'id' | 'todolistId' | 'dueDate' | 'completedAt'>,
+    Document {
+  _id: Types.ObjectId;
+  todolistId: Types.ObjectId;
+  dueDate?: Date | null;
+  completedAt?: Date | null;
 }
 
 const todoSchema = new Schema<ITodoDocument>(
   {
     name: { type: String, required: true },
-    isDone: { type: Boolean, default: false },
+    status: {
+      type: String,
+      enum: ['pending', 'successful', 'failed'] as TodoStatus[],
+      default: 'pending',
+    },
     todolistId: {
       type: Schema.Types.ObjectId,
       ref: 'Todolist',
       required: true,
     },
+    dueDate: { type: Date, default: null },
+    location: { type: String, default: null },
+    notes: { type: String, default: null },
+    completedAt: { type: Date, default: null },
   },
   {
     toJSON: {
@@ -22,8 +34,12 @@ const todoSchema = new Schema<ITodoDocument>(
         const todoItem: TodoItem = {
           id: ret._id.toString(),
           name: ret.name,
-          isDone: ret.isDone,
+          status: ret.status,
           todolistId: ret.todolistId.toString(),
+          dueDate: ret.dueDate ? ret.dueDate.toISOString() : null,
+          location: ret.location ?? null,
+          notes: ret.notes ?? null,
+          completedAt: ret.completedAt ? ret.completedAt.toISOString() : null,
         };
         return todoItem;
       },
