@@ -53,17 +53,44 @@ app.post('/api/auth/logout', AuthController.logout);
 app.get('/api/auth/user', authMiddleware, AuthController.getUser);
 
 // --- Protected API Routes ---
-app.post('/api/todolists', authMiddleware, TodolistController.create);
-app.get('/api/todolists', authMiddleware, TodolistController.getAll);
-app.get('/api/todolists/:id', authMiddleware, TodolistController.getById);
-app.put('/api/todolists/:id', authMiddleware, TodolistController.update);
-app.delete('/api/todolists/:id', authMiddleware, TodolistController.delete);
+app.post('/api/users/me/todolists', authMiddleware, TodolistController.create);
+app.get('/api/users/me/todolists', authMiddleware, TodolistController.getAll);
+app.get(
+  '/api/users/me/todolists/:todolistId',
+  authMiddleware,
+  TodolistController.getById
+);
+app.put(
+  '/api/users/me/todolists/:todolistId',
+  authMiddleware,
+  TodolistController.update
+);
+app.delete(
+  '/api/users/me/todolists/:todolistId',
+  authMiddleware,
+  TodolistController.delete
+);
 
-app.post('/api/todos', authMiddleware, TodoController.create);
-app.get('/api/todos', authMiddleware, TodoController.getAll);
-app.get('/api/todos/:id', authMiddleware, TodoController.getById);
-app.put('/api/todos/:id', authMiddleware, TodoController.update);
-app.delete('/api/todos/:id', authMiddleware, TodoController.delete);
+app.post(
+  '/api/users/me/todolists/:todolistId/todos',
+  authMiddleware,
+  TodoController.create
+);
+app.get(
+  '/api/users/me/todolists/:todolistId/todos/:id',
+  authMiddleware,
+  TodoController.getById
+);
+app.put(
+  '/api/users/me/todolists/:todolistId/todos/:id',
+  authMiddleware,
+  TodoController.update
+);
+app.delete(
+  '/api/users/me/todolists/:todolistId/todos/:id',
+  authMiddleware,
+  TodoController.delete
+);
 
 const port = process.env.PORT || 3333;
 const server = app.listen(port, () => {
