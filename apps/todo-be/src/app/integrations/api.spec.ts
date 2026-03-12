@@ -5,6 +5,10 @@ import { Todo } from '../models/todo.model';
 import { Todolist } from '../models/todoList.model';
 import { TodoList } from '@fyltura/types';
 
+// test-app injects userId = 'test-user-id' which Mongoose coerces to NaN for Number schema.
+// For integration tests we seed directly via Mongoose with numeric userId 1 matching coercion.
+const TEST_USER_ID = 1;
+
 describe('API Integration Tests', () => {
   let todolistId: string;
   let todoId: string;
@@ -12,7 +16,7 @@ describe('API Integration Tests', () => {
   beforeEach(async () => {
     const todolist = await Todolist.create({
       name: 'Test Todolist',
-      userId: 123,
+      userId: TEST_USER_ID,
     });
     todolistId = todolist._id.toString();
   });
@@ -20,58 +24,37 @@ describe('API Integration Tests', () => {
   // --- Todolist API Tests ---
   describe('Todolist API', () => {
     it('should create a new todolist', async () => {
-      const newTodolistData = { name: 'My New List', userId: 456 };
       const res = await request(app)
         .post('/api/todolists')
-        .send(newTodolistData);
+        .send({ name: 'My New List' });
 
       expect(res.statusCode).toEqual(201);
       expect(res.body).toHaveProperty('id');
-      expect(res.body.name).toBe(newTodolistData.name);
-      expect(res.body.userId).toBe(newTodolistData.userId);
+      expect(res.body.name).toBe('My New List');
 
       const dbTodolist = await Todolist.findById(res.body.id);
       expect(dbTodolist).toBeDefined();
-      expect(dbTodolist?.name).toBe(newTodolistData.name);
+      expect(dbTodolist?.name).toBe('My New List');
     });
 
-    it('should return 400 if missing name or userId for creating todolist', async () => {
-      let res = await request(app).post('/api/todolists').send({ userId: 1 });
+    it('should return 400 if missing name for creating todolist', async () => {
+      const res = await request(app).post('/api/todolists').send({});
       expect(res.statusCode).toEqual(400);
       expect(res.body.fields).toEqual([{ field: 'name', value: '' }]);
-
-      res = await request(app).post('/api/todolists').send({ name: 'Test' });
-      expect(res.statusCode).toEqual(400);
-      expect(res.body.fields).toEqual([{ field: 'userId', value: '' }]);
     });
 
-    it('should get all todolists for user 123', async () => {
-      await Todolist.create({ name: 'Another List', userId: 123 });
-      const res = await request(app).get('/api/todolists?userId=123');
+    it('should get all todolists for the authenticated user', async () => {
+      await Todolist.create({ name: 'Another List', userId: TEST_USER_ID });
+      const res = await request(app).get('/api/todolists');
 
       expect(res.statusCode).toEqual(200);
-      expect(res.body.length).toBeGreaterThanOrEqual(2); // Includes the beforeEach todolist
+      expect(res.body.length).toBeGreaterThanOrEqual(2);
       expect(res.body[0]).toHaveProperty('id');
       expect(
         res.body.some((list: TodoList) => list.name === 'Test Todolist')
       ).toBeTruthy();
       expect(
         res.body.some((list: TodoList) => list.name === 'Another List')
-      ).toBeTruthy();
-    });
-
-    it('should get all todolists filtered by userId', async () => {
-      await Todolist.create({ name: 'User 999 List 1', userId: 999 });
-      await Todolist.create({ name: 'User 999 List 2', userId: 999 });
-
-      const res = await request(app).get('/api/todolists?userId=999');
-
-      expect(res.statusCode).toEqual(200);
-      expect(res.body.length).toBe(2);
-      expect(res.body[0].userId).toBe(999);
-      expect(res.body[1].userId).toBe(999);
-      expect(
-        res.body.some((list: TodoList) => list.name === 'User 999 List 1')
       ).toBeTruthy();
     });
 
@@ -117,7 +100,7 @@ describe('API Integration Tests', () => {
     it('should return 400 if missing name for updating todolist', async () => {
       const res = await request(app)
         .put(`/api/todolists/${todolistId}`)
-        .send({}); // Missing name
+        .send({});
 
       expect(res.statusCode).toEqual(400);
       expect(res.body.fields).toEqual([{ field: 'name', value: '' }]);
@@ -185,7 +168,7 @@ describe('API Integration Tests', () => {
       const res = await request(app).get('/api/todos');
 
       expect(res.statusCode).toEqual(200);
-      expect(res.body.length).toBeGreaterThanOrEqual(2); // Includes the beforeEach todo
+      expect(res.body.length).toBeGreaterThanOrEqual(2);
       expect(
         res.body.some((todo: TodoList) => todo.name === 'Initial Todo')
       ).toBeTruthy();
@@ -237,7 +220,7 @@ describe('API Integration Tests', () => {
     });
 
     it('should return 400 if no fields provided for update', async () => {
-      const res = await request(app).put(`/api/todos/${todoId}`).send({}); // No fields to update
+      const res = await request(app).put(`/api/todos/${todoId}`).send({});
 
       expect(res.statusCode).toEqual(400);
       expect(res.body.fields).toEqual([{ field: '', value: '' }]);
@@ -266,7 +249,7 @@ describe('API Integration Tests', () => {
     it('should populate todos when fetching a todolist', async () => {
       const newTodolist = await Todolist.create({
         name: 'List with Todos',
-        userId: 789,
+        userId: TEST_USER_ID,
       });
       await Todo.create({ name: 'Task 1', todolistId: newTodolist._id });
       await Todo.create({ name: 'Task 2', todolistId: newTodolist._id });

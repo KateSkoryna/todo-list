@@ -1,23 +1,13 @@
 import { Request, Response } from 'express';
 import { TodolistRepository } from '../repositories/todolist.repository';
 import { createValidationError } from '../utils/errors';
+import { AuthRequest } from '../middleware/auth.middleware';
 import mongoose from 'mongoose';
 
 export const TodolistController = {
   getAll: async (req: Request, res: Response) => {
     try {
-      const userIdParam = req.query.userId;
-
-      if (!userIdParam) {
-        return res.status(400).json(createValidationError([{ field: 'userId', value: userIdParam }]));
-      }
-
-      const userId = Number(userIdParam);
-
-      if (isNaN(userId)) {
-        return res.status(400).json(createValidationError([{ field: 'userId', value: userIdParam }]));
-      }
-
+      const userId = (req as AuthRequest).userId;
       const lists = await TodolistRepository.findAll(userId);
       res.json(lists);
     } catch (error) {
@@ -33,7 +23,9 @@ export const TodolistController = {
       const { id } = req.params;
 
       if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json(createValidationError([{ field: 'id', value: id }]));
+        return res
+          .status(400)
+          .json(createValidationError([{ field: 'id', value: id }]));
       }
 
       const list = await TodolistRepository.findById(id);
@@ -51,18 +43,13 @@ export const TodolistController = {
 
   create: async (req: Request, res: Response) => {
     try {
-      const { name, userId } = req.body;
-      const errors = [];
+      const { name } = req.body;
+      const userId = (req as AuthRequest).userId;
 
       if (!name) {
-        errors.push({ field: 'name', value: name });
-      }
-      if (!userId) {
-        errors.push({ field: 'userId', value: userId });
-      }
-
-      if (errors.length > 0) {
-        return res.status(400).json(createValidationError(errors));
+        return res
+          .status(400)
+          .json(createValidationError([{ field: 'name', value: name }]));
       }
 
       const newList = await TodolistRepository.create(name, userId);
@@ -81,11 +68,15 @@ export const TodolistController = {
       const { name } = req.body;
 
       if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json(createValidationError([{ field: 'id', value: id }]));
+        return res
+          .status(400)
+          .json(createValidationError([{ field: 'id', value: id }]));
       }
 
       if (!name) {
-        return res.status(400).json(createValidationError([{ field: 'name', value: name }]));
+        return res
+          .status(400)
+          .json(createValidationError([{ field: 'name', value: name }]));
       }
 
       const updatedList = await TodolistRepository.update(id, name);
@@ -106,7 +97,9 @@ export const TodolistController = {
       const { id } = req.params;
 
       if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json(createValidationError([{ field: 'id', value: id }]));
+        return res
+          .status(400)
+          .json(createValidationError([{ field: 'id', value: id }]));
       }
 
       const deletedList = await TodolistRepository.delete(id);
