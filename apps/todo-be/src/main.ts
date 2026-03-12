@@ -10,6 +10,7 @@ import cors from 'cors';
 import { TodolistController } from './app/controllers/todolist.controller';
 import { TodoController } from './app/controllers/todo.controller';
 import { AuthController } from './app/controllers/auth.controller';
+import { authMiddleware } from './app/middleware/auth.middleware';
 
 const app = express();
 
@@ -49,20 +50,20 @@ app.post('/api/auth/register', AuthController.register);
 app.post('/api/auth/login', AuthController.login);
 app.post('/api/auth/refresh', AuthController.refresh);
 app.post('/api/auth/logout', AuthController.logout);
-app.get('/api/auth/user', AuthController.getUser);
+app.get('/api/auth/user', authMiddleware, AuthController.getUser);
 
-// --- API Routes ---
-app.post('/api/todolists', TodolistController.create);
-app.post('/api/todos', TodoController.create);
-app.get('/api/todolists', TodolistController.getAll);
-app.get('/api/todolists/:id', TodolistController.getById);
-app.put('/api/todolists/:id', TodolistController.update);
-app.delete('/api/todolists/:id', TodolistController.delete);
+// --- Protected API Routes ---
+app.post('/api/todolists', authMiddleware, TodolistController.create);
+app.get('/api/todolists', authMiddleware, TodolistController.getAll);
+app.get('/api/todolists/:id', authMiddleware, TodolistController.getById);
+app.put('/api/todolists/:id', authMiddleware, TodolistController.update);
+app.delete('/api/todolists/:id', authMiddleware, TodolistController.delete);
 
-app.get('/api/todos', TodoController.getAll);
-app.get('/api/todos/:id', TodoController.getById);
-app.put('/api/todos/:id', TodoController.update);
-app.delete('/api/todos/:id', TodoController.delete);
+app.post('/api/todos', authMiddleware, TodoController.create);
+app.get('/api/todos', authMiddleware, TodoController.getAll);
+app.get('/api/todos/:id', authMiddleware, TodoController.getById);
+app.put('/api/todos/:id', authMiddleware, TodoController.update);
+app.delete('/api/todos/:id', authMiddleware, TodoController.delete);
 
 const port = process.env.PORT || 3333;
 const server = app.listen(port, () => {
