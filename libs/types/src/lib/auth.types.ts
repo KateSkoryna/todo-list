@@ -34,7 +34,15 @@ export interface LoginRequest {
  */
 export interface AuthResponse {
   user: User;
-  token: string;
+  accessToken: string;
+  refreshToken: string;
+}
+
+/**
+ * Refresh token request payload.
+ */
+export interface RefreshRequest {
+  refreshToken: string;
 }
 
 /**

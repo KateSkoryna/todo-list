@@ -9,6 +9,7 @@ import cors from 'cors';
 
 import { TodolistController } from './app/controllers/todolist.controller';
 import { TodoController } from './app/controllers/todo.controller';
+import { AuthController } from './app/controllers/auth.controller';
 
 const app = express();
 
@@ -42,6 +43,13 @@ const swaggerDocument = YAML.load(
   path.resolve(__dirname, '../../../tools/swagger.yml')
 );
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// --- Auth Routes ---
+app.post('/api/auth/register', AuthController.register);
+app.post('/api/auth/login', AuthController.login);
+app.post('/api/auth/refresh', AuthController.refresh);
+app.post('/api/auth/logout', AuthController.logout);
+app.get('/api/auth/user', AuthController.getUser);
 
 // --- API Routes ---
 app.post('/api/todolists', TodolistController.create);
