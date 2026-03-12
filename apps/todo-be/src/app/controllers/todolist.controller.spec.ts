@@ -6,7 +6,9 @@ import mongoose from 'mongoose';
 
 jest.mock('../repositories/todolist.repository');
 
-const mockRequest = (userId = '1') => {
+const TEST_USER_ID = '507f1f77bcf86cd799439011';
+
+const mockRequest = (userId = TEST_USER_ID) => {
   const req = {
     params: {},
     body: {},
@@ -38,12 +40,14 @@ describe('TodolistController', () => {
   });
 
   it('should get all todolists for the authenticated user', async () => {
-    const todolists = [{ id: todolistId, name: 'Test Todolist', userId: '1' }];
+    const todolists = [
+      { id: todolistId, name: 'Test Todolist', userId: TEST_USER_ID },
+    ];
     (TodolistRepository.findAll as jest.Mock).mockResolvedValue(todolists);
 
     await TodolistController.getAll(req, res);
 
-    expect(TodolistRepository.findAll).toHaveBeenCalledWith('1');
+    expect(TodolistRepository.findAll).toHaveBeenCalledWith(TEST_USER_ID);
     expect(res.json).toHaveBeenCalledWith(todolists);
   });
 
@@ -63,22 +67,25 @@ describe('TodolistController', () => {
   });
 
   it('should get a todolist by id', async () => {
-    req.params.id = todolistId;
+    req.params.todolistId = todolistId;
     const todolist = {
       id: todolistId,
       name: 'Test Todolist',
-      userId: '1',
+      userId: TEST_USER_ID,
     };
     (TodolistRepository.findById as jest.Mock).mockResolvedValue(todolist);
 
     await TodolistController.getById(req, res);
 
-    expect(TodolistRepository.findById).toHaveBeenCalledWith(todolistId);
+    expect(TodolistRepository.findById).toHaveBeenCalledWith(
+      todolistId,
+      TEST_USER_ID
+    );
     expect(res.json).toHaveBeenCalledWith(todolist);
   });
 
   it('should return 404 if todolist not found by id', async () => {
-    req.params.id = todolistId;
+    req.params.todolistId = todolistId;
     (TodolistRepository.findById as jest.Mock).mockResolvedValue(null);
 
     await TodolistController.getById(req, res);
@@ -88,7 +95,7 @@ describe('TodolistController', () => {
   });
 
   it('should handle error when getting todolist by id', async () => {
-    req.params.id = todolistId;
+    req.params.todolistId = todolistId;
     const errorMessage = 'Database error';
     (TodolistRepository.findById as jest.Mock).mockRejectedValue(
       new Error(errorMessage)
@@ -108,13 +115,16 @@ describe('TodolistController', () => {
     const newTodolist = {
       id: todolistId,
       name: 'New Todolist',
-      userId: '1',
+      userId: TEST_USER_ID,
     };
     (TodolistRepository.create as jest.Mock).mockResolvedValue(newTodolist);
 
     await TodolistController.create(req, res);
 
-    expect(TodolistRepository.create).toHaveBeenCalledWith('New Todolist', '1');
+    expect(TodolistRepository.create).toHaveBeenCalledWith(
+      'New Todolist',
+      TEST_USER_ID
+    );
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith(newTodolist);
   });
@@ -147,12 +157,12 @@ describe('TodolistController', () => {
   });
 
   it('should update a todolist', async () => {
-    req.params.id = todolistId;
+    req.params.todolistId = todolistId;
     req.body = { name: 'Updated Name' };
     const updatedTodolist = {
       id: todolistId,
       name: 'Updated Name',
-      userId: '1',
+      userId: TEST_USER_ID,
     };
     (TodolistRepository.update as jest.Mock).mockResolvedValue(updatedTodolist);
 
@@ -160,13 +170,14 @@ describe('TodolistController', () => {
 
     expect(TodolistRepository.update).toHaveBeenCalledWith(
       todolistId,
-      'Updated Name'
+      'Updated Name',
+      TEST_USER_ID
     );
     expect(res.json).toHaveBeenCalledWith(updatedTodolist);
   });
 
   it('should return 404 if todolist not found for update', async () => {
-    req.params.id = todolistId;
+    req.params.todolistId = todolistId;
     req.body = { name: 'Updated Name' };
     (TodolistRepository.update as jest.Mock).mockResolvedValue(null);
 
@@ -177,7 +188,7 @@ describe('TodolistController', () => {
   });
 
   it('should return 400 if missing name in update', async () => {
-    req.params.id = todolistId;
+    req.params.todolistId = todolistId;
     req.body = {};
     await TodolistController.update(req, res);
 
@@ -189,7 +200,7 @@ describe('TodolistController', () => {
   });
 
   it('should handle error when updating todolist', async () => {
-    req.params.id = todolistId;
+    req.params.todolistId = todolistId;
     req.body = { name: 'Updated Name' };
     const errorMessage = 'Database error';
     (TodolistRepository.update as jest.Mock).mockRejectedValue(
@@ -206,24 +217,27 @@ describe('TodolistController', () => {
   });
 
   it('should delete a todolist', async () => {
-    req.params.id = todolistId;
+    req.params.todolistId = todolistId;
     const deletedTodolist = {
       id: todolistId,
       name: 'Deleted Todolist',
-      userId: '1',
+      userId: TEST_USER_ID,
     };
     (TodolistRepository.delete as jest.Mock).mockResolvedValue(deletedTodolist);
 
     await TodolistController.delete(req, res);
 
-    expect(TodolistRepository.delete).toHaveBeenCalledWith(todolistId);
+    expect(TodolistRepository.delete).toHaveBeenCalledWith(
+      todolistId,
+      TEST_USER_ID
+    );
     expect(res.status).toHaveBeenCalledWith(204);
     expect(res.send).toHaveBeenCalledTimes(1);
     expect(res.json).not.toHaveBeenCalled();
   });
 
   it('should return 404 if todolist not found for delete', async () => {
-    req.params.id = todolistId;
+    req.params.todolistId = todolistId;
     (TodolistRepository.delete as jest.Mock).mockResolvedValue(null);
 
     await TodolistController.delete(req, res);
@@ -233,7 +247,7 @@ describe('TodolistController', () => {
   });
 
   it('should handle error when deleting todolist', async () => {
-    req.params.id = todolistId;
+    req.params.todolistId = todolistId;
     const errorMessage = 'Database error';
     (TodolistRepository.delete as jest.Mock).mockRejectedValue(
       new Error(errorMessage)

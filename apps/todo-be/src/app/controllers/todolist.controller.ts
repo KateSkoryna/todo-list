@@ -20,15 +20,16 @@ export const TodolistController = {
 
   getById: async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const { todolistId } = req.params;
+      const userId = (req as AuthRequest).userId;
 
-      if (!mongoose.Types.ObjectId.isValid(id)) {
+      if (!mongoose.Types.ObjectId.isValid(todolistId)) {
         return res
           .status(400)
-          .json(createValidationError([{ field: 'id', value: id }]));
+          .json(createValidationError([{ field: 'id', value: todolistId }]));
       }
 
-      const list = await TodolistRepository.findById(id);
+      const list = await TodolistRepository.findById(todolistId, userId);
       if (!list) {
         return res.status(404).json({ message: 'Todolist not found' });
       }
@@ -64,13 +65,14 @@ export const TodolistController = {
 
   update: async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const { todolistId } = req.params;
       const { name } = req.body;
+      const userId = (req as AuthRequest).userId;
 
-      if (!mongoose.Types.ObjectId.isValid(id)) {
+      if (!mongoose.Types.ObjectId.isValid(todolistId)) {
         return res
           .status(400)
-          .json(createValidationError([{ field: 'id', value: id }]));
+          .json(createValidationError([{ field: 'id', value: todolistId }]));
       }
 
       if (!name) {
@@ -79,7 +81,11 @@ export const TodolistController = {
           .json(createValidationError([{ field: 'name', value: name }]));
       }
 
-      const updatedList = await TodolistRepository.update(id, name);
+      const updatedList = await TodolistRepository.update(
+        todolistId,
+        name,
+        userId
+      );
       if (!updatedList) {
         return res.status(404).json({ message: 'Todolist not found' });
       }
@@ -94,15 +100,16 @@ export const TodolistController = {
 
   delete: async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const { todolistId } = req.params;
+      const userId = (req as AuthRequest).userId;
 
-      if (!mongoose.Types.ObjectId.isValid(id)) {
+      if (!mongoose.Types.ObjectId.isValid(todolistId)) {
         return res
           .status(400)
-          .json(createValidationError([{ field: 'id', value: id }]));
+          .json(createValidationError([{ field: 'id', value: todolistId }]));
       }
 
-      const deletedList = await TodolistRepository.delete(id);
+      const deletedList = await TodolistRepository.delete(todolistId, userId);
       if (!deletedList) {
         return res.status(404).json({ message: 'Todolist not found' });
       }
