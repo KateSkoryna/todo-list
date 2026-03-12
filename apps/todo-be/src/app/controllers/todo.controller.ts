@@ -1,24 +1,25 @@
 import { Request, Response } from 'express';
 import { TodoRepository } from '../repositories/todo.repository';
+import { TodolistRepository } from '../repositories/todolist.repository';
 import { createValidationError } from '../utils/errors';
+import { AuthRequest } from '../middleware/auth.middleware';
 import mongoose from 'mongoose';
 
 export const TodoController = {
-  getAll: async (req: Request, res: Response) => {
-    try {
-      const todos = await TodoRepository.findAll();
-      res.json(todos);
-    } catch (error) {
-      res.status(500).json({ message: 'Error fetching todos', error: (error as Error).message });
-    }
-  },
-
   getById: async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const { todolistId, id } = req.params;
+      const userId = (req as AuthRequest).userId;
 
       if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json(createValidationError([{ field: 'id', value: id }]));
+        return res
+          .status(400)
+          .json(createValidationError([{ field: 'id', value: id }]));
+      }
+
+      const todolist = await TodolistRepository.findById(todolistId, userId);
+      if (!todolist) {
+        return res.status(404).json({ message: 'Todolist not found' });
       }
 
       const todo = await TodoRepository.findById(id);
@@ -27,19 +28,22 @@ export const TodoController = {
       }
       res.json(todo);
     } catch (error) {
-      res.status(500).json({ message: 'Error fetching todo', error: (error as Error).message });
+      res.status(500).json({
+        message: 'Error fetching todo',
+        error: (error as Error).message,
+      });
     }
   },
 
   create: async (req: Request, res: Response) => {
     try {
-      const { todolistId, name, isDone } = req.body;
+      const { todolistId } = req.params;
+      const { name, isDone } = req.body;
+      const userId = (req as AuthRequest).userId;
       const errors = [];
 
-      if (!todolistId) {
-        errors.push({ field: 'todolistId', value: todolistId });
-      } else if (!mongoose.Types.ObjectId.isValid(todolistId)) {
-        errors.push({ field: 'todolistId', value: todolistId });
+      if (!todolistId || !mongoose.Types.ObjectId.isValid(todolistId)) {
+        errors.push({ field: 'todolistId', value: todolistId ?? '' });
       }
 
       if (!name) {
@@ -50,24 +54,42 @@ export const TodoController = {
         return res.status(400).json(createValidationError(errors));
       }
 
+      const todolist = await TodolistRepository.findById(todolistId, userId);
+      if (!todolist) {
+        return res.status(404).json({ message: 'Todolist not found' });
+      }
+
       const newTodo = await TodoRepository.create(todolistId, name, isDone);
       res.status(201).json(newTodo);
     } catch (error) {
-      res.status(500).json({ message: 'Error creating todo', error: (error as Error).message });
+      res.status(500).json({
+        message: 'Error creating todo',
+        error: (error as Error).message,
+      });
     }
   },
 
   update: async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const { todolistId, id } = req.params;
       const { name, isDone } = req.body;
+      const userId = (req as AuthRequest).userId;
 
       if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json(createValidationError([{ field: 'id', value: id }]));
+        return res
+          .status(400)
+          .json(createValidationError([{ field: 'id', value: id }]));
       }
 
       if (name === undefined && isDone === undefined) {
-        return res.status(400).json(createValidationError([{ field: '', value: '' }]));
+        return res
+          .status(400)
+          .json(createValidationError([{ field: '', value: '' }]));
+      }
+
+      const todolist = await TodolistRepository.findById(todolistId, userId);
+      if (!todolist) {
+        return res.status(404).json({ message: 'Todolist not found' });
       }
 
       const updates: { name?: string; isDone?: boolean } = {};
@@ -80,16 +102,27 @@ export const TodoController = {
       }
       res.json(updatedTodo);
     } catch (error) {
-      res.status(500).json({ message: 'Error updating todo', error: (error as Error).message });
+      res.status(500).json({
+        message: 'Error updating todo',
+        error: (error as Error).message,
+      });
     }
   },
 
   delete: async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
+      const { todolistId, id } = req.params;
+      const userId = (req as AuthRequest).userId;
 
       if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json(createValidationError([{ field: 'id', value: id }]));
+        return res
+          .status(400)
+          .json(createValidationError([{ field: 'id', value: id }]));
+      }
+
+      const todolist = await TodolistRepository.findById(todolistId, userId);
+      if (!todolist) {
+        return res.status(404).json({ message: 'Todolist not found' });
       }
 
       const deletedTodo = await TodoRepository.delete(id);
@@ -98,7 +131,10 @@ export const TodoController = {
       }
       res.status(204).send();
     } catch (error) {
-      res.status(500).json({ message: 'Error deleting todo', error: (error as Error).message });
+      res.status(500).json({
+        message: 'Error deleting todo',
+        error: (error as Error).message,
+      });
     }
   },
 };
