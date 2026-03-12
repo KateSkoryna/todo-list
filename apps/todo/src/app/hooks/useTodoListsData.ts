@@ -41,7 +41,10 @@ export const useTodoListsData = (userId: number) => {
       ?.flatMap((list) => list.todos)
       .find((t) => t.id === id);
     if (todo) {
-      toggleTodoMutation.mutate({ id, isDone: !todo.isDone });
+      toggleTodoMutation.mutate({
+        id,
+        status: todo.status === 'successful' ? 'pending' : 'successful',
+      });
     }
   };
 

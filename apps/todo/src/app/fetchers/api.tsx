@@ -65,8 +65,8 @@ export const useAddTodoMutation = (userId: number) => {
 
 export const useToggleTodoMutation = (userId: number) => {
   const queryClient = useQueryClient();
-  return useMutation<TodoItemType, Error, { id: string; isDone: boolean }>({
-    mutationFn: ({ id, isDone }) => updateTodoFetcher(id, { isDone }),
+  return useMutation<TodoItemType, Error, { id: string; status: string }>({
+    mutationFn: ({ id, status }) => updateTodoFetcher(id, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todoLists', userId] });
     },

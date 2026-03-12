@@ -46,17 +46,17 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
   return (
     <div
       className={`flex w-full flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 p-4 bg-base-bg rounded-lg border-2 border-secondary-bg hover:border-accent transition-colors group${
-        todo.isDone ? ' completed' : ''
+        todo.status === 'successful' ? ' completed' : ''
       }`}
       data-testid={'todo-item-' + todo.id}
     >
       <Input
         type="checkbox"
-        checked={todo.isDone}
+        checked={todo.status === 'successful'}
         onChange={handleToggle}
         className="w-5 h-5 shrink-0 rounded border-2 border-secondary-dark-bg checked:bg-accent checked:border-accent focus:ring-2 focus:ring-accent focus:ring-offset-2 cursor-pointer"
         aria-label={`Mark ${todo.name} as ${
-          todo.isDone ? 'not complete' : 'complete'
+          todo.status === 'successful' ? 'not complete' : 'complete'
         }`}
         inputTestId={'todo-item-complete-checkbox-' + todo.id}
       />
@@ -82,7 +82,7 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
         <Text
           as="span"
           className={` w-full text-lg ${
-            todo.isDone
+            todo.status === 'successful'
               ? 'line-through text-dark-bg'
               : 'text-dark-bg font-medium'
           }`}

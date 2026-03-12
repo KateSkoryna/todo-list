@@ -16,7 +16,9 @@ const TodoListHeader: React.FC<TodoListHeaderProps> = ({
   setIsExpanded,
   onDeleteList,
 }) => {
-  const completedCount = todoList.todos.filter((todo) => todo.isDone).length;
+  const completedCount = todoList.todos.filter(
+    (todo) => todo.status === 'successful'
+  ).length;
   const totalCount = todoList.todos.length;
 
   return (

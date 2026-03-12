@@ -51,7 +51,7 @@ export const createTodoFetcher = async (
   const response = await fetch(`${API_BASE}/todos`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, isDone: false, todolistId }),
+    body: JSON.stringify({ name, todolistId }),
   });
   if (!response.ok) {
     throw new Error('Failed to create todo');
@@ -62,7 +62,7 @@ export const createTodoFetcher = async (
 // Toggle todo completion
 export const updateTodoFetcher = async (
   id: string,
-  data: { name?: string; isDone?: boolean }
+  data: { name?: string; status?: string }
 ): Promise<TodoItemType> => {
   const response = await fetch(`${API_BASE}/todos/${id}`, {
     method: 'PUT',
