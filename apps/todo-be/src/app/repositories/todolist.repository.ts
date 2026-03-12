@@ -7,8 +7,8 @@ export const TodolistRepository = {
     return docs.map((doc) => doc.toJSON()) as TodoList[];
   },
 
-  findById: async (id: string): Promise<TodoList | null> => {
-    const doc = await Todolist.findById(id).populate('todos');
+  findById: async (id: string, userId: string): Promise<TodoList | null> => {
+    const doc = await Todolist.findOne({ _id: id, userId }).populate('todos');
     if (!doc) {
       return null;
     }
@@ -20,9 +20,13 @@ export const TodolistRepository = {
     return doc.toJSON() as TodoList;
   },
 
-  update: async (id: string, name: string): Promise<TodoList | null> => {
-    const doc = await Todolist.findByIdAndUpdate(
-      id,
+  update: async (
+    id: string,
+    name: string,
+    userId: string
+  ): Promise<TodoList | null> => {
+    const doc = await Todolist.findOneAndUpdate(
+      { _id: id, userId },
       { name },
       { new: true }
     ).exec();
@@ -33,8 +37,8 @@ export const TodolistRepository = {
     return (doc as any).toJSON() as TodoList;
   },
 
-  delete: async (id: string): Promise<TodoList | null> => {
-    const doc = await Todolist.findByIdAndDelete(id).exec();
+  delete: async (id: string, userId: string): Promise<TodoList | null> => {
+    const doc = await Todolist.findOneAndDelete({ _id: id, userId }).exec();
     if (!doc) {
       return null;
     }
