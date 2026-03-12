@@ -1,15 +1,15 @@
 import { Schema, model, Document, Types } from 'mongoose';
 import { TodoList, TodoItem } from '@fyltura/types';
 
-interface ITodolistDocument extends Omit<TodoList, 'id'>, Document {
+interface ITodolistDocument extends Omit<TodoList, 'id' | 'userId'>, Document {
   _id: Types.ObjectId;
-  userId: number;
+  userId: Types.ObjectId;
 }
 
 const todolistSchema = new Schema<ITodolistDocument>(
   {
     name: { type: String, required: true },
-    userId: { type: Number, required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
   {
     toJSON: {
@@ -18,7 +18,7 @@ const todolistSchema = new Schema<ITodolistDocument>(
         const todolist: TodoList = {
           id: ret._id.toString(),
           name: ret.name,
-          userId: ret.userId,
+          userId: ret.userId.toString(),
           todos: (ret.todos as TodoItem[]) || [],
         };
         return todolist;

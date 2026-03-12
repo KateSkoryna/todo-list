@@ -8,7 +8,13 @@ interface IUserDocument extends Omit<User, 'id'>, Document {
 
 const userSchema = new Schema<IUserDocument>(
   {
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
     passwordHash: { type: String, required: true },
     displayName: { type: String, required: true, trim: true },
   },

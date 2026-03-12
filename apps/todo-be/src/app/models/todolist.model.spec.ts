@@ -1,21 +1,24 @@
 import { Todolist } from './todoList.model';
 import { TodoList } from '@fyltura/types';
+import mongoose from 'mongoose';
+
+const userId = new mongoose.Types.ObjectId();
 
 describe('Todolist Model', () => {
   it('should create a new todolist successfully', async () => {
     const todolistData = {
       name: 'Test Todolist',
-      userId: 123,
+      userId,
     };
     const todolist = await Todolist.create(todolistData);
     expect(todolist).toBeDefined();
     expect(todolist.name).toBe(todolistData.name);
-    expect(todolist.userId).toBe(todolistData.userId);
+    expect(todolist.userId.toString()).toBe(userId.toString());
   });
 
   it('should require a name', async () => {
     const todolistData = {
-      userId: 123,
+      userId,
     };
 
     await expect(Todolist.create(todolistData)).rejects.toThrow(
@@ -35,7 +38,7 @@ describe('Todolist Model', () => {
   it('should transform to JSON correctly', async () => {
     const todolistData = {
       name: 'Test Todolist',
-      userId: 456,
+      userId,
     };
     const todolist = await Todolist.create(todolistData);
 
@@ -44,6 +47,6 @@ describe('Todolist Model', () => {
     expect(todolistObject.id).toBeDefined();
     expect(typeof todolistObject.id).toBe('string');
     expect(todolistObject.name).toBe(todolistData.name);
-    expect(todolistObject.userId).toBe(todolistData.userId);
+    expect(todolistObject.userId).toBe(userId.toString());
   });
 });
