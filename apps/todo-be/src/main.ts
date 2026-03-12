@@ -52,42 +52,41 @@ app.post('/api/auth/refresh', AuthController.refresh);
 app.post('/api/auth/logout', AuthController.logout);
 app.get('/api/auth/user', authMiddleware, AuthController.getUser);
 
-// --- Protected API Routes ---
-app.post('/api/users/me/todolists', authMiddleware, TodolistController.create);
-app.get('/api/users/me/todolists', authMiddleware, TodolistController.getAll);
+// --- Todolist Routes ---
 app.get(
-  '/api/users/me/todolists/:todolistId',
+  '/api/users/:userId/todolists',
   authMiddleware,
-  TodolistController.getById
+  TodolistController.getAll
+);
+app.post(
+  '/api/users/:userId/todolists',
+  authMiddleware,
+  TodolistController.create
 );
 app.put(
-  '/api/users/me/todolists/:todolistId',
+  '/api/users/:userId/todolists/:todolistId',
   authMiddleware,
   TodolistController.update
 );
 app.delete(
-  '/api/users/me/todolists/:todolistId',
+  '/api/users/:userId/todolists/:todolistId',
   authMiddleware,
   TodolistController.delete
 );
 
+// --- Todo Routes ---
 app.post(
-  '/api/users/me/todolists/:todolistId/todos',
+  '/api/users/:userId/todolists/:todolistId/todos',
   authMiddleware,
   TodoController.create
 );
-app.get(
-  '/api/users/me/todolists/:todolistId/todos/:id',
-  authMiddleware,
-  TodoController.getById
-);
 app.put(
-  '/api/users/me/todolists/:todolistId/todos/:id',
+  '/api/users/:userId/todolists/:todolistId/todos/:id',
   authMiddleware,
   TodoController.update
 );
 app.delete(
-  '/api/users/me/todolists/:todolistId/todos/:id',
+  '/api/users/:userId/todolists/:todolistId/todos/:id',
   authMiddleware,
   TodoController.delete
 );

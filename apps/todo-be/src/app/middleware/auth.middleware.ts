@@ -29,6 +29,11 @@ export const authMiddleware = (
     const payload = jwt.verify(token, secret) as JwtPayload;
     (req as AuthRequest).userId = payload.userId;
     (req as AuthRequest).userEmail = payload.email;
+
+    if (req.params.userId && req.params.userId !== payload.userId) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
     next();
   } catch {
     return res.status(401).json({ message: 'Invalid or expired token' });

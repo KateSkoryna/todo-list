@@ -1,134 +1,281 @@
 openapi: 3.0.3
 info:
   title: Todolist RESTful API
-  version: '1'
+  version: '2'
+
+security:
+  - bearerAuth: []
+
 paths:
-  /api/todolists:
-    get:
-      tags:
-        - Todolists
-      summary: Get all Todolists
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          schema:
-            type: integer
-      responses:
-        default:
-          $ref: '#/components/responses/default'
-        200:
-          $ref: '#/components/responses/Todolists'
+  # --- Auth ---
+  /api/auth/register:
     post:
       tags:
-        - Todolists
-      summary: Create new Todolist
+        - Auth
+      summary: Register a new user
+      security: []
       requestBody:
-        $ref: '#/components/requestBodies/NewTodolist'
+        $ref: '#/components/requestBodies/RegisterRequest'
       responses:
-        200:
-          $ref: '#/components/responses/Todolist'
-  /api/todolists/{id}:
-    get:
-      tags:
-        - Todolists
-      summary: Get a single Todolist
-      parameters:
-        - $ref: '#/components/parameters/id'
-      responses:
-        default:
-          $ref: '#/components/responses/default'
+        201:
+          $ref: '#/components/responses/AuthResponse'
         400:
           $ref: '#/components/responses/Errors'
-        200:
-          $ref: '#/components/responses/Todolist'
-    put:
-      tags:
-        - Todolists
-      summary: Update existing Todolist
-      parameters:
-        - $ref: '#/components/parameters/id'
-      requestBody:
-        $ref: '#/components/requestBodies/UpdateTodolist'
-      responses:
         default:
           $ref: '#/components/responses/default'
+
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login with email and password
+      security: []
+      requestBody:
+        $ref: '#/components/requestBodies/LoginRequest'
+      responses:
+        200:
+          $ref: '#/components/responses/AuthResponse'
         400:
           $ref: '#/components/responses/Errors'
-        200:
-          $ref: '#/components/responses/Todolist'
-    delete:
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/default'
+
+  /api/auth/refresh:
+    post:
       tags:
-        - Todolists
-      summary: Delete existing todolist
-      parameters:
-        - $ref: '#/components/parameters/id'
+        - Auth
+      summary: Refresh access token using refresh token
+      security: []
+      requestBody:
+        $ref: '#/components/requestBodies/RefreshRequest'
+      responses:
+        200:
+          $ref: '#/components/responses/AuthResponse'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        default:
+          $ref: '#/components/responses/default'
+
+  /api/auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout current user
       responses:
         204:
           $ref: '#/components/responses/204'
         default:
           $ref: '#/components/responses/default'
-  /api/todos:
+
+  /api/auth/user:
     get:
       tags:
-        - Todos
-      summary: Get all Todos
+        - Auth
+      summary: Get current authenticated user
       responses:
+        200:
+          $ref: '#/components/responses/UserResponse'
+        401:
+          $ref: '#/components/responses/Unauthorized'
         default:
           $ref: '#/components/responses/default'
+
+  # --- Todolists ---
+  /api/users/{userId}/todolists:
+    get:
+      tags:
+        - Todolists
+      summary: Get all Todolists for the user
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        200:
+          $ref: '#/components/responses/Todolists'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/default'
+    post:
+      tags:
+        - Todolists
+      summary: Create a new Todolist
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        $ref: '#/components/requestBodies/NewTodolist'
+      responses:
+        201:
+          $ref: '#/components/responses/Todolist'
         400:
           $ref: '#/components/responses/Errors'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        default:
+          $ref: '#/components/responses/default'
+
+  /api/users/{userId}/todolists/{todolistId}:
+    put:
+      tags:
+        - Todolists
+      summary: Update an existing Todolist
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/todolistId'
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateTodolist'
+      responses:
         200:
-          $ref: '#/components/responses/Todos'
+          $ref: '#/components/responses/Todolist'
+        400:
+          $ref: '#/components/responses/Errors'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/default'
+    delete:
+      tags:
+        - Todolists
+      summary: Delete an existing Todolist
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/todolistId'
+      responses:
+        204:
+          $ref: '#/components/responses/204'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/default'
+
+  # --- Todos ---
+  /api/users/{userId}/todolists/{todolistId}/todos:
     post:
       tags:
         - Todos
-      summary: Create new Todo
+      summary: Create a new Todo in a Todolist
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/todolistId'
       requestBody:
         $ref: '#/components/requestBodies/NewTodo'
       responses:
-        200:
+        201:
           $ref: '#/components/responses/Todo'
-  /api/todos/{id}:
+        400:
+          $ref: '#/components/responses/Errors'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/default'
+
+  /api/users/{userId}/todolists/{todolistId}/todos/{id}:
     put:
       tags:
         - Todos
-      summary: Update existing Todo
+      summary: Update an existing Todo
       parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/todolistId'
         - $ref: '#/components/parameters/id'
       requestBody:
         $ref: '#/components/requestBodies/UpdateTodo'
       responses:
-        default:
-          $ref: '#/components/responses/default'
-        400:
-          $ref: '#/components/responses/Errors'
         200:
           $ref: '#/components/responses/Todo'
+        400:
+          $ref: '#/components/responses/Errors'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        default:
+          $ref: '#/components/responses/default'
     delete:
       tags:
         - Todos
-      summary: Delete existing Todo
+      summary: Delete an existing Todo
       parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/todolistId'
         - $ref: '#/components/parameters/id'
       responses:
         204:
           $ref: '#/components/responses/204'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
         default:
           $ref: '#/components/responses/default'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   parameters:
+    userId:
+      name: userId
+      in: path
+      description: MongoDB ObjectId of the user
+      required: true
+      schema:
+        type: string
+    todolistId:
+      name: todolistId
+      in: path
+      description: MongoDB ObjectId of the Todolist
+      required: true
+      schema:
+        type: string
     id:
       name: id
       in: path
-      description: ID of the resource
+      description: MongoDB ObjectId of the Todo
       required: true
       schema:
-        type: integer
-        format: int64
+        type: string
 
   requestBodies:
+    RegisterRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RegisterRequest'
+    LoginRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LoginRequest'
+    RefreshRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RefreshRequest'
     NewTodolist:
       content:
         application/json:
@@ -154,7 +301,25 @@ components:
     default:
       description: Unexpected error
     204:
-      description: No Content, successful deletion
+      description: No Content — successful deletion
+    Unauthorized:
+      description: Missing or invalid authentication token
+    Forbidden:
+      description: Authenticated user does not own this resource
+    NotFound:
+      description: Resource not found
+    AuthResponse:
+      description: Authentication successful
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthResponse'
+    UserResponse:
+      description: User profile
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
     Todolists:
       description: A list of Todolists
       content:
@@ -169,14 +334,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Todolist'
-    Todos:
-      description: A list of Todos
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Todo'
     Todo:
       description: A single Todo
       content:
@@ -191,15 +348,80 @@ components:
             $ref: '#/components/schemas/Errors'
 
   schemas:
+    # --- Auth ---
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - displayName
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        displayName:
+          type: string
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    RefreshRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    # --- Todolists ---
     Todolist:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         name:
           type: string
         userId:
-          type: integer
+          type: string
         todos:
           type: array
           items:
@@ -209,12 +431,9 @@ components:
       type: object
       required:
         - name
-        - userId
       properties:
         name:
           type: string
-        userId:
-          type: integer
 
     UpdateTodolist:
       type: object
@@ -222,40 +441,85 @@ components:
         name:
           type: string
 
+    # --- Todos ---
     Todo:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         todolistId:
-          type: integer
+          type: string
         name:
           type: string
-        isDone:
-          type: boolean
+        status:
+          type: string
+          enum:
+            - pending
+            - successful
+            - failed
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
 
     NewTodo:
       type: object
       required:
-        - todolistId
         - name
       properties:
-        todolistId:
-          type: integer
         name:
           type: string
-        isDone:
-          type: boolean
-          default: false
+        status:
+          type: string
+          enum:
+            - pending
+            - successful
+            - failed
+          default: pending
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
 
     UpdateTodo:
       type: object
       properties:
         name:
           type: string
-        isDone:
-          type: boolean
+        status:
+          type: string
+          enum:
+            - pending
+            - successful
+            - failed
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
 
+    # --- Errors ---
     Errors:
       type: object
       properties:
