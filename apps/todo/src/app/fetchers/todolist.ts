@@ -2,85 +2,61 @@ import {
   TodoList as TodoListType,
   TodoItem as TodoItemType,
 } from '@fyltura/types';
-import { environment } from '../../environments/environment';
+import apiClient from '../lib/apiClient';
 
-const API_BASE = environment.apiUrl;
-
-// Fetch all todolists
 export const getTodoListsFetcher = async (
-  userId: number
+  userId: string
 ): Promise<TodoListType[]> => {
-  const response = await fetch(`${API_BASE}/todolists?userId=${userId}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch todolists');
-  }
-  return response.json();
+  const { data } = await apiClient.get(`/users/${userId}/todolists`);
+  return data;
 };
 
-// Create new todolist
 export const createTodoListFetcher = async (
   name: string,
-  userId: number
+  userId: string
 ): Promise<TodoListType> => {
-  const response = await fetch(`${API_BASE}/todolists`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, userId }),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to create todolist');
-  }
-  return response.json();
+  const { data } = await apiClient.post(`/users/${userId}/todolists`, { name });
+  return data;
 };
 
-// Delete todolist
-export const deleteTodoListFetcher = async (id: string): Promise<void> => {
-  const response = await fetch(`${API_BASE}/todolists/${id}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to delete todolist');
-  }
+export const deleteTodoListFetcher = async (
+  todolistId: string,
+  userId: string
+): Promise<void> => {
+  await apiClient.delete(`/users/${userId}/todolists/${todolistId}`);
 };
 
-// Add todo to list
 export const createTodoFetcher = async (
   todolistId: string,
+  userId: string,
   name: string
 ): Promise<TodoItemType> => {
-  const response = await fetch(`${API_BASE}/todos`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, todolistId }),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to create todo');
-  }
-  return response.json();
+  const { data } = await apiClient.post(
+    `/users/${userId}/todolists/${todolistId}/todos`,
+    { name }
+  );
+  return data;
 };
 
-// Toggle todo completion
 export const updateTodoFetcher = async (
   id: string,
-  data: { name?: string; status?: string }
+  todolistId: string,
+  userId: string,
+  updates: { name?: string; status?: string }
 ): Promise<TodoItemType> => {
-  const response = await fetch(`${API_BASE}/todos/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  if (!response.ok) {
-    throw new Error('Failed to update todo');
-  }
-  return response.json();
+  const { data } = await apiClient.put(
+    `/users/${userId}/todolists/${todolistId}/todos/${id}`,
+    updates
+  );
+  return data;
 };
 
-// Delete todo
-export const deleteTodoFetcher = async (id: string): Promise<void> => {
-  const response = await fetch(`${API_BASE}/todos/${id}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to delete todo');
-  }
+export const deleteTodoFetcher = async (
+  id: string,
+  todolistId: string,
+  userId: string
+): Promise<void> => {
+  await apiClient.delete(
+    `/users/${userId}/todolists/${todolistId}/todos/${id}`
+  );
 };

@@ -11,93 +11,101 @@ import {
   TodoList as TodoListType,
   TodoItem as TodoItemType,
 } from '@fyltura/types';
+import { useAuthStore } from '../store/authStore';
 
-export const useTodoListsQuery = (userId: number) => {
+export const useTodoListsQuery = () => {
+  const user = useAuthStore((s) => s.user);
   return useQuery<TodoListType[], Error>({
-    queryKey: ['todoLists', userId],
-    queryFn: () => getTodoListsFetcher(userId),
-    enabled: !!userId,
+    queryKey: ['todoLists', user?.id],
+    queryFn: () => getTodoListsFetcher(user!.id),
+    enabled: !!user,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 30,
   });
 };
 
-export const useCreateListMutation = (userId: number) => {
+export const useCreateListMutation = () => {
+  const user = useAuthStore((s) => s.user);
   const queryClient = useQueryClient();
   return useMutation<TodoListType, Error, string>({
-    mutationFn: (name) => createTodoListFetcher(name, userId),
+    mutationFn: (name) => createTodoListFetcher(name, user!.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todoLists', userId] });
+      queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
     },
-    onError: (err) => {
-      console.error('Error creating todolist:', err);
-    },
+    onError: (err) => console.error('Error creating todolist:', err),
   });
 };
 
-export const useDeleteListMutation = (userId: number) => {
+export const useDeleteListMutation = () => {
+  const user = useAuthStore((s) => s.user);
   const queryClient = useQueryClient();
   return useMutation<void, Error, string>({
-    mutationFn: deleteTodoListFetcher,
+    mutationFn: (todolistId) => deleteTodoListFetcher(todolistId, user!.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todoLists', userId] });
+      queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
     },
-    onError: (err) => {
-      console.error('Error deleting todolist:', err);
-    },
+    onError: (err) => console.error('Error deleting todolist:', err),
   });
 };
 
-export const useAddTodoMutation = (userId: number) => {
+export const useAddTodoMutation = () => {
+  const user = useAuthStore((s) => s.user);
   const queryClient = useQueryClient();
   return useMutation<TodoItemType, Error, { todolistId: string; name: string }>(
     {
-      mutationFn: ({ todolistId, name }) => createTodoFetcher(todolistId, name),
+      mutationFn: ({ todolistId, name }) =>
+        createTodoFetcher(todolistId, user!.id, name),
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['todoLists', userId] });
+        queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
       },
-      onError: (err) => {
-        console.error('Error creating todo:', err);
-      },
+      onError: (err) => console.error('Error creating todo:', err),
     }
   );
 };
 
-export const useToggleTodoMutation = (userId: number) => {
+export const useToggleTodoMutation = () => {
+  const user = useAuthStore((s) => s.user);
   const queryClient = useQueryClient();
-  return useMutation<TodoItemType, Error, { id: string; status: string }>({
-    mutationFn: ({ id, status }) => updateTodoFetcher(id, { status }),
+  return useMutation<
+    TodoItemType,
+    Error,
+    { id: string; todolistId: string; status: string }
+  >({
+    mutationFn: ({ id, todolistId, status }) =>
+      updateTodoFetcher(id, todolistId, user!.id, { status }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todoLists', userId] });
+      queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
     },
-    onError: (err) => {
-      console.error('Error updating todo:', err);
-    },
+    onError: (err) => console.error('Error updating todo:', err),
   });
 };
 
-export const useEditTodoMutation = (userId: number) => {
+export const useEditTodoMutation = () => {
+  const user = useAuthStore((s) => s.user);
   const queryClient = useQueryClient();
-  return useMutation<TodoItemType, Error, { id: string; name: string }>({
-    mutationFn: ({ id, name }) => updateTodoFetcher(id, { name }),
+  return useMutation<
+    TodoItemType,
+    Error,
+    { id: string; todolistId: string; name: string }
+  >({
+    mutationFn: ({ id, todolistId, name }) =>
+      updateTodoFetcher(id, todolistId, user!.id, { name }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todoLists', userId] });
+      queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
     },
-    onError: (err) => {
-      console.error('Error editing todo:', err);
-    },
+    onError: (err) => console.error('Error editing todo:', err),
   });
 };
 
-export const useDeleteTodoMutation = (userId: number) => {
+export const useDeleteTodoMutation = () => {
+  const user = useAuthStore((s) => s.user);
   const queryClient = useQueryClient();
-  return useMutation<void, Error, string>({
-    mutationFn: deleteTodoFetcher,
+  return useMutation<void, Error, { id: string; todolistId: string }>({
+    mutationFn: ({ id, todolistId }) =>
+      deleteTodoFetcher(id, todolistId, user!.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['todoLists', userId] });
+      queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
     },
-    onError: (err) => {
-      console.error('Error deleting todo:', err);
-    },
+    onError: (err) => console.error('Error deleting todo:', err),
   });
 };

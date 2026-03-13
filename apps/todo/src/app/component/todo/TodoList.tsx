@@ -8,10 +8,10 @@ import TodoListHeader from './TodoListHeader';
 interface TodoListProps {
   todoList: TodoListType;
   onAddTodo: (todolistId: string, name: string) => void;
-  onToggleTodo: (id: string) => void;
-  onDeleteTodo: (id: string) => void;
+  onToggleTodo: (id: string, todolistId: string) => void;
+  onDeleteTodo: (id: string, todolistId: string) => void;
   onDeleteList: (id: string) => void;
-  onEditTodo: (id: string, newName: string) => void;
+  onEditTodo: (id: string, todolistId: string, newName: string) => void;
   dataTestId?: string;
 }
 
@@ -60,9 +60,9 @@ function TodoList({
                 <TodoItem
                   key={todo.id}
                   todo={todo}
-                  onToggle={onToggleTodo}
-                  onDelete={onDeleteTodo}
-                  onEdit={onEditTodo}
+                  onToggle={(id) => onToggleTodo(id, todoList.id)}
+                  onDelete={(id) => onDeleteTodo(id, todoList.id)}
+                  onEdit={(id, name) => onEditTodo(id, todoList.id, name)}
                 />
               ))
             )}

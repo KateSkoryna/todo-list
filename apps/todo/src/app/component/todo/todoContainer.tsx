@@ -2,15 +2,7 @@ import { useTodoListsData } from '../../hooks/useTodoListsData';
 import TodoListForm from './TodoListForm';
 import TodoLists from './TodoLists';
 
-type TodoContainerProps = {
-  userId: number;
-};
-
-const TodoContainer: React.FC<TodoContainerProps> = ({
-  userId,
-}: {
-  userId: number;
-}) => {
+const TodoContainer: React.FC = () => {
   const {
     todoLists,
     isLoading,
@@ -24,7 +16,7 @@ const TodoContainer: React.FC<TodoContainerProps> = ({
     handleDeleteTodo,
     handleEditTodo,
     createListMutationIsPending,
-  } = useTodoListsData(userId);
+  } = useTodoListsData();
   return (
     <>
       <TodoListForm

@@ -13,9 +13,9 @@ interface TodoListsProps {
   refetch: () => void;
   handleDeleteList: (id: string) => void;
   handleAddTodo: (todolistId: string, name: string) => void;
-  handleToggleTodo: (id: string) => void;
-  handleDeleteTodo: (id: string) => void;
-  handleEditTodo: (id: string, newName: string) => void;
+  handleToggleTodo: (id: string, todolistId: string) => void;
+  handleDeleteTodo: (id: string, todolistId: string) => void;
+  handleEditTodo: (id: string, todolistId: string, newName: string) => void;
 }
 
 function TodoLists({

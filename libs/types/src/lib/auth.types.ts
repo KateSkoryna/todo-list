@@ -79,7 +79,6 @@ export type StatsPeriod = 'day' | 'week' | 'month' | 'year';
  * Based on todo completion status.
  */
 export interface UserStats {
-  period: StatsPeriod;
   total: number;
   successful: number;
   failed: number;

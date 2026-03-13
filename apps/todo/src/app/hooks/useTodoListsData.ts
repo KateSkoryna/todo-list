@@ -8,21 +8,21 @@ import {
   useTodoListsQuery,
 } from '../fetchers/api';
 
-export const useTodoListsData = (userId: number) => {
+export const useTodoListsData = () => {
   const {
     data: todoLists,
     isLoading,
     isError,
     error,
     refetch,
-  } = useTodoListsQuery(userId);
+  } = useTodoListsQuery();
 
-  const createListMutation = useCreateListMutation(userId);
-  const deleteListMutation = useDeleteListMutation(userId);
-  const addTodoMutation = useAddTodoMutation(userId);
-  const toggleTodoMutation = useToggleTodoMutation(userId);
-  const deleteTodoMutation = useDeleteTodoMutation(userId);
-  const editTodoMutation = useEditTodoMutation(userId);
+  const createListMutation = useCreateListMutation();
+  const deleteListMutation = useDeleteListMutation();
+  const addTodoMutation = useAddTodoMutation();
+  const toggleTodoMutation = useToggleTodoMutation();
+  const deleteTodoMutation = useDeleteTodoMutation();
+  const editTodoMutation = useEditTodoMutation();
 
   const handleCreateList = (name: string) => {
     createListMutation.mutate(name);
@@ -36,24 +36,25 @@ export const useTodoListsData = (userId: number) => {
     addTodoMutation.mutate({ todolistId, name });
   };
 
-  const handleToggleTodo = (id: string) => {
+  const handleToggleTodo = (id: string, todolistId: string) => {
     const todo = todoLists
       ?.flatMap((list) => list.todos)
       .find((t) => t.id === id);
     if (todo) {
       toggleTodoMutation.mutate({
         id,
+        todolistId,
         status: todo.status === 'successful' ? 'pending' : 'successful',
       });
     }
   };
 
-  const handleDeleteTodo = (id: string) => {
-    deleteTodoMutation.mutate(id);
+  const handleDeleteTodo = (id: string, todolistId: string) => {
+    deleteTodoMutation.mutate({ id, todolistId });
   };
 
-  const handleEditTodo = (id: string, name: string) => {
-    editTodoMutation.mutate({ id, name });
+  const handleEditTodo = (id: string, todolistId: string, name: string) => {
+    editTodoMutation.mutate({ id, todolistId, name });
   };
 
   return {

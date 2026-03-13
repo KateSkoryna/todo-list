@@ -1,43 +1,39 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Container from './component/elements/Container';
 import Header from './component/elements/Header';
-import Dropdown from './component/elements/Dropdown';
 import TodoContainer from './component/todo/todoContainer';
-import { useEffect, useMemo } from 'react';
+import Button from './component/elements/Button';
+import { useAuthStore } from './store/authStore';
 
 function App() {
-  const { userId } = useParams<{ userId: string }>();
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
 
-  // Dummy user data for demonstration
-  const users = useMemo(
-    () => [
-      { id: '1', name: 'Alice' },
-      { id: '2', name: 'Bob' },
-      { id: '3', name: 'Charlie' },
-      { id: '4', name: 'David' },
-      { id: '5', name: 'Eve' },
-    ],
-    []
-  );
-  const user = users.find((u) => u.id === userId);
-  const parsedUserId = userId ? parseInt(userId) : undefined;
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
-  useEffect(() => {
-    if (!userId && !user) {
-      navigate(`/users/${users[0].id}`);
-    }
-  }, [userId, users, navigate, user]);
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-base-bg py-8">
       <main className="max-w-6xl mx-auto px-4">
-        <Header />
+        <div className="flex justify-between items-center mb-2">
+          <Header />
+          <div className="flex flex-col items-end gap-1">
+            <span className="text-dark-bg text-sm">{user.displayName}</span>
+            <Button
+              onClick={handleLogout}
+              className="px-3 py-1 text-sm bg-dark-bg text-white rounded hover:bg-secondary-dark-bg"
+            >
+              Logout
+            </Button>
+          </div>
+        </div>
         <Container className="space-y-6">
-          <Dropdown users={users} />
-          {parsedUserId && users.some((user) => user.id === userId) && (
-            <TodoContainer userId={parsedUserId} />
-          )}
+          <TodoContainer />
         </Container>
       </main>
     </div>

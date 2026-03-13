@@ -1,5 +1,6 @@
 type InputProps = {
   type?: string;
+  name?: string;
   value?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   className?: string;
@@ -15,6 +16,7 @@ type InputProps = {
 
 const Input: React.FC<InputProps> = ({
   type = 'text',
+  name,
   value,
   onChange,
   className = '',
@@ -40,6 +42,7 @@ const Input: React.FC<InputProps> = ({
       )}
       <input
         id={id}
+        name={name}
         type={type}
         value={value}
         onChange={onChange}
