@@ -262,6 +262,48 @@ describe('API Integration Tests', () => {
     });
   });
 
+  // --- Stats API Tests ---
+  describe('Stats API', () => {
+    it('should return zero stats when no todos exist', async () => {
+      const res = await request(app).get('/api/users/me/stats?period=week');
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toEqual({
+        total: 0,
+        successful: 0,
+        failed: 0,
+        pending: 0,
+        completionRate: 0,
+      });
+    });
+
+    it('should return correct counts for default period', async () => {
+      await Todo.create({ name: 'Pending', todolistId });
+      await Todo.create({ name: 'Done', todolistId, status: 'successful' });
+
+      const res = await request(app).get('/api/users/me/stats');
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.total).toBe(2);
+      expect(res.body.pending).toBe(1);
+      expect(res.body.successful).toBe(1);
+      expect(res.body.completionRate).toBe(50);
+    });
+
+    it('should return 400 for invalid period', async () => {
+      const res = await request(app).get('/api/users/me/stats?period=invalid');
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.message).toContain('Invalid period');
+    });
+
+    it('should accept all valid periods', async () => {
+      for (const period of ['day', 'week', 'month', 'year']) {
+        const res = await request(app).get(
+          `/api/users/me/stats?period=${period}`
+        );
+        expect(res.statusCode).toEqual(200);
+      }
+    });
+  });
+
   // --- Todolist and Todo Interaction Tests ---
   describe('Todolist and Todo Interactions', () => {
     it('should populate todos when fetching a todolist', async () => {

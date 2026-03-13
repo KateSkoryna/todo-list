@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { TodolistController } from './controllers/todolist.controller';
 import { TodoController } from './controllers/todo.controller';
+import { UserController } from './controllers/user.controller';
 import { AuthRequest } from './middleware/auth.middleware';
 
 export const TEST_USER_ID = '507f1f77bcf86cd799439011';
@@ -20,6 +21,7 @@ app.use((req: Request, _res: Response, next: NextFunction) => {
 });
 
 // --- API Routes ---
+app.get('/api/users/me/stats', UserController.getStats);
 app.post('/api/users/me/todolists', TodolistController.create);
 app.get('/api/users/me/todolists', TodolistController.getAll);
 app.get('/api/users/me/todolists/:todolistId', TodolistController.getById);

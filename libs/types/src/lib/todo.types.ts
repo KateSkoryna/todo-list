@@ -25,6 +25,17 @@ export interface UpdateTodoItem {
   completedAt?: string | null;
 }
 
+// --- STATS TYPES ---
+export type StatsPeriod = 'day' | 'week' | 'month' | 'year';
+
+export interface UserStats {
+  total: number;
+  successful: number;
+  failed: number;
+  pending: number;
+  completionRate: number;
+}
+
 // --- TODOLIST TYPES ---
 export interface NewTodoList {
   name: string;

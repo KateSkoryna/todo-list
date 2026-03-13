@@ -29,6 +29,7 @@ const todoSchema = new Schema<ITodoDocument>(
     completedAt: { type: Date, default: null },
   },
   {
+    timestamps: true,
     toJSON: {
       transform: (_, ret: ITodoDocument) => {
         const todoItem: TodoItem = {

@@ -100,4 +100,70 @@ describe('TodoRepository', () => {
     );
     expect(deletedTodo).toBeNull();
   });
+
+  describe('getStats', () => {
+    it('should return zero counts when no todos exist', async () => {
+      const stats = await TodoRepository.getStats(USER_ID, 'week');
+      expect(stats).toEqual({
+        total: 0,
+        successful: 0,
+        failed: 0,
+        pending: 0,
+        completionRate: 0,
+      });
+    });
+
+    it('should count todos by status', async () => {
+      await TodoRepository.create(todolistId.toString(), { name: 'Pending 1' });
+      await TodoRepository.create(todolistId.toString(), { name: 'Pending 2' });
+      await TodoRepository.create(todolistId.toString(), {
+        name: 'Done',
+        status: 'successful',
+      });
+      await TodoRepository.create(todolistId.toString(), {
+        name: 'Failed',
+        status: 'failed',
+      });
+
+      const stats = await TodoRepository.getStats(USER_ID, 'week');
+      expect(stats.total).toBe(4);
+      expect(stats.pending).toBe(2);
+      expect(stats.successful).toBe(1);
+      expect(stats.failed).toBe(1);
+      expect(stats.completionRate).toBe(50);
+    });
+
+    it('should not count todos belonging to another user', async () => {
+      const otherUserId = new mongoose.Types.ObjectId().toString();
+      const otherList = await Todolist.create({
+        name: 'Other List',
+        userId: otherUserId,
+      });
+      await TodoRepository.create(otherList._id.toString(), {
+        name: 'Other todo',
+        status: 'successful',
+      });
+
+      await TodoRepository.create(todolistId.toString(), { name: 'My todo' });
+
+      const stats = await TodoRepository.getStats(USER_ID, 'week');
+      expect(stats.total).toBe(1);
+      expect(stats.pending).toBe(1);
+      expect(stats.successful).toBe(0);
+    });
+
+    it('should return 100% completionRate when all tasks are completed', async () => {
+      await TodoRepository.create(todolistId.toString(), {
+        name: 'Done 1',
+        status: 'successful',
+      });
+      await TodoRepository.create(todolistId.toString(), {
+        name: 'Done 2',
+        status: 'successful',
+      });
+
+      const stats = await TodoRepository.getStats(USER_ID, 'week');
+      expect(stats.completionRate).toBe(100);
+    });
+  });
 });
