@@ -3,7 +3,13 @@ import Text from '../elements/Text';
 import Loader from '../elements/Loader';
 import ErrorFallback from '../elements/ErrorFallback';
 import Container from '../elements/Container';
-import { TodoList as TodoListType } from '@fyltura/types';
+import { TodoList as TodoListType, UpdateTodoItem } from '@fyltura/types';
+
+type NewTodoOpts = {
+  dueDate?: string;
+  location?: string;
+  notes?: string;
+};
 
 interface TodoListsProps {
   todoLists: TodoListType[] | undefined;
@@ -12,10 +18,14 @@ interface TodoListsProps {
   error: Error | null;
   refetch: () => void;
   handleDeleteList: (id: string) => void;
-  handleAddTodo: (todolistId: string, name: string) => void;
+  handleAddTodo: (todolistId: string, name: string, opts?: NewTodoOpts) => void;
   handleToggleTodo: (id: string, todolistId: string) => void;
   handleDeleteTodo: (id: string, todolistId: string) => void;
-  handleEditTodo: (id: string, todolistId: string, newName: string) => void;
+  handleEditTodo: (
+    id: string,
+    todolistId: string,
+    updates: UpdateTodoItem
+  ) => void;
 }
 
 function TodoLists({

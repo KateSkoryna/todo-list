@@ -1,17 +1,23 @@
 import { useState } from 'react';
-import { TodoList as TodoListType } from '@fyltura/types';
+import { TodoList as TodoListType, UpdateTodoItem } from '@fyltura/types';
 import TodoItem from './TodoItem';
 import TodoForm from './TodoForm';
 import Text from '../elements/Text';
 import TodoListHeader from './TodoListHeader';
 
+type NewTodoOpts = {
+  dueDate?: string;
+  location?: string;
+  notes?: string;
+};
+
 interface TodoListProps {
   todoList: TodoListType;
-  onAddTodo: (todolistId: string, name: string) => void;
+  onAddTodo: (todolistId: string, name: string, opts?: NewTodoOpts) => void;
   onToggleTodo: (id: string, todolistId: string) => void;
   onDeleteTodo: (id: string, todolistId: string) => void;
   onDeleteList: (id: string) => void;
-  onEditTodo: (id: string, todolistId: string, newName: string) => void;
+  onEditTodo: (id: string, todolistId: string, updates: UpdateTodoItem) => void;
   dataTestId?: string;
 }
 
@@ -26,8 +32,8 @@ function TodoList({
 }: TodoListProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const handleAddTodo = (name: string) => {
-    onAddTodo(todoList.id, name);
+  const handleAddTodo = (name: string, opts?: NewTodoOpts) => {
+    onAddTodo(todoList.id, name, opts);
   };
 
   return (
@@ -62,7 +68,7 @@ function TodoList({
                   todo={todo}
                   onToggle={(id) => onToggleTodo(id, todoList.id)}
                   onDelete={(id) => onDeleteTodo(id, todoList.id)}
-                  onEdit={(id, name) => onEditTodo(id, todoList.id, name)}
+                  onEdit={(id, updates) => onEditTodo(id, todoList.id, updates)}
                 />
               ))
             )}
