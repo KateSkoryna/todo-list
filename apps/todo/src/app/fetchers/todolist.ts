@@ -29,11 +29,12 @@ export const deleteTodoListFetcher = async (
 export const createTodoFetcher = async (
   todolistId: string,
   userId: string,
-  name: string
+  name: string,
+  opts?: { dueDate?: string; location?: string; notes?: string }
 ): Promise<TodoItemType> => {
   const { data } = await apiClient.post(
     `/users/${userId}/todolists/${todolistId}/todos`,
-    { name }
+    { name, ...opts }
   );
   return data;
 };
@@ -42,7 +43,13 @@ export const updateTodoFetcher = async (
   id: string,
   todolistId: string,
   userId: string,
-  updates: { name?: string; status?: string }
+  updates: {
+    name?: string;
+    status?: string;
+    dueDate?: string | null;
+    location?: string | null;
+    notes?: string | null;
+  }
 ): Promise<TodoItemType> => {
   const { data } = await apiClient.put(
     `/users/${userId}/todolists/${todolistId}/todos/${id}`,

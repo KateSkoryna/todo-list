@@ -102,6 +102,33 @@ npm run test:unit:be
 npm run test:e2e:watch
 ```
 
+## Authentication
+
+### Login
+- Displays a generic error on failed sign-in (no credential hints exposed)
+- Links to Register and Forgot Password pages
+
+### Register Form Validation
+Validated client-side with Zod before the request is sent:
+- Display name — required
+- Email — valid email format
+- Password — must contain at least 1 uppercase letter, 1 number, and 1 symbol
+- Confirm password — must match password
+
+Inline field errors are shown beneath each input. The same regex rules are enforced server-side on the backend.
+
+### Forgot / Reset Password
+1. User submits their email on `/forgot-password`
+2. Backend generates a secure random token, hashes it, and stores it on the user with a 1-hour expiry
+3. A reset link (`/reset-password?token=...`) is emailed to the user
+4. User submits a new password on `/reset-password` — validated with the same Zod schema as registration
+5. Token is verified against the hash, checked for expiry, then cleared after a successful reset
+
+### Email Provider
+The email service switches provider automatically based on `NODE_ENV`:
+- `development` — Mailtrap (SMTP sandbox, `MAILTRAP_*` env vars)
+- `production` — Resend (SMTP, `RESEND_*` env vars)
+
 ## Notes
 
 - Styling: Used Tailwind CSS to simplify styling.

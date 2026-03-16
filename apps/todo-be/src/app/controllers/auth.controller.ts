@@ -1,13 +1,18 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { UserRepository } from '../repositories/user.repository';
+import { sendPasswordResetEmail } from '../services/email.service';
 import {
   RegisterRequest,
   LoginRequest,
   AuthResponse,
   RefreshRequest,
   JwtPayload,
+  EMAIL_REGEX,
+  PASSWORD_REGEX,
+  PASSWORD_REQUIREMENTS,
 } from '@fyltura/types';
 
 const SALT_ROUNDS = 10;
@@ -46,6 +51,14 @@ export const AuthController = {
           .json({ message: 'email, password, and displayName are required' });
       }
 
+      if (!EMAIL_REGEX.test(email)) {
+        return res.status(400).json({ message: 'Invalid email address' });
+      }
+
+      if (!PASSWORD_REGEX.test(password)) {
+        return res.status(400).json({ message: PASSWORD_REQUIREMENTS });
+      }
+
       const existing = await UserRepository.findByEmail(email);
       if (existing) {
         return res.status(409).json({ message: 'Email already in use' });
@@ -60,12 +73,10 @@ export const AuthController = {
 
       res.status(201).json(buildAuthResponse(user));
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          message: 'Error registering user',
-          error: (error as Error).message,
-        });
+      res.status(500).json({
+        message: 'Error registering user',
+        error: (error as Error).message,
+      });
     }
   },
 
@@ -122,17 +133,74 @@ export const AuthController = {
           .status(401)
           .json({ message: 'Invalid or expired refresh token' });
       }
-      res
-        .status(500)
-        .json({
-          message: 'Error refreshing token',
-          error: (error as Error).message,
-        });
+      res.status(500).json({
+        message: 'Error refreshing token',
+        error: (error as Error).message,
+      });
     }
   },
 
   logout: (_req: Request, res: Response) => {
     res.json({ message: 'Logged out' });
+  },
+
+  forgotPassword: async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ message: 'email is required' });
+      }
+
+      // Always respond with success to avoid leaking which emails are registered
+      const user = await UserRepository.findByEmail(email);
+      if (user) {
+        const token = crypto.randomBytes(32).toString('hex');
+        const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+        await UserRepository.setResetToken(user.id, token, expires);
+        await sendPasswordResetEmail(user.email, token);
+      }
+
+      res.json({
+        message: 'If that email exists, a reset link has been sent.',
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error sending reset email',
+        error: (error as Error).message,
+      });
+    }
+  },
+
+  resetPassword: async (req: Request, res: Response) => {
+    try {
+      const { token, password } = req.body;
+      if (!token || !password) {
+        return res
+          .status(400)
+          .json({ message: 'token and password are required' });
+      }
+
+      if (!PASSWORD_REGEX.test(password)) {
+        return res.status(400).json({ message: PASSWORD_REQUIREMENTS });
+      }
+
+      const user = await UserRepository.findByResetToken(token);
+      if (!user) {
+        return res
+          .status(400)
+          .json({ message: 'Reset link is invalid or has expired.' });
+      }
+
+      const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+      await UserRepository.updatePassword(user.id, passwordHash);
+
+      res.json({ message: 'Password updated. You can now sign in.' });
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error resetting password',
+        error: (error as Error).message,
+      });
+    }
   },
 
   getUser: async (req: Request, res: Response) => {
@@ -147,12 +215,10 @@ export const AuthController = {
       }
       res.json(user);
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          message: 'Error fetching user',
-          error: (error as Error).message,
-        });
+      res.status(500).json({
+        message: 'Error fetching user',
+        error: (error as Error).message,
+      });
     }
   },
 };

@@ -10,6 +10,7 @@ import {
 import {
   TodoList as TodoListType,
   TodoItem as TodoItemType,
+  UpdateTodoItem,
 } from '@fyltura/types';
 import { useAuthStore } from '../store/authStore';
 
@@ -51,16 +52,28 @@ export const useDeleteListMutation = () => {
 export const useAddTodoMutation = () => {
   const user = useAuthStore((s) => s.user);
   const queryClient = useQueryClient();
-  return useMutation<TodoItemType, Error, { todolistId: string; name: string }>(
+  return useMutation<
+    TodoItemType,
+    Error,
     {
-      mutationFn: ({ todolistId, name }) =>
-        createTodoFetcher(todolistId, user!.id, name),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
-      },
-      onError: (err) => console.error('Error creating todo:', err),
+      todolistId: string;
+      name: string;
+      dueDate?: string;
+      location?: string;
+      notes?: string;
     }
-  );
+  >({
+    mutationFn: ({ todolistId, name, dueDate, location, notes }) =>
+      createTodoFetcher(todolistId, user!.id, name, {
+        dueDate,
+        location,
+        notes,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
+    },
+    onError: (err) => console.error('Error creating todo:', err),
+  });
 };
 
 export const useToggleTodoMutation = () => {
@@ -86,10 +99,10 @@ export const useEditTodoMutation = () => {
   return useMutation<
     TodoItemType,
     Error,
-    { id: string; todolistId: string; name: string }
+    { id: string; todolistId: string } & UpdateTodoItem
   >({
-    mutationFn: ({ id, todolistId, name }) =>
-      updateTodoFetcher(id, todolistId, user!.id, { name }),
+    mutationFn: ({ id, todolistId, ...updates }) =>
+      updateTodoFetcher(id, todolistId, user!.id, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
     },
