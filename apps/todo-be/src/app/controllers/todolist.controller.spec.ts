@@ -121,10 +121,14 @@ describe('TodolistController', () => {
 
     await TodolistController.create(req, res);
 
-    expect(TodolistRepository.create).toHaveBeenCalledWith(
-      'New Todolist',
-      TEST_USER_ID
-    );
+    expect(TodolistRepository.create).toHaveBeenCalledWith({
+      name: 'New Todolist',
+      userId: TEST_USER_ID,
+      priority: undefined,
+      category: undefined,
+      dueDate: undefined,
+      notes: undefined,
+    });
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith(newTodolist);
   });
@@ -170,7 +174,13 @@ describe('TodolistController', () => {
 
     expect(TodolistRepository.update).toHaveBeenCalledWith(
       todolistId,
-      'Updated Name',
+      {
+        name: 'Updated Name',
+        priority: undefined,
+        category: undefined,
+        dueDate: undefined,
+        notes: undefined,
+      },
       TEST_USER_ID
     );
     expect(res.json).toHaveBeenCalledWith(updatedTodolist);

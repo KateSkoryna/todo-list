@@ -44,7 +44,7 @@ export const TodolistController = {
 
   create: async (req: Request, res: Response) => {
     try {
-      const { name } = req.body;
+      const { name, priority, category, dueDate, notes } = req.body;
       const userId = (req as AuthRequest).userId;
 
       if (!name) {
@@ -53,7 +53,14 @@ export const TodolistController = {
           .json(createValidationError([{ field: 'name', value: name }]));
       }
 
-      const newList = await TodolistRepository.create(name, userId);
+      const newList = await TodolistRepository.create({
+        name,
+        userId,
+        priority,
+        category,
+        dueDate,
+        notes,
+      });
       res.status(201).json(newList);
     } catch (error) {
       res.status(500).json({
@@ -66,7 +73,7 @@ export const TodolistController = {
   update: async (req: Request, res: Response) => {
     try {
       const { todolistId } = req.params;
-      const { name } = req.body;
+      const { name, priority, category, dueDate, notes } = req.body;
       const userId = (req as AuthRequest).userId;
 
       if (!mongoose.Types.ObjectId.isValid(todolistId)) {
@@ -75,7 +82,13 @@ export const TodolistController = {
           .json(createValidationError([{ field: 'id', value: todolistId }]));
       }
 
-      if (!name) {
+      if (
+        !name &&
+        priority === undefined &&
+        category === undefined &&
+        dueDate === undefined &&
+        notes === undefined
+      ) {
         return res
           .status(400)
           .json(createValidationError([{ field: 'name', value: name }]));
@@ -83,7 +96,7 @@ export const TodolistController = {
 
       const updatedList = await TodolistRepository.update(
         todolistId,
-        name,
+        { name, priority, category, dueDate, notes },
         userId
       );
       if (!updatedList) {

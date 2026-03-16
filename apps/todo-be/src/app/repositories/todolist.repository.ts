@@ -1,5 +1,19 @@
 import { Todolist } from '../models/todoList.model';
-import { TodoList } from '@fyltura/types';
+import {
+  TodoList,
+  TodoListPriority,
+  TodoListCategory,
+  UpdateTodoList,
+} from '@shared/types';
+
+type CreateTodoListData = {
+  name: string;
+  userId: string;
+  priority?: TodoListPriority;
+  category?: TodoListCategory;
+  dueDate?: string | null;
+  notes?: string | null;
+};
 
 export const TodolistRepository = {
   findAll: async (userId: string): Promise<TodoList[]> => {
@@ -15,21 +29,19 @@ export const TodolistRepository = {
     return doc.toJSON() as TodoList;
   },
 
-  create: async (name: string, userId: string): Promise<TodoList> => {
-    const doc = await Todolist.create({ name, userId });
+  create: async (data: CreateTodoListData): Promise<TodoList> => {
+    const doc = await Todolist.create(data);
     return doc.toJSON() as TodoList;
   },
 
   update: async (
     id: string,
-    name: string,
+    updates: UpdateTodoList,
     userId: string
   ): Promise<TodoList | null> => {
-    const doc = await Todolist.findOneAndUpdate(
-      { _id: id, userId },
-      { name },
-      { new: true }
-    ).exec();
+    const doc = await Todolist.findOneAndUpdate({ _id: id, userId }, updates, {
+      new: true,
+    }).exec();
     if (!doc) {
       return null;
     }

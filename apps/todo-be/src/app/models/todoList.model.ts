@@ -1,17 +1,44 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import { TodoList, TodoItem } from '@fyltura/types';
+import {
+  TodoList,
+  TodoItem,
+  TodoListPriority,
+  TodoListCategory,
+} from '@shared/types';
 
-interface ITodolistDocument extends Omit<TodoList, 'id' | 'userId'>, Document {
+interface ITodolistDocument
+  extends Omit<
+      TodoList,
+      'id' | 'userId' | 'dueDate' | 'createdAt' | 'updatedAt'
+    >,
+    Document {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
+  priority?: TodoListPriority;
+  category?: TodoListCategory;
+  dueDate?: Date | null;
+  notes?: string | null;
 }
 
 const todolistSchema = new Schema<ITodolistDocument>(
   {
     name: { type: String, required: true },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    priority: {
+      type: String,
+      enum: ['low', 'medium', 'high'],
+      default: undefined,
+    },
+    category: {
+      type: String,
+      enum: ['home', 'education', 'work', 'family', 'health'],
+      default: undefined,
+    },
+    dueDate: { type: Date, default: undefined },
+    notes: { type: String, default: undefined },
   },
   {
+    timestamps: true,
     toJSON: {
       virtuals: true,
       transform: (_, ret: ITodolistDocument) => {
@@ -20,6 +47,16 @@ const todolistSchema = new Schema<ITodolistDocument>(
           name: ret.name,
           userId: ret.userId.toString(),
           todos: (ret.todos as TodoItem[]) || [],
+          priority: ret.priority,
+          category: ret.category,
+          dueDate: ret.dueDate ? ret.dueDate.toISOString() : null,
+          notes: ret.notes,
+          createdAt: (
+            ret as unknown as { createdAt: Date }
+          ).createdAt?.toISOString(),
+          updatedAt: (
+            ret as unknown as { updatedAt: Date }
+          ).updatedAt?.toISOString(),
         };
         return todolist;
       },
