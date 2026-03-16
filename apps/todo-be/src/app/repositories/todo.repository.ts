@@ -6,7 +6,7 @@ import {
   UpdateTodoItem,
   UserStats,
   StatsPeriod,
-} from '@fyltura/types';
+} from '@shared/types';
 
 export const TodoRepository = {
   findById: async (id: string): Promise<TodoItem | null> => {

@@ -1,4 +1,4 @@
-import { AuthResponse, LoginRequest, RegisterRequest } from '@fyltura/types';
+import { AuthResponse, LoginRequest, RegisterRequest } from '@shared/types';
 import apiClient from '../lib/apiClient';
 
 export const loginFetcher = async (

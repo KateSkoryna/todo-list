@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { StatsPeriod } from '@fyltura/types';
+import { StatsPeriod } from '@shared/types';
 import { TodoRepository } from '../repositories/todo.repository';
 import { AuthRequest } from '../middleware/auth.middleware';
 

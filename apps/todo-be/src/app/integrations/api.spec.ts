@@ -3,7 +3,7 @@ import app, { TEST_USER_ID } from '../test-app';
 import mongoose from 'mongoose';
 import { Todo } from '../models/todo.model';
 import { Todolist } from '../models/todoList.model';
-import { TodoList } from '@fyltura/types';
+import { TodoList } from '@shared/types';
 
 describe('API Integration Tests', () => {
   let todolistId: string;

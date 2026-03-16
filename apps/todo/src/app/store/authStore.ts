@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { User } from '@fyltura/types';
+import { User } from '@shared/types';
 import { environment } from '../../environments/environment';
 
 const ACCESS_TOKEN_KEY = 'accessToken';

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TodoList as TodoListType, UpdateTodoItem } from '@fyltura/types';
+import { TodoList as TodoListType, UpdateTodoItem } from '@shared/types';
 import TodoItem from './TodoItem';
 import TodoForm from './TodoForm';
 import Text from '../elements/Text';

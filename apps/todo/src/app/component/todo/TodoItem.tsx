@@ -3,7 +3,7 @@ import {
   TodoItem as TodoItemType,
   UpdateTodoItem,
   TodoStatus,
-} from '@fyltura/types';
+} from '@shared/types';
 import Button from '../elements/Button';
 import Text from '../elements/Text';
 import Input from '../elements/Input';

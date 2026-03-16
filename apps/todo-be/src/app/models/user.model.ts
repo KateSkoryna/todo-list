@@ -1,5 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import { User } from '@fyltura/types';
+import { User } from '@shared/types';
 
 interface IUserDocument extends Omit<User, 'id'>, Document {
   _id: Types.ObjectId;

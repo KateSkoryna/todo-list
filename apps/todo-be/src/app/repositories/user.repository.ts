@@ -1,5 +1,5 @@
 import { UserModel } from '../models/user.model';
-import { User } from '@fyltura/types';
+import { User } from '@shared/types';
 
 type UserWithResetToken = User & {
   passwordHash: string;

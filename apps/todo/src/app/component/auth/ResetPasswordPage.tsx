@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { resetPasswordSchema } from '@fyltura/types';
+import { resetPasswordSchema } from '@shared/types';
 import apiClient from '../../lib/apiClient';
 import Input from '../elements/Input';
 import Button from '../elements/Button';
