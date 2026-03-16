@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.EMAIL_PROVIDER === 'resend';
 
 const smtpConfig = isProduction
   ? {

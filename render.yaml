@@ -7,8 +7,8 @@ services:
     buildCommand: npm install && npx nx build todo-be --configuration=production
     startCommand: node dist/apps/todo-be/main.js
     envVars:
-      - key: NODE_ENV
-        value: production
+      - key: EMAIL_PROVIDER
+        value: resend
       - key: MONGODB_URI
         sync: false
       - key: DATABASE_NAME
