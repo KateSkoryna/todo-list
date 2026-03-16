@@ -1,8 +1,17 @@
 import {
   TodoList as TodoListType,
   TodoItem as TodoItemType,
-} from '@fyltura/types';
+  TodoListPriority,
+  TodoListCategory,
+} from '@shared/types';
 import apiClient from '../lib/apiClient';
+
+export type CreateTodoListOpts = {
+  priority?: TodoListPriority;
+  category?: TodoListCategory;
+  dueDate?: string | null;
+  notes?: string | null;
+};
 
 export const getTodoListsFetcher = async (
   userId: string
@@ -13,9 +22,13 @@ export const getTodoListsFetcher = async (
 
 export const createTodoListFetcher = async (
   name: string,
-  userId: string
+  userId: string,
+  opts?: CreateTodoListOpts
 ): Promise<TodoListType> => {
-  const { data } = await apiClient.post(`/users/${userId}/todolists`, { name });
+  const { data } = await apiClient.post(`/users/${userId}/todolists`, {
+    name,
+    ...opts,
+  });
   return data;
 };
 
