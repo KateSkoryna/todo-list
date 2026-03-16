@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './app/app';
 import LoginPage from './app/component/auth/LoginPage';
 import RegisterPage from './app/component/auth/RegisterPage';
+import ForgotPasswordPage from './app/component/auth/ForgotPasswordPage';
+import ResetPasswordPage from './app/component/auth/ResetPasswordPage';
 import { useAuthStore } from './app/store/authStore';
 import Loader from './app/component/elements/Loader';
 
@@ -59,6 +61,8 @@ root.render(
               </AuthRoute>
             }
           />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

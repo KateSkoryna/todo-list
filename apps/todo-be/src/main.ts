@@ -52,6 +52,8 @@ app.post('/api/auth/login', AuthController.login);
 app.post('/api/auth/refresh', AuthController.refresh);
 app.post('/api/auth/logout', AuthController.logout);
 app.get('/api/auth/user', authMiddleware, AuthController.getUser);
+app.post('/api/auth/forgot-password', AuthController.forgotPassword);
+app.post('/api/auth/reset-password', AuthController.resetPassword);
 
 // --- User Routes ---
 app.get('/api/users/:userId/stats', authMiddleware, UserController.getStats);

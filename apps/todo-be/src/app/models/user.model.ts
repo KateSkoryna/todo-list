@@ -4,6 +4,8 @@ import { User } from '@fyltura/types';
 interface IUserDocument extends Omit<User, 'id'>, Document {
   _id: Types.ObjectId;
   passwordHash: string;
+  resetToken?: string;
+  resetTokenExpires?: Date;
 }
 
 const userSchema = new Schema<IUserDocument>(
@@ -17,6 +19,8 @@ const userSchema = new Schema<IUserDocument>(
     },
     passwordHash: { type: String, required: true },
     displayName: { type: String, required: true, trim: true },
+    resetToken: { type: String },
+    resetTokenExpires: { type: Date },
   },
   {
     timestamps: true,
