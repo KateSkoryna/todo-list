@@ -23,8 +23,8 @@ function LoginPage() {
       );
       login(user, accessToken, refreshToken);
       navigate('/');
-    } catch (err) {
-      setError((err as Error).message);
+    } catch {
+      setError('Sign in failed. Check email or password.');
     } finally {
       setIsPending(false);
     }
@@ -59,6 +59,15 @@ function LoginPage() {
             />
           </div>
 
+          <div className="text-right -mt-2">
+            <Link
+              to="/forgot-password"
+              className="text-accent font-black text-sm hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
+
           {error && <p className="text-red-600 text-sm">{error}</p>}
 
           <Button
@@ -74,7 +83,7 @@ function LoginPage() {
           Don't have an account?{' '}
           <Link
             to="/register"
-            className="text-accent font-medium hover:underline"
+            className="text-accent font-black hover:underline"
           >
             Register
           </Link>
