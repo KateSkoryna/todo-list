@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { JwtPayload } from '@fyltura/types';
+import { JwtPayload } from '@shared/types';
 
 export interface AuthRequest extends Request {
   userId: string;

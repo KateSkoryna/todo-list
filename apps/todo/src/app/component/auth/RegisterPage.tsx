@@ -2,7 +2,7 @@ import { useState, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { registerFetcher } from '../../fetchers/auth';
-import { registerSchema } from '@fyltura/types';
+import { registerSchema } from '@shared/types';
 import Input from '../elements/Input';
 import Button from '../elements/Button';
 

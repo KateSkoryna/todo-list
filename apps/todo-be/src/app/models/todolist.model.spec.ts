@@ -1,5 +1,5 @@
 import { Todolist } from './todoList.model';
-import { TodoList } from '@fyltura/types';
+import { TodoList } from '@shared/types';
 import mongoose from 'mongoose';
 
 const userId = new mongoose.Types.ObjectId();

@@ -2,14 +2,17 @@ import { TodolistRepository } from './todolist.repository';
 import { Todolist } from '../models/todoList.model';
 import { Todo } from '../models/todo.model';
 import mongoose from 'mongoose';
-import { TodoList } from '@fyltura/types';
+import { TodoList } from '@shared/types';
 
 const USER1_ID = '507f1f77bcf86cd799439011';
 const USER2_ID = '507f1f77bcf86cd799439012';
 
 describe('TodolistRepository', () => {
   it('should create a new todolist', async () => {
-    const todolist = await TodolistRepository.create('New Todolist', USER1_ID);
+    const todolist = await TodolistRepository.create({
+      name: 'New Todolist',
+      userId: USER1_ID,
+    });
     expect(todolist).toBeDefined();
     expect(todolist.name).toBe('New Todolist');
     expect(todolist.userId).toBe(USER1_ID);
@@ -19,8 +22,8 @@ describe('TodolistRepository', () => {
   });
 
   it('should find all todolists for user 1', async () => {
-    await TodolistRepository.create('Todolist 1', USER1_ID);
-    await TodolistRepository.create('Todolist 2', USER1_ID);
+    await TodolistRepository.create({ name: 'Todolist 1', userId: USER1_ID });
+    await TodolistRepository.create({ name: 'Todolist 2', userId: USER1_ID });
 
     const todolists = await TodolistRepository.findAll(USER1_ID);
     expect(todolists.length).toBe(2);
@@ -29,9 +32,18 @@ describe('TodolistRepository', () => {
   });
 
   it('should find all todolists by userId', async () => {
-    await TodolistRepository.create('User 1 Todolist 1', USER1_ID);
-    await TodolistRepository.create('User 1 Todolist 2', USER1_ID);
-    await TodolistRepository.create('User 2 Todolist 1', USER2_ID);
+    await TodolistRepository.create({
+      name: 'User 1 Todolist 1',
+      userId: USER1_ID,
+    });
+    await TodolistRepository.create({
+      name: 'User 1 Todolist 2',
+      userId: USER1_ID,
+    });
+    await TodolistRepository.create({
+      name: 'User 2 Todolist 1',
+      userId: USER2_ID,
+    });
 
     const todolists = await TodolistRepository.findAll(USER1_ID);
     expect(todolists.length).toBe(2);
@@ -39,7 +51,10 @@ describe('TodolistRepository', () => {
   });
 
   it('should find a todolist by id', async () => {
-    const todolist = await TodolistRepository.create('Find Me', USER1_ID);
+    const todolist = await TodolistRepository.create({
+      name: 'Find Me',
+      userId: USER1_ID,
+    });
     const foundTodolist = await TodolistRepository.findById(
       todolist.id,
       USER1_ID
@@ -49,7 +64,10 @@ describe('TodolistRepository', () => {
   });
 
   it('should find a todolist by id with userId ownership check', async () => {
-    const todolist = await TodolistRepository.create('Find Me', USER1_ID);
+    const todolist = await TodolistRepository.create({
+      name: 'Find Me',
+      userId: USER1_ID,
+    });
     const found = await TodolistRepository.findById(todolist.id, USER1_ID);
     expect(found).toBeDefined();
     expect(found?.name).toBe('Find Me');
@@ -67,8 +85,15 @@ describe('TodolistRepository', () => {
   });
 
   it('should update a todolist', async () => {
-    const todolist = await TodolistRepository.create('Old Name', USER1_ID);
-    await TodolistRepository.update(todolist.id, 'Updated Name', USER1_ID);
+    const todolist = await TodolistRepository.create({
+      name: 'Old Name',
+      userId: USER1_ID,
+    });
+    await TodolistRepository.update(
+      todolist.id,
+      { name: 'Updated Name' },
+      USER1_ID
+    );
 
     const foundTodolist = await Todolist.findById(todolist.id);
     expect(foundTodolist).toBeDefined();
@@ -78,27 +103,30 @@ describe('TodolistRepository', () => {
   it('should return null if todolist not found for update', async () => {
     const updatedTodolist = await TodolistRepository.update(
       new mongoose.Types.ObjectId().toString(),
-      'Non Existent',
+      { name: 'Non Existent' },
       USER1_ID
     );
     expect(updatedTodolist).toBeNull();
   });
 
   it('should return null if update attempted by wrong user', async () => {
-    const todolist = await TodolistRepository.create(
-      'Owned by User 1',
-      USER1_ID
-    );
+    const todolist = await TodolistRepository.create({
+      name: 'Owned by User 1',
+      userId: USER1_ID,
+    });
     const result = await TodolistRepository.update(
       todolist.id,
-      'Hacked',
+      { name: 'Hacked' },
       USER2_ID
     );
     expect(result).toBeNull();
   });
 
   it('should delete a todolist', async () => {
-    const todolist = await TodolistRepository.create('Delete Me', USER1_ID);
+    const todolist = await TodolistRepository.create({
+      name: 'Delete Me',
+      userId: USER1_ID,
+    });
     await TodolistRepository.delete(todolist.id, USER1_ID);
 
     const foundTodolist = await Todolist.findById(todolist.id);
@@ -114,16 +142,19 @@ describe('TodolistRepository', () => {
   });
 
   it('should return null if delete attempted by wrong user', async () => {
-    const todolist = await TodolistRepository.create(
-      'Owned by User 1',
-      USER1_ID
-    );
+    const todolist = await TodolistRepository.create({
+      name: 'Owned by User 1',
+      userId: USER1_ID,
+    });
     const result = await TodolistRepository.delete(todolist.id, USER2_ID);
     expect(result).toBeNull();
   });
 
   it('should populate todos when finding a todolist', async () => {
-    const todolist = await TodolistRepository.create('Populate Test', USER1_ID);
+    const todolist = await TodolistRepository.create({
+      name: 'Populate Test',
+      userId: USER1_ID,
+    });
     await Todo.create({
       name: 'Todo 1',
       todolistId: todolist.id,

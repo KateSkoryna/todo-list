@@ -1,5 +1,5 @@
 import { Todo } from './todo.model';
-import { TodoItem } from '@fyltura/types';
+import { TodoItem } from '@shared/types';
 import mongoose from 'mongoose';
 
 describe('Todo Model', () => {

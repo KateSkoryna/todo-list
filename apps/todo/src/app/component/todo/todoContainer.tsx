@@ -1,6 +1,14 @@
 import { useTodoListsData } from '../../hooks/useTodoListsData';
 import TodoListForm from './TodoListForm';
 import TodoLists from './TodoLists';
+import { TodoListPriority, TodoListCategory } from '@shared/types';
+
+type CreateListOpts = {
+  priority?: TodoListPriority;
+  category?: TodoListCategory;
+  dueDate?: string | null;
+  notes?: string | null;
+};
 
 const TodoContainer: React.FC = () => {
   const {
@@ -20,7 +28,7 @@ const TodoContainer: React.FC = () => {
   return (
     <>
       <TodoListForm
-        onSubmit={handleCreateList}
+        onSubmit={(name, opts?: CreateListOpts) => handleCreateList(name, opts)}
         isSubmitting={createListMutationIsPending}
       />
       <TodoLists

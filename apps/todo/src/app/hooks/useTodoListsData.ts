@@ -7,7 +7,11 @@ import {
   useEditTodoMutation,
   useTodoListsQuery,
 } from '../fetchers/api';
-import { UpdateTodoItem } from '@fyltura/types';
+import {
+  UpdateTodoItem,
+  TodoListPriority,
+  TodoListCategory,
+} from '@shared/types';
 
 export const useTodoListsData = () => {
   const {
@@ -25,8 +29,16 @@ export const useTodoListsData = () => {
   const deleteTodoMutation = useDeleteTodoMutation();
   const editTodoMutation = useEditTodoMutation();
 
-  const handleCreateList = (name: string) => {
-    createListMutation.mutate(name);
+  const handleCreateList = (
+    name: string,
+    opts?: {
+      priority?: TodoListPriority;
+      category?: TodoListCategory;
+      dueDate?: string | null;
+      notes?: string | null;
+    }
+  ) => {
+    createListMutation.mutate({ name, ...opts });
   };
 
   const handleDeleteList = (id: string) => {

@@ -6,12 +6,13 @@ import {
   updateTodoFetcher,
   deleteTodoFetcher,
   getTodoListsFetcher,
+  CreateTodoListOpts,
 } from './todolist';
 import {
   TodoList as TodoListType,
   TodoItem as TodoItemType,
   UpdateTodoItem,
-} from '@fyltura/types';
+} from '@shared/types';
 import { useAuthStore } from '../store/authStore';
 
 export const useTodoListsQuery = () => {
@@ -28,8 +29,13 @@ export const useTodoListsQuery = () => {
 export const useCreateListMutation = () => {
   const user = useAuthStore((s) => s.user);
   const queryClient = useQueryClient();
-  return useMutation<TodoListType, Error, string>({
-    mutationFn: (name) => createTodoListFetcher(name, user!.id),
+  return useMutation<
+    TodoListType,
+    Error,
+    { name: string } & CreateTodoListOpts
+  >({
+    mutationFn: ({ name, ...opts }) =>
+      createTodoListFetcher(name, user!.id, opts),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
     },

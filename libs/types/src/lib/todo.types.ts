@@ -26,16 +26,34 @@ export interface UpdateTodoItem {
 }
 
 // --- TODOLIST TYPES ---
+export type TodoListPriority = 'low' | 'medium' | 'high';
+export type TodoListCategory =
+  | 'home'
+  | 'education'
+  | 'work'
+  | 'family'
+  | 'health';
+
 export interface NewTodoList {
   name: string;
   userId: string;
+  priority?: TodoListPriority;
+  category?: TodoListCategory;
+  dueDate?: string | null;
+  notes?: string | null;
 }
 
 export interface TodoList extends NewTodoList {
   id: string;
   todos: TodoItem[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface UpdateTodoList {
   name?: string;
+  priority?: TodoListPriority;
+  category?: TodoListCategory;
+  dueDate?: string | null;
+  notes?: string | null;
 }

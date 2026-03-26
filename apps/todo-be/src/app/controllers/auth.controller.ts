@@ -13,7 +13,7 @@ import {
   EMAIL_REGEX,
   PASSWORD_REGEX,
   PASSWORD_REQUIREMENTS,
-} from '@fyltura/types';
+} from '@shared/types';
 
 const SALT_ROUNDS = 10;
 

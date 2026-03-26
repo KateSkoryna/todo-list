@@ -1,5 +1,5 @@
 import { Schema, model, Document, Types } from 'mongoose';
-import { TodoItem, TodoStatus } from '@fyltura/types';
+import { TodoItem, TodoStatus } from '@shared/types';
 
 interface ITodoDocument
   extends Omit<TodoItem, 'id' | 'todolistId' | 'dueDate' | 'completedAt'>,

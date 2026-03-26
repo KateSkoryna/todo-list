@@ -3,7 +3,7 @@ import { TodoRepository } from '../repositories/todo.repository';
 import { TodolistRepository } from '../repositories/todolist.repository';
 import { createValidationError } from '../utils/errors';
 import { AuthRequest } from '../middleware/auth.middleware';
-import { TodoStatus, UpdateTodoItem } from '@fyltura/types';
+import { TodoStatus, UpdateTodoItem } from '@shared/types';
 import mongoose from 'mongoose';
 
 const VALID_STATUSES: TodoStatus[] = ['pending', 'successful', 'failed'];
