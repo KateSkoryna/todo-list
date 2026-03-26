@@ -54,7 +54,7 @@ export function filterByPeriod(todos: TodoItem[], period: Period): TodoItem[] {
   const start = getFilterStart(period);
   return todos.filter((todo) => {
     const date = getTodoDate(todo);
-    if (!date) return false;
+    if (!date) return true;
     return dayjs(date).isAfter(start);
   });
 }

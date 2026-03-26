@@ -273,7 +273,7 @@ export default function StatisticsPage() {
             </p>
             <div className="flex-1 flex items-center justify-center">
               {statusData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={160}>
+                <ResponsiveContainer width="100%" height={180}>
                   <PieChart>
                     <Pie
                       data={statusData}
@@ -295,7 +295,9 @@ export default function StatisticsPage() {
                         fontSize: 12,
                       }}
                     />
-                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                    <Legend
+                      wrapperStyle={{ fontSize: 12, paddingTop: '20px' }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
