@@ -2,6 +2,10 @@ import React from 'react';
 import { TodoList as TodoListType } from '@shared/types';
 import Button from '../elements/Button';
 import Text from '../elements/Text';
+import {
+  PRIORITY_COLORS,
+  CATEGORY_LABELS,
+} from '../../constants/todolist.constants';
 
 interface TodoListHeaderProps {
   todoList: TodoListType;
@@ -9,20 +13,6 @@ interface TodoListHeaderProps {
   setIsExpanded: (expanded: boolean) => void;
   onDeleteList: (id: string) => void;
 }
-
-const PRIORITY_COLORS: Record<string, string> = {
-  high: 'bg-red-100 text-red-700 border border-red-300',
-  medium: 'bg-amber-100 text-amber-700 border border-amber-300',
-  low: 'bg-green-100 text-green-700 border border-green-300',
-};
-
-const CATEGORY_LABELS: Record<string, string> = {
-  home: 'Home',
-  education: 'Education',
-  work: 'Work',
-  family: 'Family',
-  health: 'Health',
-};
 
 function formatDate(iso: string | null | undefined): string | null {
   if (!iso) return null;
@@ -92,7 +82,7 @@ const TodoListHeader: React.FC<TodoListHeaderProps> = ({
         <div className="flex items-center gap-2 shrink-0 ml-4">
           <Button
             onClick={() => onDeleteList(todoList.id)}
-            className="px-4 py-2 bg-secondary-bg text-black rounded hover:bg-accent hover:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-dark-bg"
+            className="px-4 py-2 bg-triadic-blue text-white rounded hover:bg-dark-bg transition-colors focus:outline-none focus:ring-2 focus:ring-triadic-blue focus:ring-offset-2 focus:ring-offset-dark-bg"
             dataTestId="todolist-item-delete-button"
           >
             Delete List

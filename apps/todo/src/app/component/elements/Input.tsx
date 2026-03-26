@@ -1,3 +1,5 @@
+import React from 'react';
+
 type InputProps = {
   type?: string;
   name?: string;
@@ -14,48 +16,55 @@ type InputProps = {
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 };
 
-const Input: React.FC<InputProps> = ({
-  type = 'text',
-  name,
-  value,
-  onChange,
-  className = '',
-  placeholder = '',
-  label,
-  id,
-  inputTestId,
-  labelTestId,
-  checked,
-  onBlur,
-  onKeyDown,
-}) => {
-  return (
-    <>
-      {label && (
-        <label
-          className="block text-sm font-medium text-dark-bg mb-1"
-          data-testid={labelTestId}
-          htmlFor={id}
-        >
-          {label}
-        </label>
-      )}
-      <input
-        id={id}
-        name={name}
-        type={type}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-        className={className}
-        placeholder={placeholder}
-        data-testid={inputTestId}
-        checked={checked}
-        autoFocus
-        onKeyDown={onKeyDown}
-      />
-    </>
-  );
-};
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  (
+    {
+      type = 'text',
+      name,
+      value,
+      onChange,
+      className = '',
+      placeholder = '',
+      label,
+      id,
+      inputTestId,
+      labelTestId,
+      checked,
+      onBlur,
+      onKeyDown,
+    },
+    ref
+  ) => {
+    return (
+      <>
+        {label && (
+          <label
+            className="block text-sm font-medium text-dark-bg mb-1"
+            data-testid={labelTestId}
+            htmlFor={id}
+          >
+            {label}
+          </label>
+        )}
+        <input
+          ref={ref}
+          id={id}
+          name={name}
+          type={type}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+          className={className}
+          placeholder={placeholder}
+          data-testid={inputTestId}
+          checked={checked}
+          onKeyDown={onKeyDown}
+        />
+      </>
+    );
+  }
+);
+
+Input.displayName = 'Input';
 
 export default Input;

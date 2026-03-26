@@ -5,6 +5,11 @@ import Loader from '../elements/Loader';
 import ErrorFallback from '../elements/ErrorFallback';
 import Container from '../elements/Container';
 import { TodoList as TodoListType, UpdateTodoItem } from '@shared/types';
+import {
+  SortKey,
+  SORT_OPTIONS,
+  PRIORITY_ORDER,
+} from '../../constants/todolist.constants';
 
 type NewTodoOpts = {
   dueDate?: string;
@@ -29,10 +34,6 @@ interface TodoListsProps {
   ) => void;
 }
 
-type SortKey = 'name' | 'priority' | 'dueDate' | 'category';
-
-const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
-
 function sortLists(lists: TodoListType[], key: SortKey): TodoListType[] {
   return [...lists].sort((a, b) => {
     switch (key) {
@@ -55,13 +56,6 @@ function sortLists(lists: TodoListType[], key: SortKey): TodoListType[] {
     }
   });
 }
-
-const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-  { value: 'name', label: 'Name' },
-  { value: 'priority', label: 'Priority' },
-  { value: 'dueDate', label: 'Due Date' },
-  { value: 'category', label: 'Category' },
-];
 
 function TodoLists({
   todoLists,
@@ -104,10 +98,10 @@ function TodoLists({
             <button
               key={opt.value}
               onClick={() => setSortKey(opt.value)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent ${
+              className={`w-24 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-triadic-orange border ${
                 sortKey === opt.value
-                  ? 'bg-accent text-black'
-                  : 'bg-secondary-bg text-dark-bg hover:bg-accent hover:text-black'
+                  ? 'bg-triadic-orange text-white border-triadic-orange'
+                  : 'bg-secondary-bg text-dark-bg border-secondary-bg hover:bg-triadic-orange hover:text-white hover:border-triadic-orange'
               }`}
             >
               {opt.label}

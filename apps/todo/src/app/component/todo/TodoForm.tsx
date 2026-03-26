@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import Input from '../elements/Input';
 import Button from '../elements/Button';
 
@@ -12,56 +13,48 @@ type FormProps = {
   onAddTodo: (name: string, opts?: NewTodoOpts) => void;
 };
 
+type FormValues = {
+  name: string;
+  dueDate: string;
+  location: string;
+  notes: string;
+};
+
 const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
-  const [newTodoName, setNewTodoName] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
   const [showExtra, setShowExtra] = useState(false);
-  const [dueDate, setDueDate] = useState('');
-  const [location, setLocation] = useState('');
-  const [notes, setNotes] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newTodoName.trim()) {
-      const opts: NewTodoOpts = {};
-      if (dueDate) opts.dueDate = dueDate;
-      if (location.trim()) opts.location = location.trim();
-      if (notes.trim()) opts.notes = notes.trim();
-      onAddTodo(
-        newTodoName.trim(),
-        Object.keys(opts).length ? opts : undefined
-      );
-      setNewTodoName('');
-      setDueDate('');
-      setLocation('');
-      setNotes('');
-      setErrorMessage('');
-    } else {
-      setErrorMessage('Title cannot be empty.');
-    }
-  };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormValues>({
+    defaultValues: { name: '', dueDate: '', location: '', notes: '' },
+  });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewTodoName(e.target.value);
-    if (errorMessage && e.target.value.trim()) {
-      setErrorMessage('');
-    }
+  const onFormSubmit = (data: FormValues) => {
+    const opts: NewTodoOpts = {};
+    if (data.dueDate) opts.dueDate = data.dueDate;
+    if (data.location.trim()) opts.location = data.location.trim();
+    if (data.notes.trim()) opts.notes = data.notes.trim();
+    onAddTodo(data.name.trim(), Object.keys(opts).length ? opts : undefined);
+    reset();
+    setShowExtra(false);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mb-6">
+    <form onSubmit={handleSubmit(onFormSubmit)} className="mb-6">
       <div className="flex flex-col sm:flex-row gap-3 items-baseline">
         <label htmlFor="new-todo-name" className="text-dark-bg font-medium">
           Todo Name:
         </label>
         <Input
+          {...register('name', { required: 'Title cannot be empty.' })}
           id="new-todo-name"
           type="text"
-          value={newTodoName}
-          onChange={handleInputChange}
           placeholder="Add a new todo..."
           className={`flex-1 px-4 py-3 rounded-lg border-2 ${
-            errorMessage ? 'border-red-500' : 'border-secondary-bg'
+            errors.name ? 'border-red-500' : 'border-secondary-bg'
           } focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent bg-white text-dark-bg placeholder-secondary-dark-bg`}
           inputTestId="todo-form-input"
         />
@@ -73,14 +66,16 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
           Add
         </Button>
       </div>
-      {errorMessage && (
+
+      {errors.name && (
         <p
           className="text-red-500 text-sm mt-1"
           data-testid="todo-error-message"
         >
-          {errorMessage}
+          {errors.name.message}
         </p>
       )}
+
       <button
         type="button"
         onClick={() => setShowExtra((v) => !v)}
@@ -89,6 +84,7 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
       >
         {showExtra ? 'Hide options' : 'More options'}
       </button>
+
       {showExtra && (
         <div className="mt-3 flex flex-col gap-3">
           <div className="flex flex-col sm:flex-row gap-3 items-baseline">
@@ -101,8 +97,7 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
             <input
               id="new-todo-due-date"
               type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
+              {...register('dueDate')}
               className="px-3 py-2 rounded-lg border-2 border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg"
               data-testid="todo-form-due-date"
             />
@@ -117,8 +112,7 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
             <input
               id="new-todo-location"
               type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
+              {...register('location')}
               placeholder="Optional location..."
               className="flex-1 px-3 py-2 rounded-lg border-2 border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg placeholder-secondary-dark-bg"
               data-testid="todo-form-location"
@@ -133,8 +127,7 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
             </label>
             <textarea
               id="new-todo-notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              {...register('notes')}
               placeholder="Optional notes..."
               rows={2}
               className="flex-1 px-3 py-2 rounded-lg border-2 border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg placeholder-secondary-dark-bg resize-none"

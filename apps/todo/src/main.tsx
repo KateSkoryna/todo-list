@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import App from './app/app';
+import StatisticsPage from './app/component/statistics/StatisticsPage';
 import LoginPage from './app/component/auth/LoginPage';
 import RegisterPage from './app/component/auth/RegisterPage';
 import ForgotPasswordPage from './app/component/auth/ForgotPasswordPage';
@@ -58,6 +59,14 @@ root.render(
             element={
               <AuthRoute requireAuth={false}>
                 <RegisterPage />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/statistics"
+            element={
+              <AuthRoute requireAuth>
+                <StatisticsPage />
               </AuthRoute>
             }
           />
