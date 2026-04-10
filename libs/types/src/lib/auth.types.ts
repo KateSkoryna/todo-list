@@ -6,65 +6,35 @@
  */
 export interface User {
   id: string;
+  firebaseUid: string;
   email: string;
   displayName: string;
+  firstName: string;
+  lastName: string;
+  username?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 /**
- * User registration request payload.
+ * User registration request payload (collected from form, sent to /auth/provision).
  */
 export interface RegisterRequest {
   email: string;
-  password: string;
-  displayName: string;
-}
-
-/**
- * User login request payload.
- */
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-/**
- * Authentication response - returned after successful login/register.
- */
-export interface AuthResponse {
-  user: User;
-  accessToken: string;
-  refreshToken: string;
-}
-
-/**
- * Refresh token request payload.
- */
-export interface RefreshRequest {
-  refreshToken: string;
+  firstName: string;
+  lastName: string;
+  username: string;
 }
 
 /**
  * User profile update payload - all fields optional.
- * Note: Password changes should use a separate endpoint.
  */
 export interface UpdateUser {
   email?: string;
   displayName?: string;
-}
-
-// --- JWT TYPES ---
-
-/**
- * JWT token payload structure.
- * Used by backend to encode/decode tokens.
- */
-export interface JwtPayload {
-  userId: string;
-  email: string;
-  iat?: number;
-  exp?: number;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
 }
 
 // --- STATS TYPES ---
