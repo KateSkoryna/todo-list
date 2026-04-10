@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 interface DetailsSelectProps<T extends string> {
   id?: string;
@@ -29,18 +30,7 @@ function DetailsSelect<T extends string>({
         <span className={selected ? 'text-dark-bg' : 'text-secondary-dark-bg'}>
           {selected ? selected.label : placeholder}
         </span>
-        <svg
-          className="ml-2 h-4 w-4 text-secondary-dark-bg"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-            clipRule="evenodd"
-          />
-        </svg>
+        <ChevronDown className="ml-2 h-4 w-4 text-secondary-dark-bg" />
       </summary>
       <ul className="absolute z-10 mt-1 w-full bg-base-bg border-2 border-secondary-bg rounded-lg shadow-lg overflow-hidden list-none p-0">
         <li
