@@ -1,32 +1,71 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithPopup,
+} from 'firebase/auth';
+import { auth, googleProvider } from '../../lib/firebase';
 import { useAuthStore } from '../../store/authStore';
-import { registerFetcher } from '../../fetchers/auth';
+import { provisionUserFetcher } from '../../fetchers/auth';
 import { registerSchema } from '@shared/types';
-import Input from '../elements/Input';
-import Button from '../elements/Button';
+import { User, AtSign, Mail, Lock } from 'lucide-react';
+import manImage from '../../../assets/man.webp';
+import Checkbox from '../elements/Checkbox';
+import AuthLayout from './AuthLayout';
+
+function GoogleIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+        fill="#4285F4"
+      />
+      <path
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+        fill="#34A853"
+      />
+      <path
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+        fill="#FBBC05"
+      />
+      <path
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+        fill="#EA4335"
+      />
+    </svg>
+  );
+}
+
+type FormErrors = {
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  agreeToTerms?: string;
+  form?: string;
+};
 
 function RegisterPage() {
-  const login = useAuthStore((s) => s.login);
+  const setUser = useAuthStore((s) => s.setUser);
   const navigate = useNavigate();
-  type FormErrors = {
-    displayName?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-    form?: string;
-  };
   const [errors, setErrors] = useState<FormErrors>({});
   const [isPending, setIsPending] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const values = {
-      displayName: formData.get('displayName') as string,
+      firstName: formData.get('firstName') as string,
+      lastName: formData.get('lastName') as string,
+      username: formData.get('username') as string,
       email: formData.get('email') as string,
       password: formData.get('password') as string,
       confirmPassword: formData.get('confirmPassword') as string,
+      agreeToTerms: agreeToTerms as true,
     };
 
     const result = registerSchema.safeParse(values);
@@ -43,12 +82,20 @@ function RegisterPage() {
     setErrors({});
     setIsPending(true);
     try {
-      const { user, accessToken, refreshToken } = await registerFetcher(
+      const credential = await createUserWithEmailAndPassword(
+        auth,
         values.email,
-        values.password,
-        values.displayName
+        values.password
       );
-      login(user, accessToken, refreshToken);
+      await updateProfile(credential.user, {
+        displayName: `${values.firstName} ${values.lastName}`,
+      });
+      const user = await provisionUserFetcher(
+        values.firstName,
+        values.lastName,
+        values.username
+      );
+      setUser(user);
       navigate('/');
     } catch (err) {
       setErrors({ form: (err as Error).message });
@@ -57,91 +104,180 @@ function RegisterPage() {
     }
   };
 
+  const handleGoogleSignUp = async () => {
+    setErrors({});
+    setIsPending(true);
+    try {
+      const credential = await signInWithPopup(auth, googleProvider);
+      const { displayName, email } = credential.user;
+      const firstName = displayName?.split(' ')[0] ?? '';
+      const lastName = displayName?.split(' ').slice(1).join(' ') ?? '';
+      const username = (email ?? '').split('@')[0];
+      const user = await provisionUserFetcher(firstName, lastName, username);
+      setUser(user);
+      navigate('/');
+    } catch {
+      setErrors({ form: 'Google sign-up failed. Please try again.' });
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   const inputClass =
-    'w-full px-4 py-2 border-2 border-secondary-bg rounded-lg focus:outline-none focus:border-accent';
+    'w-full pl-9 pr-4 py-3 border border-secondary-bg rounded-lg focus:outline-none focus:border-dark-bg text-dark-bg placeholder:text-secondary-dark-bg';
+
+  const illustration = (
+    <div className="hidden md:flex w-1/2 bg-white items-center justify-center overflow-hidden">
+      <img
+        src={manImage}
+        alt="Man with documents illustration"
+        className="object-contain h-2/3 w-2/3"
+      />
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-base-bg flex items-center justify-center py-8 px-4">
-      <div className="bg-white rounded-lg shadow-lg border-2 border-secondary-bg p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-dark-bg mb-6 text-center">
-          Create Account
-        </h1>
+    <AuthLayout illustration={illustration}>
+      {/* Form */}
+      <div className="w-full md:w-1/2 p-10 flex flex-col justify-center">
+        <h1 className="text-3xl font-bold text-dark-bg mb-6">Sign Up</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Input
-              id="displayName"
-              name="displayName"
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-dark-bg" />
+                <input
+                  name="firstName"
+                  type="text"
+                  placeholder="Enter First Name"
+                  required
+                  className={inputClass}
+                />
+              </div>
+              {errors.firstName && (
+                <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
+              )}
+            </div>
+            <div>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-dark-bg" />
+                <input
+                  name="lastName"
+                  type="text"
+                  placeholder="Enter Last Name"
+                  required
+                  className={inputClass}
+                />
+              </div>
+              {errors.lastName && (
+                <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="relative">
+            <AtSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-dark-bg" />
+            <input
+              name="username"
               type="text"
-              label="Display Name"
-              placeholder="Your name"
+              placeholder="Enter Username"
+              required
               className={inputClass}
             />
-            {errors.displayName && (
-              <p className="text-red-600 text-sm mt-1">{errors.displayName}</p>
-            )}
           </div>
-          <div>
-            <Input
-              id="email"
+          {errors.username && (
+            <p className="text-red-500 text-xs -mt-2">{errors.username}</p>
+          )}
+
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-dark-bg" />
+            <input
               name="email"
               type="email"
-              label="Email"
-              placeholder="you@example.com"
+              placeholder="Enter Email"
+              required
               className={inputClass}
             />
-            {errors.email && (
-              <p className="text-red-600 text-sm mt-1">{errors.email}</p>
-            )}
           </div>
-          <div>
-            <Input
-              id="password"
+          {errors.email && (
+            <p className="text-red-500 text-xs -mt-2">{errors.email}</p>
+          )}
+
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-dark-bg" />
+            <input
               name="password"
               type="password"
-              label="Password"
-              placeholder="••••••••"
+              placeholder="Enter Password"
+              required
               className={inputClass}
             />
-            {errors.password && (
-              <p className="text-red-600 text-sm mt-1">{errors.password}</p>
-            )}
           </div>
-          <div>
-            <Input
-              id="confirmPassword"
+          {errors.password && (
+            <p className="text-red-500 text-xs -mt-2">{errors.password}</p>
+          )}
+
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-dark-bg" />
+            <input
               name="confirmPassword"
               type="password"
-              label="Confirm Password"
-              placeholder="••••••••"
+              placeholder="Confirm Password"
+              required
               className={inputClass}
             />
-            {errors.confirmPassword && (
-              <p className="text-red-600 text-sm mt-1">
-                {errors.confirmPassword}
-              </p>
-            )}
           </div>
+          {errors.confirmPassword && (
+            <p className="text-red-500 text-xs -mt-2">
+              {errors.confirmPassword}
+            </p>
+          )}
 
-          {errors.form && <p className="text-red-600 text-sm">{errors.form}</p>}
+          <Checkbox
+            id="agreeToTerms"
+            checked={agreeToTerms}
+            onChange={setAgreeToTerms}
+            label="I agree to all terms and conditions"
+          />
+          {errors.agreeToTerms && (
+            <p className="text-red-500 text-xs">{errors.agreeToTerms}</p>
+          )}
 
-          <Button
+          {errors.form && <p className="text-red-500 text-sm">{errors.form}</p>}
+
+          <button
             type="submit"
             disabled={isPending}
-            className="w-full py-2 bg-dark-bg text-white rounded-lg hover:bg-secondary-dark-bg disabled:opacity-50 font-medium"
+            className="w-full py-3 bg-accent text-dark-bg font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
           >
-            {isPending ? 'Creating account…' : 'Create Account'}
-          </Button>
+            {isPending ? 'Creating account…' : 'Register'}
+          </button>
         </form>
 
-        <p className="mt-4 text-center text-dark-bg text-sm">
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={handleGoogleSignUp}
+            disabled={isPending}
+            className="w-full flex items-center justify-center gap-2 py-3 border border-secondary-bg rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 text-sm text-dark-bg font-medium"
+          >
+            <GoogleIcon />
+            Continue with Google
+          </button>
+        </div>
+
+        <p className="mt-4 text-sm text-secondary-dark-bg">
           Already have an account?{' '}
-          <Link to="/login" className="text-accent font-black hover:underline">
+          <Link
+            to="/login"
+            className="text-triadic-blue font-semibold hover:underline"
+          >
             Sign In
           </Link>
         </p>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
 

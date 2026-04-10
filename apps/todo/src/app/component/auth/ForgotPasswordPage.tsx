@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import apiClient from '../../lib/apiClient';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../../lib/firebase';
 import Input from '../elements/Input';
 import Button from '../elements/Button';
 
@@ -15,9 +16,7 @@ function ForgotPasswordPage() {
     setError(null);
     setIsPending(true);
     try {
-      await apiClient.post('/auth/forgot-password', {
-        email: formData.get('email'),
-      });
+      await sendPasswordResetEmail(auth, formData.get('email') as string);
       setSubmitted(true);
     } catch {
       setError('Something went wrong. Please try again.');
