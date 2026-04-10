@@ -11,7 +11,10 @@ import { TodolistController } from './app/controllers/todolist.controller';
 import { TodoController } from './app/controllers/todo.controller';
 import { AuthController } from './app/controllers/auth.controller';
 import { UserController } from './app/controllers/user.controller';
-import { authMiddleware } from './app/middleware/auth.middleware';
+import {
+  authMiddleware,
+  verifyFirebaseToken,
+} from './app/middleware/auth.middleware';
 
 const app = express();
 
@@ -47,13 +50,12 @@ const swaggerDocument = YAML.load(
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // --- Auth Routes ---
-app.post('/api/auth/register', AuthController.register);
-app.post('/api/auth/login', AuthController.login);
-app.post('/api/auth/refresh', AuthController.refresh);
-app.post('/api/auth/logout', AuthController.logout);
 app.get('/api/auth/user', authMiddleware, AuthController.getUser);
-app.post('/api/auth/forgot-password', AuthController.forgotPassword);
-app.post('/api/auth/reset-password', AuthController.resetPassword);
+app.post(
+  '/api/auth/provision',
+  verifyFirebaseToken,
+  AuthController.provisionUser
+);
 
 // --- User Routes ---
 app.get('/api/users/:userId/stats', authMiddleware, UserController.getStats);

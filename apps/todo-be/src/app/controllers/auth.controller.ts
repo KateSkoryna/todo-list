@@ -1,211 +1,11 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
-import crypto from 'crypto';
-import jwt from 'jsonwebtoken';
 import { UserRepository } from '../repositories/user.repository';
-import { sendPasswordResetEmail } from '../services/email.service';
-import {
-  RegisterRequest,
-  LoginRequest,
-  AuthResponse,
-  RefreshRequest,
-  JwtPayload,
-  EMAIL_REGEX,
-  PASSWORD_REGEX,
-  PASSWORD_REQUIREMENTS,
-} from '@shared/types';
-
-const SALT_ROUNDS = 10;
-
-function signAccessToken(payload: JwtPayload): string {
-  const secret = process.env.JWT_SECRET;
-  const expiresIn = process.env.JWT_ACCESS_EXPIRES_IN || '15m';
-  if (!secret) throw new Error('JWT_SECRET is not set');
-  return jwt.sign(payload, secret, { expiresIn } as jwt.SignOptions);
-}
-
-function signRefreshToken(payload: JwtPayload): string {
-  const secret = process.env.JWT_REFRESH_SECRET;
-  const expiresIn = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
-  if (!secret) throw new Error('JWT_REFRESH_SECRET is not set');
-  return jwt.sign(payload, secret, { expiresIn } as jwt.SignOptions);
-}
-
-function buildAuthResponse(user: AuthResponse['user']): AuthResponse {
-  const tokenPayload: JwtPayload = { userId: user.id, email: user.email };
-  return {
-    user,
-    accessToken: signAccessToken(tokenPayload),
-    refreshToken: signRefreshToken(tokenPayload),
-  };
-}
+import { AuthRequest } from '../middleware/auth.middleware';
 
 export const AuthController = {
-  register: async (req: Request, res: Response) => {
-    try {
-      const { email, password, displayName }: RegisterRequest = req.body;
-
-      if (!email || !password || !displayName) {
-        return res
-          .status(400)
-          .json({ message: 'email, password, and displayName are required' });
-      }
-
-      if (!EMAIL_REGEX.test(email)) {
-        return res.status(400).json({ message: 'Invalid email address' });
-      }
-
-      if (!PASSWORD_REGEX.test(password)) {
-        return res.status(400).json({ message: PASSWORD_REQUIREMENTS });
-      }
-
-      const existing = await UserRepository.findByEmail(email);
-      if (existing) {
-        return res.status(409).json({ message: 'Email already in use' });
-      }
-
-      const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-      const user = await UserRepository.create(
-        email,
-        passwordHash,
-        displayName
-      );
-
-      res.status(201).json(buildAuthResponse(user));
-    } catch (error) {
-      res.status(500).json({
-        message: 'Error registering user',
-        error: (error as Error).message,
-      });
-    }
-  },
-
-  login: async (req: Request, res: Response) => {
-    try {
-      const { email, password }: LoginRequest = req.body;
-
-      if (!email || !password) {
-        return res
-          .status(400)
-          .json({ message: 'email and password are required' });
-      }
-
-      const userWithHash = await UserRepository.findByEmail(email);
-      if (!userWithHash) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-
-      const valid = await bcrypt.compare(password, userWithHash.passwordHash);
-      if (!valid) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-
-      const { passwordHash: _passwordHash, ...user } = userWithHash;
-      res.json(buildAuthResponse(user));
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: 'Error logging in', error: (error as Error).message });
-    }
-  },
-
-  refresh: (req: Request, res: Response) => {
-    try {
-      const { refreshToken }: RefreshRequest = req.body;
-
-      if (!refreshToken) {
-        return res.status(400).json({ message: 'refreshToken is required' });
-      }
-
-      const secret = process.env.JWT_REFRESH_SECRET;
-      if (!secret) throw new Error('JWT_REFRESH_SECRET is not set');
-
-      const payload = jwt.verify(refreshToken, secret) as JwtPayload;
-      const tokenPayload: JwtPayload = {
-        userId: payload.userId,
-        email: payload.email,
-      };
-
-      res.json({ accessToken: signAccessToken(tokenPayload) });
-    } catch (error) {
-      if (error instanceof jwt.JsonWebTokenError) {
-        return res
-          .status(401)
-          .json({ message: 'Invalid or expired refresh token' });
-      }
-      res.status(500).json({
-        message: 'Error refreshing token',
-        error: (error as Error).message,
-      });
-    }
-  },
-
-  logout: (_req: Request, res: Response) => {
-    res.json({ message: 'Logged out' });
-  },
-
-  forgotPassword: async (req: Request, res: Response) => {
-    try {
-      const { email } = req.body;
-      if (!email) {
-        return res.status(400).json({ message: 'email is required' });
-      }
-
-      // Always respond with success to avoid leaking which emails are registered
-      const user = await UserRepository.findByEmail(email);
-      if (user) {
-        const token = crypto.randomBytes(32).toString('hex');
-        const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
-        await UserRepository.setResetToken(user.id, token, expires);
-        await sendPasswordResetEmail(user.email, token);
-      }
-
-      res.json({
-        message: 'If that email exists, a reset link has been sent.',
-      });
-    } catch (error) {
-      res.status(500).json({
-        message: 'Error sending reset email',
-        error: (error as Error).message,
-      });
-    }
-  },
-
-  resetPassword: async (req: Request, res: Response) => {
-    try {
-      const { token, password } = req.body;
-      if (!token || !password) {
-        return res
-          .status(400)
-          .json({ message: 'token and password are required' });
-      }
-
-      if (!PASSWORD_REGEX.test(password)) {
-        return res.status(400).json({ message: PASSWORD_REQUIREMENTS });
-      }
-
-      const user = await UserRepository.findByResetToken(token);
-      if (!user) {
-        return res
-          .status(400)
-          .json({ message: 'Reset link is invalid or has expired.' });
-      }
-
-      const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-      await UserRepository.updatePassword(user.id, passwordHash);
-
-      res.json({ message: 'Password updated. You can now sign in.' });
-    } catch (error) {
-      res.status(500).json({
-        message: 'Error resetting password',
-        error: (error as Error).message,
-      });
-    }
-  },
-
   getUser: async (req: Request, res: Response) => {
     try {
-      const userId = (req as Request & { userId?: string }).userId;
+      const userId = (req as AuthRequest).userId;
       if (!userId) {
         return res.status(401).json({ message: 'Unauthorized' });
       }
@@ -217,6 +17,40 @@ export const AuthController = {
     } catch (error) {
       res.status(500).json({
         message: 'Error fetching user',
+        error: (error as Error).message,
+      });
+    }
+  },
+
+  provisionUser: async (req: Request, res: Response) => {
+    try {
+      const { firebaseUid, userEmail } = req as AuthRequest;
+      const { firstName, lastName, username } = req.body;
+
+      let user = await UserRepository.findByFirebaseUid(firebaseUid);
+      if (!user) {
+        // Existing account from old auth system — link firebaseUid by email
+        user = await UserRepository.findByEmailAndLinkFirebaseUid(
+          userEmail,
+          firebaseUid
+        );
+      }
+      if (!user) {
+        const displayName = `${firstName} ${lastName}`.trim();
+        user = await UserRepository.create(
+          firebaseUid,
+          userEmail,
+          firstName || '',
+          lastName || '',
+          username || userEmail.split('@')[0],
+          displayName || userEmail.split('@')[0]
+        );
+      }
+
+      res.status(201).json(user);
+    } catch (error) {
+      res.status(500).json({
+        message: 'Error provisioning user',
         error: (error as Error).message,
       });
     }

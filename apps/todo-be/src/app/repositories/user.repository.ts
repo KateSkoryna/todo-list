@@ -1,64 +1,24 @@
 import { UserModel } from '../models/user.model';
 import { User } from '@shared/types';
 
-type UserWithResetToken = User & {
-  passwordHash: string;
-  resetToken?: string;
-  resetTokenExpires?: Date;
-};
-
 export const UserRepository = {
-  findByEmail: async (email: string): Promise<UserWithResetToken | null> => {
-    const doc = await UserModel.findOne({ email: email.toLowerCase() }).lean();
+  findByFirebaseUid: async (firebaseUid: string): Promise<User | null> => {
+    const doc = await UserModel.findOne({ firebaseUid });
     if (!doc) return null;
-    return {
-      id: doc._id.toString(),
-      email: doc.email,
-      displayName: doc.displayName,
-      passwordHash: doc.passwordHash,
-      resetToken: doc.resetToken,
-      resetTokenExpires: doc.resetTokenExpires,
-      createdAt: new Date(doc.createdAt as string | Date).toISOString(),
-      updatedAt: new Date(doc.updatedAt as string | Date).toISOString(),
-    };
+    return doc.toJSON() as User;
   },
 
-  findByResetToken: async (
-    token: string
-  ): Promise<UserWithResetToken | null> => {
-    const doc = await UserModel.findOne({
-      resetToken: token,
-      resetTokenExpires: { $gt: new Date() },
-    }).lean();
+  findByEmailAndLinkFirebaseUid: async (
+    email: string,
+    firebaseUid: string
+  ): Promise<User | null> => {
+    const doc = await UserModel.findOneAndUpdate(
+      { email },
+      { firebaseUid },
+      { new: true }
+    );
     if (!doc) return null;
-    return {
-      id: doc._id.toString(),
-      email: doc.email,
-      displayName: doc.displayName,
-      passwordHash: doc.passwordHash,
-      resetToken: doc.resetToken,
-      resetTokenExpires: doc.resetTokenExpires,
-      createdAt: new Date(doc.createdAt as string | Date).toISOString(),
-      updatedAt: new Date(doc.updatedAt as string | Date).toISOString(),
-    };
-  },
-
-  setResetToken: async (
-    id: string,
-    token: string,
-    expires: Date
-  ): Promise<void> => {
-    await UserModel.findByIdAndUpdate(id, {
-      resetToken: token,
-      resetTokenExpires: expires,
-    });
-  },
-
-  updatePassword: async (id: string, passwordHash: string): Promise<void> => {
-    await UserModel.findByIdAndUpdate(id, {
-      passwordHash,
-      $unset: { resetToken: '', resetTokenExpires: '' },
-    });
+    return doc.toJSON() as User;
   },
 
   findById: async (id: string): Promise<User | null> => {
@@ -68,11 +28,21 @@ export const UserRepository = {
   },
 
   create: async (
+    firebaseUid: string,
     email: string,
-    passwordHash: string,
+    firstName: string,
+    lastName: string,
+    username: string,
     displayName: string
   ): Promise<User> => {
-    const doc = await UserModel.create({ email, passwordHash, displayName });
+    const doc = await UserModel.create({
+      firebaseUid,
+      email,
+      firstName,
+      lastName,
+      username,
+      displayName,
+    });
     return doc.toJSON() as User;
   },
 };

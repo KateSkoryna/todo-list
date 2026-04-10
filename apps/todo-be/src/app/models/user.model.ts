@@ -3,13 +3,11 @@ import { User } from '@shared/types';
 
 interface IUserDocument extends Omit<User, 'id'>, Document {
   _id: Types.ObjectId;
-  passwordHash: string;
-  resetToken?: string;
-  resetTokenExpires?: Date;
 }
 
 const userSchema = new Schema<IUserDocument>(
   {
+    firebaseUid: { type: String, required: true, unique: true, index: true },
     email: {
       type: String,
       required: true,
@@ -17,10 +15,10 @@ const userSchema = new Schema<IUserDocument>(
       lowercase: true,
       trim: true,
     },
-    passwordHash: { type: String, required: true },
     displayName: { type: String, required: true, trim: true },
-    resetToken: { type: String },
-    resetTokenExpires: { type: Date },
+    firstName: { type: String, required: true, trim: true },
+    lastName: { type: String, required: true, trim: true },
+    username: { type: String, trim: true, sparse: true },
   },
   {
     timestamps: true,
@@ -28,10 +26,14 @@ const userSchema = new Schema<IUserDocument>(
       transform: (_, ret: IUserDocument) => {
         const user: User = {
           id: ret._id.toString(),
+          firebaseUid: ret.firebaseUid,
           email: ret.email,
           displayName: ret.displayName,
-          createdAt: ret.createdAt,
-          updatedAt: ret.updatedAt,
+          firstName: ret.firstName,
+          lastName: ret.lastName,
+          username: ret.username,
+          createdAt: ret.createdAt as unknown as string,
+          updatedAt: ret.updatedAt as unknown as string,
         };
         return user;
       },
