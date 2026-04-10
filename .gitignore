@@ -32,6 +32,7 @@ node_modules
 npm-debug.log
 yarn-error.log
 testem.log
+firebase-debug.log
 /typings
 
 # System Files
@@ -41,6 +42,12 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
 
 .nx/cache
 
