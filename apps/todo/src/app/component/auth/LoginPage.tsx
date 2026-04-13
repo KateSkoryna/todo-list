@@ -11,7 +11,7 @@ import { auth, googleProvider } from '../../lib/firebase';
 import { useAuthStore } from '../../store/authStore';
 import apiClient from '../../lib/apiClient';
 import { provisionUserFetcher } from '../../fetchers/auth';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import womanImage from '../../../assets/woman.webp';
 import Checkbox from '../elements/Checkbox';
 import AuthLayout from './AuthLayout';
@@ -45,6 +45,8 @@ function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState('');
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -139,11 +141,28 @@ function LoginPage() {
             <input
               id="password"
               name="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
               placeholder="Enter Password"
               required
-              className="w-full pl-9 pr-4 py-3 border border-secondary-bg rounded-lg focus:outline-none focus:border-dark-bg text-dark-bg placeholder:text-secondary-dark-bg"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full pl-9 pr-9 py-3 border border-secondary-bg rounded-lg focus:outline-none focus:border-dark-bg text-dark-bg placeholder:text-secondary-dark-bg"
             />
+            {password && (
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary-dark-bg hover:text-dark-bg"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            )}
           </div>
 
           <Checkbox

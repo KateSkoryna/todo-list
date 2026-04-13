@@ -9,7 +9,7 @@ import { auth, googleProvider } from '../../lib/firebase';
 import { useAuthStore } from '../../store/authStore';
 import { provisionUserFetcher } from '../../fetchers/auth';
 import { registerSchema } from '@shared/types';
-import { User, AtSign, Mail, Lock } from 'lucide-react';
+import { User, AtSign, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import manImage from '../../../assets/man.webp';
 import Checkbox from '../elements/Checkbox';
 import AuthLayout from './AuthLayout';
@@ -54,6 +54,10 @@ function RegisterPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isPending, setIsPending] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -125,6 +129,8 @@ function RegisterPage() {
 
   const inputClass =
     'w-full pl-9 pr-4 py-3 border border-secondary-bg rounded-lg focus:outline-none focus:border-dark-bg text-dark-bg placeholder:text-secondary-dark-bg';
+  const passwordInputClass =
+    'w-full pl-9 pr-9 py-3 border border-secondary-bg rounded-lg focus:outline-none focus:border-dark-bg text-dark-bg placeholder:text-secondary-dark-bg';
 
   const illustration = (
     <div className="hidden md:flex w-1/2 bg-white items-center justify-center overflow-hidden">
@@ -208,11 +214,28 @@ function RegisterPage() {
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-dark-bg" />
             <input
               name="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="new-password"
               placeholder="Enter Password"
               required
-              className={inputClass}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={passwordInputClass}
             />
+            {password && (
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary-dark-bg hover:text-dark-bg"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            )}
           </div>
           {errors.password && (
             <p className="text-red-500 text-xs -mt-2">{errors.password}</p>
@@ -222,11 +245,28 @@ function RegisterPage() {
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-dark-bg" />
             <input
               name="confirmPassword"
-              type="password"
+              type={showConfirmPassword ? 'text' : 'password'}
+              autoComplete="new-password"
               placeholder="Confirm Password"
               required
-              className={inputClass}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className={passwordInputClass}
             />
+            {confirmPassword && (
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary-dark-bg hover:text-dark-bg"
+                tabIndex={-1}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            )}
           </div>
           {errors.confirmPassword && (
             <p className="text-red-500 text-xs -mt-2">
