@@ -1,81 +1,160 @@
-# Todo List Application - Quick Reference
+# Todo List Application
+
+A full-stack task management app built with React, Express, MongoDB, and Firebase Authentication.
+
+---
+
+## Tech Stack
+
+### Frontend
+- **React 18** — UI framework
+- **Vite + Nx** — build tooling
+- **React Router 7** — client-side routing
+- **TanStack React Query 5** — server state management
+- **Zustand** — client state (auth)
+- **TailwindCSS 3** — utility-first styling
+- **Lucide React** — icon library
+- **Firebase JS SDK** — authentication (email/password, Google OAuth)
+
+### Backend
+- **Express 4** — web framework
+- **Mongoose 7** — MongoDB ODM
+- **Firebase Admin SDK** — server-side token verification
+- **Swagger UI** — API docs at `/api-docs`
+
+### Testing
+- **Jest** — unit tests
+- **Supertest** — HTTP assertions
+- **mongodb-memory-server** — in-memory DB for tests
+- **Cypress** — E2E tests
+
+---
 
 ## Project Structure
 
-### Backend Architecture (apps/todo-be/src/app/)
 ```
-apps/todo-be/src/app/
-├── controllers/      # HTTP request handling, validation
-├── repositories/     # Database operations
-├── models/          # Mongoose schemas and models
-└── utils/           # Helper functions (error handling)
-```
-
-### Frontend Architecture (apps/todo/src/app/)
-```
-apps/todo/src/app/
-├── component/
-│   ├── elements/          # Reusable UI primitives
-│   │   ├── Button.tsx
-│   │   ├── Input.tsx
-│   │   ├── Text.tsx
-│   │   ├── Header.tsx
-│   │   ├── Container.tsx
-│   │   ├── Loader.tsx
-│   │   ├── ErrorFallback.tsx
-│   │   └── Dropdown.tsx
-│   └── todo/             # Feature-specific components
-│       ├── todoContainer.tsx  # Smart component (data logic)
-│       ├── TodoLists.tsx      # Presentation
-│       ├── TodoList.tsx
-│       ├── TodoListHeader.tsx
-│       ├── TodoListForm.tsx
-│       ├── TodoItem.tsx
-│       └── TodoForm.tsx
-├── fetchers/         # API client functions
-├── hooks/            # Custom React hooks (useTodoListsData)
-└── app.tsx
+todo-list/
+├── apps/
+│   ├── todo/                        # React frontend
+│   │   └── src/
+│   │       ├── app/
+│   │       │   ├── component/
+│   │       │   │   ├── auth/        # LoginPage, RegisterPage, ForgotPasswordPage, AuthLayout
+│   │       │   │   ├── elements/    # Reusable UI (Button, Input, Header, UserMenu, etc.)
+│   │       │   │   ├── todo/        # TodoContainer, TodoLists, TodoList, TodoItem, etc.
+│   │       │   │   └── statistics/  # StatisticsPage, statsUtils
+│   │       │   ├── fetchers/        # API call functions
+│   │       │   ├── hooks/           # Custom React hooks
+│   │       │   ├── lib/             # firebase.ts, apiClient.ts
+│   │       │   └── store/           # Zustand auth store
+│   │       ├── assets/              # bg.webp, man.webp, woman.webp
+│   │       └── environments/        # environment.ts / environment.prod.ts
+│   └── todo-be/                     # Express backend
+│       └── src/app/
+│           ├── controllers/         # HTTP handlers
+│           ├── integrations/        # Firebase Admin SDK init
+│           ├── middleware/          # Auth middleware
+│           ├── models/              # Mongoose schemas
+│           ├── repositories/        # DB access layer
+│           └── services/            # Business logic
+├── libs/
+│   └── types/                       # Shared TypeScript types + Zod schemas
+├── .firebaserc
+├── firebase.json
+└── .env                             # Never committed — see Environment Variables below
 ```
 
-### Shared Libraries
-```
-libs/types/           # Shared TypeScript types between FE/BE
-```
+---
+
+## Authentication
+
+Auth is handled entirely by **Firebase Authentication** — no custom JWTs or password hashing.
+
+### Supported methods
+- Email / password
+- Google OAuth (Sign in with popup)
+
+### How it works
+1. Firebase issues an **ID token** on the client after sign-in
+2. Every API request attaches the token as `Authorization: Bearer <token>`
+3. The backend verifies the token using **Firebase Admin SDK**
+4. On first Google sign-in, the frontend calls `POST /api/auth/provision` to create a MongoDB user profile
+
+### Backend middleware
+| Middleware | Used on | What it does |
+|---|---|---|
+| `verifyFirebaseToken` | `POST /api/auth/provision` | Verifies Firebase ID token only |
+| `authMiddleware` | All other protected routes | Verifies token + loads MongoDB user profile |
+
+### Password reset
+Handled natively by Firebase — no custom email service needed. `ForgotPasswordPage` calls `sendPasswordResetEmail()` from the Firebase JS SDK directly.
+
+### Register form validation
+Validated client-side with Zod before the request is sent:
+- First name, last name — required
+- Username — min 2 characters
+- Email — valid format
+- Password — min 1 uppercase, 1 number, 1 symbol
+- Confirm password — must match
+
+---
 
 ## API Endpoints
 
+All routes require Firebase auth token unless noted.
+
 ```
-POST   /api/todolists       - Create todolist
-GET    /api/todolists       - Get all todolists (filtered by userId)
-GET    /api/todolists/:id   - Get single todolist
-PUT    /api/todolists/:id   - Update todolist
-DELETE /api/todolists/:id   - Delete todolist
+# Auth
+GET  /api/auth/user          — Get authenticated user profile
+POST /api/auth/provision     — Create MongoDB profile on first sign-in (verifyFirebaseToken only)
 
-POST   /api/todos           - Create todo
-GET    /api/todos           - Get all todos
-PUT    /api/todos/:id       - Update todo
-DELETE /api/todos/:id       - Delete todo
+# Users
+GET  /api/users/:userId/stats — Get task statistics for a period
+
+# Todolists
+GET    /api/users/:userId/todolists                            — List all todolists
+POST   /api/users/:userId/todolists                            — Create todolist
+PUT    /api/users/:userId/todolists/:todolistId                — Update todolist
+DELETE /api/users/:userId/todolists/:todolistId                — Delete todolist
+
+# Todos
+POST   /api/users/:userId/todolists/:todolistId/todos          — Create todo
+PUT    /api/users/:userId/todolists/:todolistId/todos/:id      — Update todo
+DELETE /api/users/:userId/todolists/:todolistId/todos/:id      — Delete todo
 ```
 
-## Key Technologies
+---
 
-### Frontend
-- React 18.2.0 - UI framework
-- @tanstack/react-query 5.90.20 - Server state management
-- react-router-dom 7.13.0 - Client-side routing
-- tailwindcss 3.4.19 - Utility-first CSS
+## Environment Variables
 
-### Backend
-- express 4.18.2 - Web framework
-- mongoose 7.6.8 - MongoDB ODM
-- cors 2.8.6 - CORS middleware
-- swagger-ui-express 5.0.1 - API documentation
+Create a `.env` file in the project root:
 
-### Testing
-- jest - Unit testing
-- cypress - E2E testing
-- mongodb-memory-server - In-memory DB for tests
-- supertest - HTTP assertions
+```bash
+# MongoDB
+MONGODB_URI=
+
+# Firebase Admin (backend)
+FIREBASE_PROJECT_ID=
+FIREBASE_CLIENT_EMAIL=
+FIREBASE_PRIVATE_KEY=
+
+# Firebase Client (frontend — NX_ prefix required for Nx/Vite)
+NX_FIREBASE_API_KEY=
+NX_FIREBASE_AUTH_DOMAIN=
+NX_FIREBASE_PROJECT_ID=
+NX_FIREBASE_STORAGE_BUCKET=
+NX_FIREBASE_MESSAGING_SENDER_ID=
+NX_FIREBASE_APP_ID=
+
+# App
+NX_API_URL=http://localhost:3333/api
+PORT=3333
+```
+
+> The Firebase client vars (`NX_FIREBASE_*`) are read by `apps/todo/src/environments/environment.ts`.
+> The Firebase admin vars are read by `apps/todo-be/src/app/integrations/firebase.ts`.
+
+---
 
 ## Running the Project
 
@@ -86,110 +165,71 @@ npm install
 # Start MongoDB (Docker)
 npm run docker:mongodb
 
-# Start backend
+# Start backend (port 3333)
 npm run serve:be
 
-# Start frontend
+# Start frontend (port 4200)
 npm run serve:fe
 
-# Run all (frontend + backend)
+# Start both
 npm run all
 
-# Run backend tests
+# Run backend unit tests
 npm run test:unit:be
 
 # Run E2E tests
 npm run test:e2e:watch
 ```
 
-## Authentication
-
-### Login
-- Displays a generic error on failed sign-in (no credential hints exposed)
-- Links to Register and Forgot Password pages
-
-### Register Form Validation
-Validated client-side with Zod before the request is sent:
-- Display name — required
-- Email — valid email format
-- Password — must contain at least 1 uppercase letter, 1 number, and 1 symbol
-- Confirm password — must match password
-
-Inline field errors are shown beneath each input. The same regex rules are enforced server-side on the backend.
-
-### Forgot / Reset Password
-1. User submits their email on `/forgot-password`
-2. Backend generates a secure random token, hashes it, and stores it on the user with a 1-hour expiry
-3. A reset link (`/reset-password?token=...`) is emailed to the user
-4. User submits a new password on `/reset-password` — validated with the same Zod schema as registration
-5. Token is verified against the hash, checked for expiry, then cleared after a successful reset
-
-### Email Provider
-The email service switches provider automatically based on `NODE_ENV`:
-- `development` — Mailtrap (SMTP sandbox, `MAILTRAP_*` env vars)
-- `production` — Resend (SMTP, `RESEND_*` env vars)
-
-## Notes
-
-- Styling: Used Tailwind CSS to simplify styling.
-- Data Fetching: Implemented TanstackReact Query for fetching data.
-- Navigation: Used React DOM for routing/navigation.
-- Database: Experimented with MongoDB as it was mentioned in the job description.
-- ToDo Functionality: Implemented an Edit ToDo feature. Attempted to write E2E tests for it, but the tests kept failing. Due to time constraints, E2E tests for editing functionality were not completed.
-
 ---
 
-# Full-Stack React-Express Project
+## Notification System (planned)
 
-This task covers React basics together with Node.js/Express as well as your testing skills.
+The dashboard nav includes a notification bell. Planned implementation uses **Firebase Firestore** for real-time notifications — keeping everything in the Firebase ecosystem already in use.
 
-To ease your start, a [Nx skeleton](Nx.md) is provided in this repo. Please get familiar with it so that you understand where your code belongs too.
-The setup assumes you have a **MySql** database running on port **3306** with username **root** and password **root**. Nevertheless, you're free
-to change the database to whatever you like. If you do so ensure you commit all necessary code changes such that it can be executed by the reviewer.
+### Why Firestore
+- Real-time listeners (`onSnapshot`) — no polling needed
+- No extra backend infrastructure
+- Frontend reads/writes Firestore directly with security rules
 
-## General
+### Notification types
+- Task due today
+- Task overdue
+- (Future) Task assigned to collaborator
 
-- Focus on a working solution rather than the most beautiful or complex one.
-- You have to create a `develop` branch. Think about creating more branches for the tasks.
-- You are allowed to merge between task/feature branches.
-- When you finished all tasks please create a pull request/merge request back to `main` and assign it to @expertsieve.
-- If you can not finish a task or have an issue during implementation try to explain it in the merge request description and/or `README` file
-- Leave some documentation about how to build your solution if you do not use Nx or do something else. (In this case built.sh and start.sh scripts are welcome)
-- If you have any questions during your test task, please visit https://expertsieve.freshdesk.com or write an email to support@fyltura.com - Support usually answers within two hours.
+### Document shape
+```ts
+interface Notification {
+  id: string;
+  userId: string;           // Firebase UID
+  type: 'due_today' | 'overdue' | 'reminder';
+  title: string;
+  body: string;
+  todolistId?: string;
+  todoId?: string;
+  read: boolean;
+  createdAt: Timestamp;
+}
+```
 
-## Task 1
+### Firestore collection path
+```
+notifications/{firebaseUid}/items/{notifId}
+```
 
-Create an Express-based[^2] backend that implemented the [API given in this swagger file](tools/swagger.yml) with a local database connection. Please do not change the API. But it's allowed to add more endpoints if needed.
+### Security rules
+```
+match /notifications/{userId}/items/{notifId} {
+  allow read, write: if request.auth.uid == userId;
+}
+```
 
-## Task 2
+### Files to create
+| File | Purpose |
+|---|---|
+| `apps/todo/src/app/lib/firestore.ts` | Initialize Firestore, export `db` |
+| `apps/todo/src/app/hooks/useNotifications.ts` | `onSnapshot` listener, `markRead` helper |
+| `apps/todo/src/app/component/elements/NotificationBell.tsx` | Bell icon + unread badge + dropdown |
 
-Add tests for your backend implementation if not yet done.
-
-## Task 3
-
-Create a React-based[^1] frontend for the backend from Task 1.
-
-## Task 4
-
-Provide end-to-end tests for your frontend implementation.
-
-## Bonus
-
-If you have time and feel lucky: Add multi-user support to the API (and to your implementation). It's ok to distinguish users just by IDs.
-
-## Expectations
-
-- Document your coding process with Git[^5] and publish your result to the repository you got along with
-  these tasks. We will then clone your code and run it locally on our machines.
-- The result in the repository should be a git history of your development process (a single commit with
-  the complete application is not acceptable).
-- We want to see multiple commits showing your progress, a README document on how to install and start your application.
-- Extensive styling of your html is not necessary. Simple is better than complicated. But it shall be usable.
-- Consider your application a proof-of-concept, quicker development using tools to achieve the result is better than handcrafting every line but taking 5x as long.
-- You can use whatever resources/libraries/open-source in addition (but not as a replacement) of the libraries previously mentioned.
-- If you use a cli that writes 98% of your code, fine!
-- If you have any questions do not hesitate to contact us.
-
-[^1]: https://reactjs.org
-[^2]: https://expressjs.com/
-[^5]: https://git-scm.com
+### How notifications are generated (initial approach)
+On app load, the frontend checks todos with `dueDate` matching today or in the past and writes to Firestore if no notification exists yet for that todo. No Cloud Functions needed for the initial version.
