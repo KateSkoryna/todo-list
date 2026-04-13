@@ -4,7 +4,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 
-import App from './app/app';
+import AppShell from './app/component/elements/AppShell';
+import DashboardPage from './app/component/dashboard/DashboardPage';
+import TasksPage from './app/component/pages/TasksPage';
+import VitalTaskPage from './app/component/pages/VitalTaskPage';
+import SettingsPage from './app/component/pages/SettingsPage';
+import HelpPage from './app/component/pages/HelpPage';
 import StatisticsPage from './app/component/statistics/StatisticsPage';
 import LoginPage from './app/component/auth/LoginPage';
 import RegisterPage from './app/component/auth/RegisterPage';
@@ -66,13 +71,19 @@ root.render(
         <AuthBootstrap>
           <Routes>
             <Route
-              path="/"
               element={
                 <AuthRoute requireAuth>
-                  <App />
+                  <AppShell />
                 </AuthRoute>
               }
-            />
+            >
+              <Route path="/" element={<DashboardPage />} />
+              <Route path="/vital" element={<VitalTaskPage />} />
+              <Route path="/tasks" element={<TasksPage />} />
+              <Route path="/statistics" element={<StatisticsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/help" element={<HelpPage />} />
+            </Route>
             <Route
               path="/login"
               element={
@@ -86,14 +97,6 @@ root.render(
               element={
                 <AuthRoute requireAuth={false}>
                   <RegisterPage />
-                </AuthRoute>
-              }
-            />
-            <Route
-              path="/statistics"
-              element={
-                <AuthRoute requireAuth>
-                  <StatisticsPage />
                 </AuthRoute>
               }
             />
