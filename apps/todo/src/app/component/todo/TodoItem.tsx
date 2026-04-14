@@ -1,19 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import dayjs from 'dayjs';
 import {
   TodoItem as TodoItemType,
   UpdateTodoItem,
   TodoStatus,
+  TodoListPriority,
 } from '@shared/types';
+import { PRIORITY_COLORS } from '../../constants/todolist.constants';
 import Button from '../elements/Button';
-import Text from '../elements/Text';
 import Input from '../elements/Input';
 
 interface TodoItemProps {
   todo: TodoItemType;
+  listPriority?: TodoListPriority;
+  isSelected?: boolean;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onEdit: (id: string, updates: UpdateTodoItem) => void;
+  onSelect?: () => void;
 }
 
 type FormValues = {
@@ -24,7 +29,33 @@ type FormValues = {
   notes: string;
 };
 
-function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
+const STATUS_DOT: Record<TodoStatus, string> = {
+  pending: 'border-2 border-amber-400 bg-transparent',
+  successful: 'bg-green-500 border-2 border-green-500',
+  failed: 'bg-red-500 border-2 border-red-500',
+};
+
+const STATUS_LABELS: Record<TodoStatus, string> = {
+  pending: 'In Progress',
+  successful: 'Completed',
+  failed: 'Not Started',
+};
+
+const STATUS_TEXT: Record<TodoStatus, string> = {
+  pending: 'text-amber-600',
+  successful: 'text-green-600',
+  failed: 'text-red-500',
+};
+
+function TodoItem({
+  todo,
+  listPriority,
+  isSelected,
+  onToggle,
+  onDelete,
+  onEdit,
+  onSelect,
+}: TodoItemProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   const { register, handleSubmit, reset } = useForm<FormValues>({
@@ -39,23 +70,13 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
 
   useEffect(() => {
     if (todo.status === 'pending' && todo.dueDate) {
-      const due = new Date(todo.dueDate);
-      due.setHours(23, 59, 59, 999);
-      if (due < new Date()) {
+      if (dayjs(todo.dueDate).endOf('day').isBefore(dayjs())) {
         onEdit(todo.id, { status: 'failed' });
       }
     }
     // intentionally runs once on mount to auto-fail overdue items
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todo.id]);
-
-  const STATUS_DOT: Record<TodoStatus, string> = {
-    pending: 'bg-yellow-400',
-    successful: 'bg-green-500',
-    failed: 'bg-red-500',
-  };
-
-  const handleEdit = () => setIsEditing(true);
 
   const handleCancelEdit = () => {
     reset();
@@ -79,167 +100,179 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
 
   return (
     <div
-      className={`flex w-full flex-col gap-2 p-4 bg-base-bg rounded-lg border-2 border-secondary-bg hover:border-accent transition-colors group${
-        todo.status === 'successful' ? ' completed' : ''
+      className={`rounded-xl border-2 transition-colors group ${
+        isSelected
+          ? 'border-triadic-orange bg-white shadow-md'
+          : 'border-secondary-bg bg-white hover:border-triadic-orange/50'
       }`}
       data-testid={'todo-item-' + todo.id}
     >
-      <form onSubmit={handleSubmit(onFormSubmit)}>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
-          <Input
-            type="checkbox"
-            checked={todo.status === 'successful'}
-            onChange={() => onToggle(todo.id)}
-            className="w-5 h-5 shrink-0 rounded border-2 border-secondary-dark-bg checked:bg-accent checked:border-accent focus:ring-2 focus:ring-accent focus:ring-offset-2 cursor-pointer"
-            aria-label={`Mark ${todo.name} as ${
-              todo.status === 'successful' ? 'not complete' : 'complete'
-            }`}
-            inputTestId={'todo-item-complete-checkbox-' + todo.id}
-          />
+      {/* Card body — clickable for selection */}
+      <div
+        className="flex items-start gap-3 p-4 cursor-pointer"
+        onClick={() => !isEditing && onSelect?.()}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !isEditing) onSelect?.();
+        }}
+      >
+        {/* Status circle */}
+        <span
+          className={`w-5 h-5 rounded-full shrink-0 mt-0.5 ${
+            STATUS_DOT[todo.status]
+          }`}
+          title={todo.status}
+        />
 
-          {isEditing ? (
-            <Input
-              {...register('name')}
-              id={'edit-todo-input-' + todo.id}
-              type="text"
-              className="w-full text-lg p-2 rounded border border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg"
-              inputTestId={'edit-todo-input-' + todo.id}
-            />
-          ) : (
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-              <Text
-                as="span"
-                className={`text-lg leading-none ${
-                  todo.status === 'successful'
-                    ? 'line-through text-dark-bg'
-                    : 'text-dark-bg font-medium'
-                }`}
-              >
-                {todo.name}
-              </Text>
-              <span
-                className={`shrink-0 w-3 h-3 rounded-full ${
-                  STATUS_DOT[todo.status]
-                }`}
-                title={todo.status}
-              />
-            </div>
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <p
+            className={`font-semibold text-dark-bg leading-snug ${
+              todo.status === 'successful'
+                ? 'line-through text-secondary-dark-bg'
+                : ''
+            }`}
+          >
+            {todo.name}
+          </p>
+          {todo.notes && (
+            <p className="text-xs text-secondary-dark-bg mt-0.5 line-clamp-2">
+              {todo.notes}
+            </p>
           )}
 
-          <div className="w-full sm:w-auto flex justify-center sm:justify-end gap-2 mt-2 sm:mt-0 shrink-0">
-            <Button
-              type="button"
-              onClick={() => onDelete(todo.id)}
-              className="px-3 py-1 bg-triadic-blue text-white rounded hover:bg-dark-bg focus:outline-none focus:ring-2 focus:ring-triadic-blue"
-              aria-label="Delete todo"
-              dataTestId={'todo-item-delete-button-' + todo.id}
-            >
-              Delete
-            </Button>
-
-            {isEditing ? (
-              <>
-                <Button
-                  type="submit"
-                  className="px-3 py-1 bg-accent text-black rounded hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent"
-                  aria-label="Save todo edit"
-                  dataTestId={'save-todo-edit-button-' + todo.id}
-                >
-                  Save
-                </Button>
-                <Button
-                  type="button"
-                  onClick={handleCancelEdit}
-                  className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
-                  aria-label="Cancel todo edit"
-                  dataTestId={'cancel-todo-edit-button-' + todo.id}
-                >
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <Button
-                type="button"
-                onClick={handleEdit}
-                className="px-3 py-1 bg-dark-bg text-white rounded hover:bg-secondary-dark-bg focus:outline-none focus:ring-2 focus:ring-accent"
-                aria-label="Edit todo"
-                dataTestId={'edit-todo-button-' + todo.id}
+          {/* Footer badges */}
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            {listPriority && (
+              <span
+                className={`text-xs font-medium px-2 py-0.5 rounded-full ${PRIORITY_COLORS[listPriority]}`}
               >
-                Edit
-              </Button>
+                {listPriority.charAt(0).toUpperCase() + listPriority.slice(1)}
+              </span>
+            )}
+            <span className={`text-xs font-medium ${STATUS_TEXT[todo.status]}`}>
+              {STATUS_LABELS[todo.status]}
+            </span>
+            {todo.dueDate && (
+              <span className="text-xs text-secondary-dark-bg">
+                {dayjs(todo.dueDate).format('DD/MM/YYYY')}
+              </span>
             )}
           </div>
         </div>
 
-        {isEditing && (
-          <div className="flex flex-col gap-2 mt-1 pl-7">
-            <div className="flex items-center gap-2">
-              <label className={labelClass}>Status:</label>
-              <select
-                {...register('status')}
-                className="px-2 py-1 rounded border border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg text-sm"
-                data-testid={'edit-todo-status-' + todo.id}
-              >
-                <option value="pending">Pending</option>
-                <option value="successful">Successful</option>
-                <option value="failed">Failed</option>
-              </select>
-            </div>
-            <div className="flex items-center gap-2">
-              <label className={labelClass}>Due date:</label>
-              <input
-                type="date"
-                {...register('dueDate')}
-                className="px-2 py-1 rounded border border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg text-sm"
-                data-testid={'edit-todo-due-date-' + todo.id}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className={labelClass}>Location:</label>
-              <input
-                type="text"
-                {...register('location')}
-                placeholder="Optional location..."
-                className={inputClass}
-                data-testid={'edit-todo-location-' + todo.id}
-              />
-            </div>
-            <div className="flex items-start gap-2">
-              <label className={`${labelClass} mt-1`}>Notes:</label>
-              <textarea
-                {...register('notes')}
-                placeholder="Optional notes..."
-                rows={2}
-                className="flex-1 px-2 py-1 rounded border border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg text-sm resize-none"
-                data-testid={'edit-todo-notes-' + todo.id}
-              />
-            </div>
-          </div>
-        )}
-      </form>
-
-      {!isEditing && (todo.dueDate || todo.location || todo.notes) && (
-        <div className="flex flex-wrap gap-x-4 gap-y-1 pl-7 text-sm text-secondary-dark-bg">
-          {todo.dueDate && (
-            <span>Due: {new Date(todo.dueDate).toLocaleDateString()}</span>
-          )}
-          {todo.location && (
-            <span>
-              <span role="img" aria-label="location">
-                📍
-              </span>{' '}
-              {todo.location}
-            </span>
-          )}
-          {todo.notes && (
-            <span className="truncate max-w-xs">
-              <span role="img" aria-label="notes">
-                📝
-              </span>{' '}
-              {todo.notes}
-            </span>
-          )}
+        {/* Action buttons */}
+        <div
+          className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type="checkbox"
+            checked={todo.status === 'successful'}
+            onChange={() => onToggle(todo.id)}
+            className="w-4 h-4 rounded border-2 border-secondary-dark-bg checked:bg-accent checked:border-accent cursor-pointer focus:ring-2 focus:ring-accent focus:ring-offset-1"
+            aria-label={`Mark ${todo.name} as ${
+              todo.status === 'successful' ? 'incomplete' : 'complete'
+            }`}
+            data-testid={'todo-item-complete-checkbox-' + todo.id}
+          />
+          <Button
+            type="button"
+            onClick={() => setIsEditing(true)}
+            className="px-2 py-1 text-xs bg-dark-bg text-white rounded hover:bg-secondary-dark-bg focus:outline-none"
+            aria-label="Edit todo"
+            dataTestId={'edit-todo-button-' + todo.id}
+          >
+            Edit
+          </Button>
+          <Button
+            type="button"
+            onClick={() => onDelete(todo.id)}
+            className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none"
+            aria-label="Delete todo"
+            dataTestId={'todo-item-delete-button-' + todo.id}
+          >
+            Del
+          </Button>
         </div>
+      </div>
+
+      {/* Inline edit form */}
+      {isEditing && (
+        <form
+          onSubmit={handleSubmit(onFormSubmit)}
+          className="border-t border-secondary-bg p-4 space-y-2 bg-base-bg"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Input
+            {...register('name')}
+            id={'edit-todo-input-' + todo.id}
+            type="text"
+            className="w-full px-3 py-2 rounded border border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg text-sm"
+            inputTestId={'edit-todo-input-' + todo.id}
+          />
+          <div className="flex items-center gap-2">
+            <label className={labelClass}>Status:</label>
+            <select
+              {...register('status')}
+              className="px-2 py-1 rounded border border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg text-sm"
+              data-testid={'edit-todo-status-' + todo.id}
+            >
+              <option value="pending">In Progress</option>
+              <option value="successful">Completed</option>
+              <option value="failed">Not Started</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className={labelClass}>Due date:</label>
+            <input
+              type="date"
+              {...register('dueDate')}
+              className="px-2 py-1 rounded border border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg text-sm"
+              data-testid={'edit-todo-due-date-' + todo.id}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className={labelClass}>Location:</label>
+            <input
+              type="text"
+              {...register('location')}
+              placeholder="Optional location..."
+              className={inputClass}
+              data-testid={'edit-todo-location-' + todo.id}
+            />
+          </div>
+          <div className="flex items-start gap-2">
+            <label className={`${labelClass} mt-1`}>Notes:</label>
+            <textarea
+              {...register('notes')}
+              placeholder="Optional notes..."
+              rows={2}
+              className="flex-1 px-2 py-1 rounded border border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg text-sm resize-none"
+              data-testid={'edit-todo-notes-' + todo.id}
+            />
+          </div>
+          <div className="flex gap-2 justify-end pt-1">
+            <Button
+              type="button"
+              onClick={handleCancelEdit}
+              className="px-3 py-1.5 text-sm bg-gray-200 text-dark-bg rounded hover:bg-gray-300"
+              aria-label="Cancel todo edit"
+              dataTestId={'cancel-todo-edit-button-' + todo.id}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="px-3 py-1.5 text-sm bg-accent text-black rounded hover:bg-accent-dark"
+              aria-label="Save todo edit"
+              dataTestId={'save-todo-edit-button-' + todo.id}
+            >
+              Save
+            </Button>
+          </div>
+        </form>
       )}
     </div>
   );
