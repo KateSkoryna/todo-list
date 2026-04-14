@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom';
 import { Search, Bell, CalendarDays } from 'lucide-react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/src/style.css';
+import dayjs from 'dayjs';
+import { useDateStore } from '../../store/dateStore';
 
 const DAY_PICKER_STYLE: React.CSSProperties = {
   '--rdp-today-color': '#eb8a4a',
@@ -39,6 +41,7 @@ function TopHeader() {
 
   const [selected, setSelected] = useState<Date | undefined>(today);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const setSelectedDate = useDateStore((s) => s.setSelectedDate);
   const calendarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -124,7 +127,10 @@ function TopHeader() {
               <DayPicker
                 mode="single"
                 selected={selected}
-                onSelect={setSelected}
+                onSelect={(date) => {
+                  setSelected(date);
+                  if (date) setSelectedDate(dayjs(date));
+                }}
                 weekStartsOn={1}
                 navLayout="around"
                 showOutsideDays
