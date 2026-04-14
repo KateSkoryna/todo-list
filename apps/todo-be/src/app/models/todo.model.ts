@@ -27,6 +27,7 @@ const todoSchema = new Schema<ITodoDocument>(
     location: { type: String, default: null },
     notes: { type: String, default: null },
     completedAt: { type: Date, default: null },
+    image: { type: String, default: null },
   },
   {
     timestamps: true,
@@ -41,6 +42,7 @@ const todoSchema = new Schema<ITodoDocument>(
           location: ret.location ?? null,
           notes: ret.notes ?? null,
           completedAt: ret.completedAt ? ret.completedAt.toISOString() : null,
+          image: ret.image ?? null,
         };
         return todoItem;
       },

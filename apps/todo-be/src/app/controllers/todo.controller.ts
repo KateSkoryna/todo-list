@@ -9,6 +9,7 @@ import mongoose from 'mongoose';
 const VALID_STATUSES: TodoStatus[] = ['pending', 'successful', 'failed'];
 const MAX_LOCATION_LENGTH = 200;
 const MAX_NOTES_LENGTH = 2000;
+const MAX_IMAGE_LENGTH = 7_000_000;
 
 function isValidDate(value: string): boolean {
   return !isNaN(new Date(value).getTime());
@@ -47,7 +48,8 @@ export const TodoController = {
   create: async (req: Request, res: Response) => {
     try {
       const { todolistId } = req.params;
-      const { name, status, dueDate, location, notes, completedAt } = req.body;
+      const { name, status, dueDate, location, notes, completedAt, image } =
+        req.body;
       const userId = (req as AuthRequest).userId;
       const errors = [];
 
@@ -79,6 +81,10 @@ export const TodoController = {
         errors.push({ field: 'notes', value: notes });
       }
 
+      if (image != null && image.length > MAX_IMAGE_LENGTH) {
+        errors.push({ field: 'image', value: '[too large]' });
+      }
+
       if (errors.length > 0) {
         return res.status(400).json(createValidationError(errors));
       }
@@ -95,6 +101,7 @@ export const TodoController = {
         location: location ?? null,
         notes: notes ?? null,
         completedAt: completedAt ?? null,
+        image: image ?? null,
       });
       res.status(201).json(newTodo);
     } catch (error) {
@@ -108,7 +115,8 @@ export const TodoController = {
   update: async (req: Request, res: Response) => {
     try {
       const { todolistId, id } = req.params;
-      const { name, status, dueDate, location, notes, completedAt } = req.body;
+      const { name, status, dueDate, location, notes, completedAt, image } =
+        req.body;
       const userId = (req as AuthRequest).userId;
 
       if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -124,6 +132,7 @@ export const TodoController = {
         location,
         notes,
         completedAt,
+        image,
       ].some((v) => v !== undefined);
       if (!hasFields) {
         return res
@@ -153,6 +162,10 @@ export const TodoController = {
         errors.push({ field: 'notes', value: notes });
       }
 
+      if (image != null && image.length > MAX_IMAGE_LENGTH) {
+        errors.push({ field: 'image', value: '[too large]' });
+      }
+
       if (errors.length > 0) {
         return res.status(400).json(createValidationError(errors));
       }
@@ -169,6 +182,7 @@ export const TodoController = {
       if (location !== undefined) updates.location = location;
       if (notes !== undefined) updates.notes = notes;
       if (completedAt !== undefined) updates.completedAt = completedAt;
+      if (image !== undefined) updates.image = image;
 
       const updatedTodo = await TodoRepository.update(id, updates);
       if (!updatedTodo) {
