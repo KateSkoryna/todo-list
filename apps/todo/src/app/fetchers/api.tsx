@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ref, deleteObject } from 'firebase/storage';
 import {
   createTodoListFetcher,
   deleteTodoListFetcher,
@@ -14,6 +15,7 @@ import {
   UpdateTodoItem,
 } from '@shared/types';
 import { useAuthStore } from '../store/authStore';
+import { storage } from '../lib/firebase';
 
 export const useTodoListsQuery = () => {
   const user = useAuthStore((s) => s.user);
@@ -67,13 +69,15 @@ export const useAddTodoMutation = () => {
       dueDate?: string;
       location?: string;
       notes?: string;
+      image?: string | null;
     }
   >({
-    mutationFn: ({ todolistId, name, dueDate, location, notes }) =>
+    mutationFn: ({ todolistId, name, dueDate, location, notes, image }) =>
       createTodoFetcher(todolistId, user!.id, name, {
         dueDate,
         location,
         notes,
+        image,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
@@ -105,11 +109,22 @@ export const useEditTodoMutation = () => {
   return useMutation<
     TodoItemType,
     Error,
-    { id: string; todolistId: string } & UpdateTodoItem
+    {
+      id: string;
+      todolistId: string;
+      oldImage?: string | null;
+    } & UpdateTodoItem
   >({
-    mutationFn: ({ id, todolistId, ...updates }) =>
+    mutationFn: ({ id, todolistId, oldImage: _, ...updates }) =>
       updateTodoFetcher(id, todolistId, user!.id, updates),
-    onSuccess: () => {
+    onSuccess: async (_, { oldImage, image }) => {
+      if (oldImage && oldImage !== image) {
+        try {
+          await deleteObject(ref(storage, oldImage));
+        } catch (err) {
+          console.error('Failed to delete old image from storage:', err);
+        }
+      }
       queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
     },
     onError: (err) => console.error('Error editing todo:', err),
@@ -119,10 +134,21 @@ export const useEditTodoMutation = () => {
 export const useDeleteTodoMutation = () => {
   const user = useAuthStore((s) => s.user);
   const queryClient = useQueryClient();
-  return useMutation<void, Error, { id: string; todolistId: string }>({
+  return useMutation<
+    void,
+    Error,
+    { id: string; todolistId: string; image?: string | null }
+  >({
     mutationFn: ({ id, todolistId }) =>
       deleteTodoFetcher(id, todolistId, user!.id),
-    onSuccess: () => {
+    onSuccess: async (_, { image }) => {
+      if (image) {
+        try {
+          await deleteObject(ref(storage, image));
+        } catch (err) {
+          console.error('Failed to delete image from storage:', err);
+        }
+      }
       queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
     },
     onError: (err) => console.error('Error deleting todo:', err),

@@ -124,6 +124,19 @@ function TaskDetailPanel({
             </p>
           </div>
         )}
+
+        {todo.image && (
+          <div className="mt-6">
+            <span className="text-sm font-semibold text-dark-bg block mb-2">
+              Image
+            </span>
+            <img
+              src={todo.image}
+              alt="Attached"
+              className="w-full max-h-64 object-contain rounded-lg border border-secondary-bg"
+            />
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-end gap-3 pt-6 border-t border-secondary-bg mt-6">

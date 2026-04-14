@@ -48,7 +48,12 @@ export const useTodoListsData = () => {
   const handleAddTodo = (
     todolistId: string,
     name: string,
-    opts?: { dueDate?: string; location?: string; notes?: string }
+    opts?: {
+      dueDate?: string;
+      location?: string;
+      notes?: string;
+      image?: string | null;
+    }
   ) => {
     addTodoMutation.mutate({ todolistId, name, ...opts });
   };
@@ -67,7 +72,10 @@ export const useTodoListsData = () => {
   };
 
   const handleDeleteTodo = (id: string, todolistId: string) => {
-    deleteTodoMutation.mutate({ id, todolistId });
+    const image = todoLists
+      ?.flatMap((list) => list.todos)
+      .find((t) => t.id === id)?.image;
+    deleteTodoMutation.mutate({ id, todolistId, image });
   };
 
   const handleEditTodo = (
@@ -75,7 +83,10 @@ export const useTodoListsData = () => {
     todolistId: string,
     updates: UpdateTodoItem
   ) => {
-    editTodoMutation.mutate({ id, todolistId, ...updates });
+    const oldImage = todoLists
+      ?.flatMap((list) => list.todos)
+      .find((t) => t.id === id)?.image;
+    editTodoMutation.mutate({ id, todolistId, oldImage, ...updates });
   };
 
   return {

@@ -43,7 +43,12 @@ export const createTodoFetcher = async (
   todolistId: string,
   userId: string,
   name: string,
-  opts?: { dueDate?: string; location?: string; notes?: string }
+  opts?: {
+    dueDate?: string;
+    location?: string;
+    notes?: string;
+    image?: string | null;
+  }
 ): Promise<TodoItemType> => {
   const { data } = await apiClient.post(
     `/users/${userId}/todolists/${todolistId}/todos`,
@@ -62,6 +67,7 @@ export const updateTodoFetcher = async (
     dueDate?: string | null;
     location?: string | null;
     notes?: string | null;
+    image?: string | null;
   }
 ): Promise<TodoItemType> => {
   const { data } = await apiClient.put(

@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import dayjs from 'dayjs';
+import { uploadImage } from '../../lib/imageUtils';
+import { useAuthStore } from '../../store/authStore';
 import {
   TodoItem as TodoItemType,
   UpdateTodoItem,
@@ -56,7 +58,12 @@ function TodoItem({
   onEdit,
   onSelect,
 }: TodoItemProps) {
+  const userId = useAuthStore((s) => s.user?.firebaseUid);
   const [isEditing, setIsEditing] = useState(false);
+  const [editImage, setEditImage] = useState<string | null>(todo.image ?? null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { register, handleSubmit, reset } = useForm<FormValues>({
     defaultValues: {
@@ -80,7 +87,30 @@ function TodoItem({
 
   const handleCancelEdit = () => {
     reset();
+    setEditImage(todo.image ?? null);
+    setImageError(null);
     setIsEditing(false);
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+    setImageError(null);
+    setImageUploading(true);
+    try {
+      const url = await uploadImage(file, userId);
+      setEditImage(url);
+    } catch (err) {
+      setImageError((err as Error).message);
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setEditImage(null);
+    setImageError(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const onFormSubmit = (data: FormValues) => {
@@ -90,6 +120,7 @@ function TodoItem({
       dueDate: data.dueDate || null,
       location: data.location.trim() || null,
       notes: data.notes.trim() || null,
+      image: editImage,
     });
     setIsEditing(false);
   };
@@ -140,6 +171,15 @@ function TodoItem({
             <p className="text-xs text-secondary-dark-bg mt-0.5 line-clamp-2">
               {todo.notes}
             </p>
+          )}
+
+          {/* Image thumbnail */}
+          {todo.image && (
+            <img
+              src={todo.image}
+              alt="Attached"
+              className="mt-2 h-16 w-16 object-cover rounded"
+            />
           )}
 
           {/* Footer badges */}
@@ -252,6 +292,41 @@ function TodoItem({
               className="flex-1 px-2 py-1 rounded border border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg text-sm resize-none"
               data-testid={'edit-todo-notes-' + todo.id}
             />
+          </div>
+          <div className="flex items-start gap-2">
+            <label className={`${labelClass} mt-1`}>Image:</label>
+            <div className="flex flex-col gap-2">
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="text-sm text-dark-bg"
+                data-testid={'edit-todo-image-' + todo.id}
+              />
+              {imageUploading && (
+                <p className="text-sm text-secondary-dark-bg">Uploading...</p>
+              )}
+              {imageError && (
+                <p className="text-red-500 text-xs">{imageError}</p>
+              )}
+              {editImage && (
+                <div className="flex items-center gap-2">
+                  <img
+                    src={editImage}
+                    alt="Preview"
+                    className="h-16 w-16 object-cover rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="text-xs text-red-500 hover:text-red-700 underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
           <div className="flex gap-2 justify-end pt-1">
             <Button

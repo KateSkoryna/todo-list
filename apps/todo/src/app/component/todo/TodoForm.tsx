@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Input from '../elements/Input';
 import Button from '../elements/Button';
+import { uploadImage } from '../../lib/imageUtils';
+import { useAuthStore } from '../../store/authStore';
 
 type NewTodoOpts = {
   dueDate?: string;
   location?: string;
   notes?: string;
+  image?: string | null;
 };
 
 type FormProps = {
@@ -21,7 +24,12 @@ type FormValues = {
 };
 
 const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
+  const userId = useAuthStore((s) => s.user?.firebaseUid);
   const [showExtra, setShowExtra] = useState(false);
+  const [image, setImage] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -32,14 +40,39 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
     defaultValues: { name: '', dueDate: '', location: '', notes: '' },
   });
 
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+    setImageError(null);
+    setImageUploading(true);
+    try {
+      const url = await uploadImage(file, userId);
+      setImage(url);
+    } catch (err) {
+      setImageError((err as Error).message);
+      setImage(null);
+    } finally {
+      setImageUploading(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImage(null);
+    setImageError(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const onFormSubmit = (data: FormValues) => {
     const opts: NewTodoOpts = {};
     if (data.dueDate) opts.dueDate = data.dueDate;
     if (data.location.trim()) opts.location = data.location.trim();
     if (data.notes.trim()) opts.notes = data.notes.trim();
+    if (image) opts.image = image;
     onAddTodo(data.name.trim(), Object.keys(opts).length ? opts : undefined);
     reset();
     setShowExtra(false);
+    setImage(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   return (
@@ -133,6 +166,47 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
               className="flex-1 px-3 py-2 rounded-lg border-2 border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg placeholder-secondary-dark-bg resize-none"
               data-testid="todo-form-notes"
             />
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 items-baseline">
+            <label
+              htmlFor="new-todo-image"
+              className="text-dark-bg font-medium w-24"
+            >
+              Image:
+            </label>
+            <div className="flex flex-col gap-2">
+              <input
+                id="new-todo-image"
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="text-sm text-dark-bg"
+                data-testid="todo-form-image"
+              />
+              {imageUploading && (
+                <p className="text-sm text-secondary-dark-bg">Uploading...</p>
+              )}
+              {imageError && (
+                <p className="text-red-500 text-sm">{imageError}</p>
+              )}
+              {image && (
+                <div className="flex items-center gap-2">
+                  <img
+                    src={image}
+                    alt="Preview"
+                    className="h-16 w-16 object-cover rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="text-sm text-red-500 hover:text-red-700 underline"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
