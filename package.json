@@ -16,7 +16,8 @@
     "test:unit": "nx run-many --target=test",
     "test:e2e:watch": "nx e2e todo-e2e --watch",
     "lint": "nx lint",
-    "all": "npm run docker:mongodb & npm run serve:be & npm run serve:fe"
+    "emulator": "firebase emulators:start",
+    "all": "npm run docker:mongodb & npm run emulator & npm run serve:be & npm run serve:fe"
   },
   "private": true,
   "dependencies": {
