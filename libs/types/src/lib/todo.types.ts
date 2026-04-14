@@ -9,6 +9,7 @@ export interface NewTodoItem {
   location?: string | null;
   notes?: string | null;
   completedAt?: string | null;
+  image?: string | null;
 }
 
 export interface TodoItem extends NewTodoItem {
@@ -23,6 +24,7 @@ export interface UpdateTodoItem {
   location?: string | null;
   notes?: string | null;
   completedAt?: string | null;
+  image?: string | null;
 }
 
 // --- TODOLIST TYPES ---
