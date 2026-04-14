@@ -5,7 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 
 import AppShell from './app/component/elements/AppShell';
-import DashboardPage from './app/component/dashboard/DashboardPage';
+import DashboardPage from './app/component/pages/DashboardPage';
 import TasksPage from './app/component/pages/TasksPage';
 import VitalTaskPage from './app/component/pages/VitalTaskPage';
 import SettingsPage from './app/component/pages/SettingsPage';
