@@ -201,6 +201,7 @@ function RegisterPage() {
             <input
               name="email"
               type="email"
+              autoComplete="email"
               placeholder="Enter Email"
               required
               className={inputClass}

@@ -130,6 +130,7 @@ function LoginPage() {
               id="email"
               name="email"
               type="email"
+              autoComplete="email"
               placeholder="Enter Email"
               required
               className="w-full pl-9 pr-4 py-3 border border-secondary-bg rounded-lg focus:outline-none focus:border-dark-bg text-dark-bg placeholder:text-secondary-dark-bg"
