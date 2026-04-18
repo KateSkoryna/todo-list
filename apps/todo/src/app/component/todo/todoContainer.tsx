@@ -20,9 +20,6 @@ const TodoContainer: React.FC = () => {
     handleCreateList,
     handleDeleteList,
     handleAddTodo,
-    handleToggleTodo,
-    handleDeleteTodo,
-    handleEditTodo,
     createListMutationIsPending,
   } = useTodoListsData();
   return (
@@ -39,9 +36,6 @@ const TodoContainer: React.FC = () => {
         refetch={refetch}
         handleDeleteList={handleDeleteList}
         handleAddTodo={handleAddTodo}
-        handleToggleTodo={handleToggleTodo}
-        handleDeleteTodo={handleDeleteTodo}
-        handleEditTodo={handleEditTodo}
       />
     </>
   );

@@ -82,7 +82,7 @@ const TodoListHeader: React.FC<TodoListHeaderProps> = ({
         <div className="flex items-center gap-2 shrink-0 ml-4">
           <Button
             onClick={() => onDeleteList(todoList.id)}
-            className="px-4 py-2 bg-triadic-blue text-white rounded hover:bg-dark-bg transition-colors focus:outline-none focus:ring-2 focus:ring-triadic-blue focus:ring-offset-2 focus:ring-offset-dark-bg"
+            className="px-4 py-2 bg-triadic-blue text-white rounded-lg hover:bg-dark-bg transition-colors focus:outline-none focus:ring-2 focus:ring-triadic-blue focus:ring-offset-2 focus:ring-offset-dark-bg"
             dataTestId="todolist-item-delete-button"
           >
             Delete List

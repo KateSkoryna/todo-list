@@ -1,11 +1,7 @@
 import TodoList from './TodoList';
 import Loader from '../elements/Loader';
 import ErrorFallback from '../elements/ErrorFallback';
-import {
-  TodoList as TodoListType,
-  TodoItem,
-  UpdateTodoItem,
-} from '@shared/types';
+import { TodoList as TodoListType, TodoItem } from '@shared/types';
 
 type NewTodoOpts = {
   dueDate?: string;
@@ -21,13 +17,6 @@ interface TodoListsProps {
   refetch: () => void;
   handleDeleteList: (id: string) => void;
   handleAddTodo: (todolistId: string, name: string, opts?: NewTodoOpts) => void;
-  handleToggleTodo: (id: string, todolistId: string) => void;
-  handleDeleteTodo: (id: string, todolistId: string) => void;
-  handleEditTodo: (
-    id: string,
-    todolistId: string,
-    updates: UpdateTodoItem
-  ) => void;
   selectedTodoId?: string | null;
   onSelectTodo?: (todo: TodoItem, list: TodoListType) => void;
 }
@@ -40,9 +29,6 @@ function TodoLists({
   refetch,
   handleDeleteList,
   handleAddTodo,
-  handleToggleTodo,
-  handleDeleteTodo,
-  handleEditTodo,
   selectedTodoId,
   onSelectTodo,
 }: TodoListsProps) {
@@ -84,10 +70,7 @@ function TodoLists({
           key={list.id}
           todoList={list}
           onAddTodo={handleAddTodo}
-          onToggleTodo={handleToggleTodo}
-          onDeleteTodo={handleDeleteTodo}
           onDeleteList={handleDeleteList}
-          onEditTodo={handleEditTodo}
           selectedTodoId={selectedTodoId ?? null}
           onSelectTodo={
             onSelectTodo ? (todo) => onSelectTodo(todo, list) : undefined

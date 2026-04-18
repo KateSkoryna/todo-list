@@ -10,9 +10,6 @@ function VitalTaskPage() {
     refetch,
     handleDeleteList,
     handleAddTodo,
-    handleToggleTodo,
-    handleDeleteTodo,
-    handleEditTodo,
   } = useTodoListsData();
 
   const vitalLists = todoLists?.filter((l) => l.priority === 'high');
@@ -30,9 +27,6 @@ function VitalTaskPage() {
         refetch={refetch}
         handleDeleteList={handleDeleteList}
         handleAddTodo={handleAddTodo}
-        handleToggleTodo={handleToggleTodo}
-        handleDeleteTodo={handleDeleteTodo}
-        handleEditTodo={handleEditTodo}
       />
     </div>
   );

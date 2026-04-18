@@ -3,15 +3,11 @@ import { Plus, ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
 import {
   TodoList as TodoListType,
   TodoItem as TodoItemType,
-  UpdateTodoItem,
 } from '@shared/types';
 import TodoItem from './TodoItem';
 import TodoForm from './TodoForm';
 import Text from '../elements/Text';
-import {
-  PRIORITY_COLORS,
-  CATEGORY_LABELS,
-} from '../../constants/todolist.constants';
+import { CATEGORY_LABELS } from '../../constants/todolist.constants';
 import dayjs from 'dayjs';
 
 type NewTodoOpts = {
@@ -23,10 +19,7 @@ type NewTodoOpts = {
 interface TodoListProps {
   todoList: TodoListType;
   onAddTodo: (todolistId: string, name: string, opts?: NewTodoOpts) => void;
-  onToggleTodo: (id: string, todolistId: string) => void;
-  onDeleteTodo: (id: string, todolistId: string) => void;
   onDeleteList: (id: string) => void;
-  onEditTodo: (id: string, todolistId: string, updates: UpdateTodoItem) => void;
   selectedTodoId?: string | null;
   onSelectTodo?: (todo: TodoItemType) => void;
   dataTestId?: string;
@@ -41,10 +34,7 @@ function formatDate(iso: string | null | undefined): string | null {
 function TodoList({
   todoList,
   onAddTodo,
-  onToggleTodo,
-  onDeleteTodo,
   onDeleteList,
-  onEditTodo,
   selectedTodoId,
   onSelectTodo,
   dataTestId,
@@ -136,14 +126,14 @@ function TodoList({
                   if (!isExpanded) setIsExpanded(true);
                   setShowAddForm((v) => !v);
                 }}
-                className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-dark-bg bg-accent rounded-lg hover:opacity-90 transition-opacity"
+                className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-dark-bg bg-accent rounded hover:opacity-90 transition-opacity"
               >
                 <Plus className="w-3 h-3" />
                 Add Task
               </button>
               <button
                 onClick={() => onDeleteList(todoList.id)}
-                className="p-1.5 text-white/60 hover:text-red-400 transition-colors rounded"
+                className="p-1.5 text-white/60 hover:text-red-400 transition-colors rounded-lg"
                 aria-label="Delete list"
                 data-testid="todolist-item-delete-button"
               >
@@ -196,9 +186,6 @@ function TodoList({
                 todo={todo}
                 listPriority={todoList.priority}
                 isSelected={selectedTodoId === todo.id}
-                onToggle={(id) => onToggleTodo(id, todoList.id)}
-                onDelete={(id) => onDeleteTodo(id, todoList.id)}
-                onEdit={(id, updates) => onEditTodo(id, todoList.id, updates)}
                 onSelect={onSelectTodo ? () => onSelectTodo(todo) : undefined}
               />
             ))
