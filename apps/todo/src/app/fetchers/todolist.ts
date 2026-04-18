@@ -32,6 +32,24 @@ export const createTodoListFetcher = async (
   return data;
 };
 
+export const updateTodoListFetcher = async (
+  todolistId: string,
+  userId: string,
+  updates: {
+    name?: string;
+    priority?: TodoListPriority;
+    category?: TodoListCategory;
+    dueDate?: string | null;
+    notes?: string | null;
+  }
+): Promise<TodoListType> => {
+  const { data } = await apiClient.put(
+    `/users/${userId}/todolists/${todolistId}`,
+    updates
+  );
+  return data;
+};
+
 export const deleteTodoListFetcher = async (
   todolistId: string,
   userId: string

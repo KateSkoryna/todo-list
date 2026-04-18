@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ref, deleteObject } from 'firebase/storage';
 import {
   createTodoListFetcher,
+  updateTodoListFetcher,
   deleteTodoListFetcher,
   createTodoFetcher,
   updateTodoFetcher,
@@ -13,6 +14,7 @@ import {
   TodoList as TodoListType,
   TodoItem as TodoItemType,
   UpdateTodoItem,
+  UpdateTodoList,
 } from '@shared/types';
 import { useAuthStore } from '../store/authStore';
 import { storage } from '../lib/firebase';
@@ -42,6 +44,23 @@ export const useCreateListMutation = () => {
       queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
     },
     onError: (err) => console.error('Error creating todolist:', err),
+  });
+};
+
+export const useEditListMutation = () => {
+  const user = useAuthStore((s) => s.user);
+  const queryClient = useQueryClient();
+  return useMutation<
+    TodoListType,
+    Error,
+    { todolistId: string } & UpdateTodoList
+  >({
+    mutationFn: ({ todolistId, ...updates }) =>
+      updateTodoListFetcher(todolistId, user!.id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todoLists', user?.id] });
+    },
+    onError: (err) => console.error('Error editing todolist:', err),
   });
 };
 

@@ -1,5 +1,6 @@
 import {
   useCreateListMutation,
+  useEditListMutation,
   useDeleteListMutation,
   useAddTodoMutation,
   useToggleTodoMutation,
@@ -9,6 +10,7 @@ import {
 } from '../fetchers/api';
 import {
   UpdateTodoItem,
+  UpdateTodoList,
   TodoListPriority,
   TodoListCategory,
 } from '@shared/types';
@@ -23,6 +25,7 @@ export const useTodoListsData = () => {
   } = useTodoListsQuery();
 
   const createListMutation = useCreateListMutation();
+  const editListMutation = useEditListMutation();
   const deleteListMutation = useDeleteListMutation();
   const addTodoMutation = useAddTodoMutation();
   const toggleTodoMutation = useToggleTodoMutation();
@@ -78,6 +81,10 @@ export const useTodoListsData = () => {
     deleteTodoMutation.mutate({ id, todolistId, image });
   };
 
+  const handleEditList = (todolistId: string, updates: UpdateTodoList) => {
+    editListMutation.mutate({ todolistId, ...updates });
+  };
+
   const handleEditTodo = (
     id: string,
     todolistId: string,
@@ -97,6 +104,7 @@ export const useTodoListsData = () => {
     refetch,
     handleCreateList,
     handleDeleteList,
+    handleEditList,
     handleAddTodo,
     handleToggleTodo,
     handleDeleteTodo,
