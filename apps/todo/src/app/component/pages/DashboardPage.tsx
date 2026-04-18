@@ -1,11 +1,26 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { PieChart, Pie, Cell } from 'recharts';
-import { ClipboardList, CheckSquare, Plus } from 'lucide-react';
+import { ClipboardList, CheckSquare, CalendarDays } from 'lucide-react';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/src/style.css';
 import { useTodoListsQuery } from '../../fetchers/api';
 import { TodoItem, TodoList } from '@shared/types';
 import { useDateStore } from '../../store/dateStore';
 import TodoCard from '../elements/TodoCard';
+
+const DAY_PICKER_STYLE: React.CSSProperties = {
+  '--rdp-today-color': '#eb8a4a',
+  '--rdp-selected-border': 'none',
+  '--rdp-day-width': '50px',
+  '--rdp-day-height': '50px',
+  '--rdp-day_button-width': '50px',
+  '--rdp-day_button-height': '50px',
+  '--rdp-accent-color': '#4aabeb',
+  '--rdp-nav_button-width': '36px',
+  '--rdp-nav_button-height': '36px',
+  fontSize: '14px',
+} as React.CSSProperties;
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -133,6 +148,27 @@ function TodoPanel({
   selectedDate: Dayjs;
 }) {
   const dayLabel = selectedDate.format('D MMMM');
+  const setSelectedDate = useDateStore((s) => s.setSelectedDate);
+  const [pickerDate, setPickerDate] = useState<Date | undefined>(
+    selectedDate.toDate()
+  );
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const calendarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(e.target as Node)
+      ) {
+        setCalendarOpen(false);
+      }
+    }
+    if (calendarOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [calendarOpen]);
 
   return (
     <div className="bg-white rounded-xl border border-secondary-bg p-5 flex flex-col h-full">
@@ -141,14 +177,67 @@ function TodoPanel({
           <ClipboardList className="w-5 h-5" />
           <h3 className="font-bold text-lg">To-Do</h3>
         </div>
-        <button className="flex items-center gap-1 text-sm text-secondary-dark-bg hover:text-triadic-orange transition-colors">
-          <Plus className="w-4 h-4" />
-          Add task
-        </button>
+
+        <div className="relative" ref={calendarRef}>
+          <button
+            aria-label="Calendar"
+            onClick={() => setCalendarOpen((o) => !o)}
+            className="flex items-center gap-1.5 text-sm text-secondary-dark-bg hover:text-triadic-orange transition-colors"
+          >
+            <CalendarDays className="w-4 h-4" />
+            {dayLabel}
+          </button>
+
+          {calendarOpen && (
+            <div
+              className="absolute right-0 top-8 z-50 bg-base-bg rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.15)]"
+              style={{ width: 378 }}
+            >
+              <div className="flex items-center justify-between px-[14px] pt-4 pb-2">
+                <span className="font-bold text-dark-bg">Calendar</span>
+                <button
+                  onClick={() => setCalendarOpen(false)}
+                  className="text-secondary-dark-bg hover:text-dark-bg transition-colors"
+                  aria-label="Close calendar"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {pickerDate && (
+                <div className="mx-[14px] mb-2 px-3 py-2 rounded-lg border border-secondary-bg text-sm text-dark-bg">
+                  {pickerDate.toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </div>
+              )}
+
+              <DayPicker
+                mode="single"
+                selected={pickerDate}
+                onSelect={(date) => {
+                  setPickerDate(date);
+                  if (date) setSelectedDate(dayjs(date));
+                }}
+                weekStartsOn={1}
+                navLayout="around"
+                showOutsideDays
+                style={DAY_PICKER_STYLE}
+                modifiersClassNames={{
+                  selected:
+                    '[&>button]:!bg-accent [&>button]:!text-dark-bg [&>button]:!border-0 [&>button]:!rounded-[8px]',
+                  today:
+                    '[&>button]:!text-triadic-orange [&>button]:!font-bold',
+                }}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       <p className="text-sm text-secondary-dark-bg mb-4 flex items-center gap-1.5">
-        {dayLabel}
         {isToday(selectedDate) && (
           <>
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-triadic-orange" />

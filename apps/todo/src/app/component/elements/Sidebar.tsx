@@ -12,8 +12,8 @@ import { useAuthStore } from '../../store/authStore';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/vital', label: 'Vital Task', icon: Flame, end: false },
-  { to: '/tasks', label: 'My Task', icon: ListTodo, end: false },
+  { to: '/vital', label: 'Vital Tasks', icon: Flame, end: false },
+  { to: '/tasks', label: 'My Tasks', icon: ListTodo, end: false },
   { to: '/statistics', label: 'Statistics', icon: BarChart2, end: false },
   { to: '/settings', label: 'Settings', icon: Settings, end: false },
   { to: '/help', label: 'Help', icon: HelpCircle, end: false },
