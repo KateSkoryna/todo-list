@@ -7,6 +7,7 @@ import {
   browserSessionPersistence,
   setPersistence,
 } from 'firebase/auth';
+import { useTranslation } from 'react-i18next';
 import { auth, googleProvider } from '../../lib/firebase';
 import { useAuthStore } from '../../store/authStore';
 import apiClient from '../../lib/apiClient';
@@ -40,6 +41,7 @@ function GoogleIcon() {
 }
 
 function LoginPage() {
+  const { t } = useTranslation();
   const setUser = useAuthStore((s) => s.setUser);
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
@@ -63,10 +65,9 @@ function LoginPage() {
         formData.get('email') as string,
         formData.get('password') as string
       );
-      // onAuthStateChanged in AuthBootstrap will load the user profile
       navigate('/');
     } catch {
-      setError('Sign in failed. Check your email or password.');
+      setError(t('auth.login.error'));
     } finally {
       setIsPending(false);
     }
@@ -77,7 +78,6 @@ function LoginPage() {
     setIsPending(true);
     try {
       const credential = await signInWithPopup(auth, googleProvider);
-      // Check if MongoDB profile exists; provision if not
       try {
         await apiClient.get('/auth/user');
       } catch (err: unknown) {
@@ -101,7 +101,7 @@ function LoginPage() {
       }
       navigate('/');
     } catch {
-      setError('Google sign-in failed. Please try again.');
+      setError(t('auth.login.googleError'));
     } finally {
       setIsPending(false);
     }
@@ -119,9 +119,10 @@ function LoginPage() {
 
   return (
     <AuthLayout illustration={illustration} illustrationSide="right">
-      {/* Form */}
       <div className="w-full md:w-1/2 p-10 flex flex-col justify-center">
-        <h1 className="text-3xl font-bold text-dark-bg mb-8">Sign In</h1>
+        <h1 className="text-3xl font-bold text-dark-bg mb-8">
+          {t('auth.login.title')}
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
@@ -131,7 +132,7 @@ function LoginPage() {
               name="email"
               type="email"
               autoComplete="email"
-              placeholder="Enter Email"
+              placeholder={t('auth.login.emailPlaceholder')}
               required
               className="w-full pl-9 pr-4 py-3 border border-secondary-bg rounded-lg focus:outline-none focus:border-dark-bg text-dark-bg placeholder:text-secondary-dark-bg"
             />
@@ -144,7 +145,7 @@ function LoginPage() {
               name="password"
               type={showPassword ? 'text' : 'password'}
               autoComplete="current-password"
-              placeholder="Enter Password"
+              placeholder={t('auth.login.passwordPlaceholder')}
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -170,7 +171,7 @@ function LoginPage() {
             id="rememberMe"
             checked={rememberMe}
             onChange={setRememberMe}
-            label="Remember Me"
+            label={t('auth.login.rememberMe')}
           />
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -180,7 +181,7 @@ function LoginPage() {
             disabled={isPending}
             className="w-full py-3 bg-accent text-dark-bg font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
           >
-            {isPending ? 'Signing in…' : 'Login'}
+            {isPending ? t('auth.login.signingIn') : t('auth.login.button')}
           </button>
         </form>
 
@@ -192,17 +193,17 @@ function LoginPage() {
             className="w-full flex items-center justify-center gap-2 py-3 border border-secondary-bg rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 text-sm text-dark-bg font-medium"
           >
             <GoogleIcon />
-            Continue with Google
+            {t('auth.login.continueWithGoogle')}
           </button>
         </div>
 
         <p className="mt-6 text-sm text-secondary-dark-bg">
-          Don't have an account?{' '}
+          {t('auth.login.noAccount')}{' '}
           <Link
             to="/register"
             className="text-triadic-blue font-semibold hover:underline"
           >
-            Create One
+            {t('auth.login.createOne')}
           </Link>
         </p>
       </div>

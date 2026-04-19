@@ -5,6 +5,7 @@ import {
   updateProfile,
   signInWithPopup,
 } from 'firebase/auth';
+import { useTranslation } from 'react-i18next';
 import { auth, googleProvider } from '../../lib/firebase';
 import { useAuthStore } from '../../store/authStore';
 import { provisionUserFetcher } from '../../fetchers/auth';
@@ -49,6 +50,7 @@ type FormErrors = {
 };
 
 function RegisterPage() {
+  const { t } = useTranslation();
   const setUser = useAuthStore((s) => s.setUser);
   const navigate = useNavigate();
   const [errors, setErrors] = useState<FormErrors>({});
@@ -121,7 +123,7 @@ function RegisterPage() {
       setUser(user);
       navigate('/');
     } catch {
-      setErrors({ form: 'Google sign-up failed. Please try again.' });
+      setErrors({ form: t('auth.register.googleError') });
     } finally {
       setIsPending(false);
     }
@@ -144,9 +146,10 @@ function RegisterPage() {
 
   return (
     <AuthLayout illustration={illustration}>
-      {/* Form */}
       <div className="w-full md:w-1/2 p-10 flex flex-col justify-center">
-        <h1 className="text-3xl font-bold text-dark-bg mb-6">Sign Up</h1>
+        <h1 className="text-3xl font-bold text-dark-bg mb-6">
+          {t('auth.register.title')}
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
@@ -156,7 +159,7 @@ function RegisterPage() {
                 <input
                   name="firstName"
                   type="text"
-                  placeholder="Enter First Name"
+                  placeholder={t('auth.register.firstNamePlaceholder')}
                   required
                   className={inputClass}
                 />
@@ -171,7 +174,7 @@ function RegisterPage() {
                 <input
                   name="lastName"
                   type="text"
-                  placeholder="Enter Last Name"
+                  placeholder={t('auth.register.lastNamePlaceholder')}
                   required
                   className={inputClass}
                 />
@@ -187,7 +190,7 @@ function RegisterPage() {
             <input
               name="username"
               type="text"
-              placeholder="Enter Username"
+              placeholder={t('auth.register.usernamePlaceholder')}
               required
               className={inputClass}
             />
@@ -202,7 +205,7 @@ function RegisterPage() {
               name="email"
               type="email"
               autoComplete="email"
-              placeholder="Enter Email"
+              placeholder={t('auth.register.emailPlaceholder')}
               required
               className={inputClass}
             />
@@ -217,7 +220,7 @@ function RegisterPage() {
               name="password"
               type={showPassword ? 'text' : 'password'}
               autoComplete="new-password"
-              placeholder="Enter Password"
+              placeholder={t('auth.register.passwordPlaceholder')}
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -248,7 +251,7 @@ function RegisterPage() {
               name="confirmPassword"
               type={showConfirmPassword ? 'text' : 'password'}
               autoComplete="new-password"
-              placeholder="Confirm Password"
+              placeholder={t('auth.register.confirmPasswordPlaceholder')}
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -279,7 +282,7 @@ function RegisterPage() {
             id="agreeToTerms"
             checked={agreeToTerms}
             onChange={setAgreeToTerms}
-            label="I agree to all terms and conditions"
+            label={t('auth.register.agreeToTerms')}
           />
           {errors.agreeToTerms && (
             <p className="text-red-500 text-xs">{errors.agreeToTerms}</p>
@@ -292,7 +295,9 @@ function RegisterPage() {
             disabled={isPending}
             className="w-full py-3 bg-accent text-dark-bg font-semibold rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
           >
-            {isPending ? 'Creating account…' : 'Register'}
+            {isPending
+              ? t('auth.register.creatingAccount')
+              : t('auth.register.button')}
           </button>
         </form>
 
@@ -304,17 +309,17 @@ function RegisterPage() {
             className="w-full flex items-center justify-center gap-2 py-3 border border-secondary-bg rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 text-sm text-dark-bg font-medium"
           >
             <GoogleIcon />
-            Continue with Google
+            {t('auth.register.continueWithGoogle')}
           </button>
         </div>
 
         <p className="mt-4 text-sm text-secondary-dark-bg">
-          Already have an account?{' '}
+          {t('auth.register.haveAccount')}{' '}
           <Link
             to="/login"
             className="text-triadic-blue font-semibold hover:underline"
           >
-            Sign In
+            {t('auth.register.signIn')}
           </Link>
         </p>
       </div>
