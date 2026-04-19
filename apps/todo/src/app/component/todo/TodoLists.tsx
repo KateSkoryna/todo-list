@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import TodoList from './TodoList';
 import Loader from '../elements/Loader';
 import ErrorFallback from '../elements/ErrorFallback';
@@ -32,8 +33,10 @@ function TodoLists({
   selectedTodoId,
   onSelectTodo,
 }: TodoListsProps) {
+  const { t } = useTranslation();
+
   if (isLoading) {
-    return <Loader message="Loading todo lists..." />;
+    return <Loader message={t('todoLists.loading')} />;
   }
 
   if (isError) {
@@ -55,9 +58,11 @@ function TodoLists({
           className="text-dark-bg text-base"
           data-testid="empty-todolists-message"
         >
-          No task lists yet. Click{' '}
-          <span className="font-semibold text-triadic-orange">New List</span> to
-          get started!
+          {t('todoLists.emptyBefore')}{' '}
+          <span className="font-semibold text-triadic-orange">
+            {t('todoLists.emptyNewList')}
+          </span>{' '}
+          {t('todoLists.emptyAfter')}
         </p>
       </div>
     );

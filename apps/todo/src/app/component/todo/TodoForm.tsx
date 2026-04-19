@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { ImagePlus, Upload, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Input from '../elements/Input';
 import Button from '../elements/Button';
 import DatePickerInput from '../elements/DatePickerInput';
@@ -26,6 +27,7 @@ type FormValues = {
 };
 
 const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
+  const { t } = useTranslation();
   const userId = useAuthStore((s) => s.user?.firebaseUid);
   const [showExtra, setShowExtra] = useState(false);
   const [image, setImage] = useState<string | null>(null);
@@ -82,13 +84,13 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
     <form onSubmit={handleSubmit(onFormSubmit)}>
       <div className="flex flex-col sm:flex-row gap-3 items-baseline">
         <label htmlFor="new-todo-name" className="text-dark-bg font-medium">
-          Todo Name:
+          {t('todoForm.todoName')}
         </label>
         <Input
-          {...register('name', { required: 'Title cannot be empty.' })}
+          {...register('name', { required: t('todoForm.titleEmpty') })}
           id="new-todo-name"
           type="text"
-          placeholder="Add a new todo..."
+          placeholder={t('todoForm.addPlaceholder')}
           className={`flex-1 px-4 py-2 rounded-lg border-2 ${
             errors.name ? 'border-red-500' : 'border-secondary-bg'
           } focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent bg-white text-dark-bg placeholder-secondary-dark-bg`}
@@ -99,7 +101,7 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
           className="px-6 py-2 bg-accent text-black font-semibold rounded-lg hover:bg-dark-bg hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
           dataTestId="todo-form-submit-button"
         >
-          Add
+          {t('todoForm.add')}
         </Button>
       </div>
 
@@ -118,7 +120,7 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
         className="mt-2 text-sm text-secondary-dark-bg hover:text-dark-bg underline focus:outline-none"
         data-testid="todo-form-toggle-extra"
       >
-        {showExtra ? 'Hide options' : 'More options'}
+        {showExtra ? t('todoForm.hideOptions') : t('todoForm.moreOptions')}
       </button>
 
       {showExtra && (
@@ -128,7 +130,7 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
               htmlFor="new-todo-due-date"
               className="text-dark-bg font-medium w-24"
             >
-              Due date:
+              {t('todoForm.dueDate')}
             </label>
             <Controller
               name="dueDate"
@@ -147,13 +149,13 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
               htmlFor="new-todo-location"
               className="text-dark-bg font-medium w-24"
             >
-              Location:
+              {t('todoForm.location')}
             </label>
             <input
               id="new-todo-location"
               type="text"
               {...register('location')}
-              placeholder="Optional location..."
+              placeholder={t('todoForm.locationPlaceholder')}
               className="flex-1 px-3 py-2 rounded-lg border-2 border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg placeholder-secondary-dark-bg"
               data-testid="todo-form-location"
             />
@@ -163,12 +165,12 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
               htmlFor="new-todo-notes"
               className="text-dark-bg font-medium w-24"
             >
-              Notes:
+              {t('todoForm.notes')}
             </label>
             <textarea
               id="new-todo-notes"
               {...register('notes')}
-              placeholder="Optional notes..."
+              placeholder={t('todoForm.notesPlaceholder')}
               rows={2}
               className="flex-1 px-3 py-2 rounded-lg border-2 border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg placeholder-secondary-dark-bg resize-none"
               data-testid="todo-form-notes"
@@ -179,7 +181,7 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
               htmlFor="new-todo-image"
               className="text-dark-bg font-medium w-24"
             >
-              Image:
+              {t('todoForm.image')}
             </label>
             <div className="flex flex-col gap-2">
               <input
@@ -201,12 +203,14 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
                   {imageUploading ? (
                     <>
                       <Upload size={16} className="animate-bounce" />
-                      <span className="text-sm">Uploading...</span>
+                      <span className="text-sm">{t('todoForm.uploading')}</span>
                     </>
                   ) : (
                     <>
                       <ImagePlus size={16} />
-                      <span className="text-sm">Choose image</span>
+                      <span className="text-sm">
+                        {t('todoForm.chooseImage')}
+                      </span>
                     </>
                   )}
                 </button>

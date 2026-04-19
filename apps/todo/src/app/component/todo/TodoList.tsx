@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   TodoList as TodoListType,
   TodoItem as TodoItemType,
@@ -7,7 +8,6 @@ import {
 import TodoItem from './TodoItem';
 import TodoForm from './TodoForm';
 import Text from '../elements/Text';
-import { CATEGORY_LABELS } from '../../constants/todolist.constants';
 import dayjs from 'dayjs';
 
 type NewTodoOpts = {
@@ -39,6 +39,7 @@ function TodoList({
   onSelectTodo,
   dataTestId,
 }: TodoListProps) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
 
@@ -90,7 +91,7 @@ function TodoList({
                 <div className="flex items-center gap-4 text-xs text-white/80">
                   {todoList.priority && (
                     <span>
-                      Priority:{' '}
+                      {t('todoList.priority')}{' '}
                       <span
                         className={`font-medium ${
                           todoList.priority === 'high'
@@ -100,17 +101,15 @@ function TodoList({
                             : 'text-triadic-purple'
                         }`}
                       >
-                        {todoList.priority.charAt(0).toUpperCase() +
-                          todoList.priority.slice(1)}
+                        {t(`tasks.priority_${todoList.priority}`)}
                       </span>
                     </span>
                   )}
                   {todoList.category && (
                     <span>
-                      Category:{' '}
+                      {t('todoList.category')}{' '}
                       <span className="text-triadic-blue font-medium">
-                        {CATEGORY_LABELS[todoList.category] ??
-                          todoList.category}
+                        {t(`tasks.category_${todoList.category}`)}
                       </span>
                     </span>
                   )}
@@ -129,7 +128,7 @@ function TodoList({
                 className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-dark-bg bg-accent rounded hover:opacity-90 transition-opacity"
               >
                 <Plus className="w-3 h-3" />
-                Add Task
+                {t('todoList.addTask')}
               </button>
               <button
                 onClick={() => onDeleteList(todoList.id)}
@@ -142,7 +141,7 @@ function TodoList({
             </div>
             {formattedDate && (
               <span className="text-xs text-white pr-1.5">
-                Due: {formattedDate}
+                {t('todoList.due')} {formattedDate}
               </span>
             )}
           </div>
@@ -170,14 +169,14 @@ function TodoList({
               className="text-center text-secondary-dark-bg py-6 text-sm"
               dataTestId="empty-todos-message"
             >
-              No tasks yet. Click{' '}
+              {t('todoList.noTasksBefore')}{' '}
               <button
                 onClick={() => setShowAddForm(true)}
                 className="font-semibold text-triadic-orange hover:underline focus:outline-none"
               >
-                Add Task
+                {t('todoList.addTask')}
               </button>{' '}
-              to get started!
+              {t('todoList.noTasksAfter')}
             </Text>
           ) : (
             todoList.todos.map((todo) => (

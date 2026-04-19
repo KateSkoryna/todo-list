@@ -2,15 +2,12 @@ import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useParams } from 'react-router-dom';
 import { TodoListPriority, TodoListCategory } from '@shared/types';
+import { useTranslation } from 'react-i18next';
 import Input from '../elements/Input';
 import Button from '../elements/Button';
 import Text from '../elements/Text';
 import DetailsSelect from '../elements/DetailsSelect';
 import DatePickerInput from '../elements/DatePickerInput';
-import {
-  PRIORITY_OPTIONS,
-  CATEGORY_OPTIONS,
-} from '../../constants/todolist.constants';
 
 type TodoListFormOpts = {
   priority?: TodoListPriority;
@@ -36,6 +33,7 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
   onSubmit,
   isSubmitting,
 }) => {
+  const { t } = useTranslation();
   const [showMore, setShowMore] = useState(false);
   const { userId } = useParams<{ userId: string }>();
 
@@ -72,22 +70,39 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
     setShowMore(false);
   };
 
+  const priorityOptions = [
+    { value: 'low' as TodoListPriority, label: t('tasks.priority_low') },
+    { value: 'medium' as TodoListPriority, label: t('tasks.priority_medium') },
+    { value: 'high' as TodoListPriority, label: t('tasks.priority_high') },
+  ];
+
+  const categoryOptions = [
+    { value: 'home' as TodoListCategory, label: t('tasks.category_home') },
+    {
+      value: 'education' as TodoListCategory,
+      label: t('tasks.category_education'),
+    },
+    { value: 'work' as TodoListCategory, label: t('tasks.category_work') },
+    { value: 'family' as TodoListCategory, label: t('tasks.category_family') },
+    { value: 'health' as TodoListCategory, label: t('tasks.category_health') },
+  ];
+
   return (
     <form
       onSubmit={handleSubmit(onFormSubmit)}
       className="bg-white rounded-lg shadow-lg p-6 border-2 border-secondary-bg"
     >
       <Text as="h2" className="text-xl font-bold text-dark-bg mb-4">
-        Create New List
+        {t('todoListForm.createNewList')}
       </Text>
       <div className="flex flex-col sm:flex-row gap-3 items-baseline">
         <Text as="p" className="text-dark-bg font-medium">
-          List Name:
+          {t('todoListForm.listName')}
         </Text>
         <Input
-          {...register('name', { required: 'Todo list name cannot be empty.' })}
+          {...register('name', { required: t('todoListForm.nameEmpty') })}
           type="text"
-          placeholder="Enter list name..."
+          placeholder={t('todoListForm.listNamePlaceholder')}
           className={`flex-1 px-4 py-2 rounded-lg border-2 ${
             errors.name ? 'border-red-500' : 'border-secondary-bg'
           } focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent bg-base-bg text-dark-bg placeholder-secondary-dark-bg`}
@@ -99,7 +114,7 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
           onClick={() => setShowMore((v) => !v)}
           className="px-4 py-2 bg-secondary-bg text-dark-bg font-medium rounded hover:bg-accent hover:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
         >
-          {showMore ? 'Less ▲' : 'More ▼'}
+          {showMore ? t('todoListForm.less') : t('todoListForm.more')}
         </Button>
         <Button
           type="submit"
@@ -107,7 +122,7 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
           disabled={isSubmitting}
           dataTestId="todolist-form-submit-button"
         >
-          {isSubmitting ? 'Creating...' : 'Create List'}
+          {isSubmitting ? t('todoListForm.creating') : t('todoListForm.create')}
         </Button>
       </div>
 
@@ -128,7 +143,7 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
               className="text-sm font-medium text-dark-bg"
               htmlFor="list-priority"
             >
-              Priority
+              {t('todoListForm.priority')}
             </label>
             <Controller
               name="priority"
@@ -138,8 +153,8 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
                   id="list-priority"
                   value={field.value}
                   onChange={field.onChange}
-                  options={PRIORITY_OPTIONS}
-                  placeholder="No priority"
+                  options={priorityOptions}
+                  placeholder={t('todoListForm.noPriority')}
                 />
               )}
             />
@@ -150,7 +165,7 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
               className="text-sm font-medium text-dark-bg"
               htmlFor="list-category"
             >
-              Category
+              {t('todoListForm.category')}
             </label>
             <Controller
               name="category"
@@ -160,8 +175,8 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
                   id="list-category"
                   value={field.value}
                   onChange={field.onChange}
-                  options={CATEGORY_OPTIONS}
-                  placeholder="No category"
+                  options={categoryOptions}
+                  placeholder={t('todoListForm.noCategory')}
                 />
               )}
             />
@@ -172,7 +187,7 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
               className="text-sm font-medium text-dark-bg"
               htmlFor="list-due-date"
             >
-              Due Date
+              {t('todoListForm.dueDate')}
             </label>
             <Controller
               name="dueDate"
@@ -192,12 +207,12 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
               className="text-sm font-medium text-dark-bg"
               htmlFor="list-notes"
             >
-              Notes
+              {t('todoListForm.notes')}
             </label>
             <textarea
               id="list-notes"
               {...register('notes')}
-              placeholder="Optional notes..."
+              placeholder={t('todoListForm.notesPlaceholder')}
               rows={2}
               className="px-3 py-2 rounded-lg border-2 border-secondary-bg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent bg-base-bg text-dark-bg placeholder-secondary-dark-bg resize-none"
             />
