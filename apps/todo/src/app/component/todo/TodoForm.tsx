@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
+import { ImagePlus, Upload, Trash2 } from 'lucide-react';
 import Input from '../elements/Input';
 import Button from '../elements/Button';
+import DatePickerInput from '../elements/DatePickerInput';
 import { uploadImage } from '../../lib/imageUtils';
 import { useAuthStore } from '../../store/authStore';
 
@@ -35,6 +37,7 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: { name: '', dueDate: '', location: '', notes: '' },
@@ -76,7 +79,7 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onFormSubmit)} className="mb-6">
+    <form onSubmit={handleSubmit(onFormSubmit)}>
       <div className="flex flex-col sm:flex-row gap-3 items-baseline">
         <label htmlFor="new-todo-name" className="text-dark-bg font-medium">
           Todo Name:
@@ -86,14 +89,14 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
           id="new-todo-name"
           type="text"
           placeholder="Add a new todo..."
-          className={`flex-1 px-4 py-3 rounded-lg border-2 ${
+          className={`flex-1 px-4 py-2 rounded-lg border-2 ${
             errors.name ? 'border-red-500' : 'border-secondary-bg'
           } focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent bg-white text-dark-bg placeholder-secondary-dark-bg`}
           inputTestId="todo-form-input"
         />
         <Button
           type="submit"
-          className="px-6 py-3 bg-accent text-black font-semibold rounded-lg hover:bg-dark-bg hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
+          className="px-6 py-2 bg-accent text-black font-semibold rounded-lg hover:bg-dark-bg hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
           dataTestId="todo-form-submit-button"
         >
           Add
@@ -127,12 +130,16 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
             >
               Due date:
             </label>
-            <input
-              id="new-todo-due-date"
-              type="date"
-              {...register('dueDate')}
-              className="px-3 py-2 rounded-lg border-2 border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg"
-              data-testid="todo-form-due-date"
+            <Controller
+              name="dueDate"
+              control={control}
+              render={({ field }) => (
+                <DatePickerInput
+                  id="new-todo-due-date"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
             />
           </div>
           <div className="flex flex-col sm:flex-row gap-3 items-baseline">
@@ -181,11 +188,28 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
                 accept="image/*"
                 ref={fileInputRef}
                 onChange={handleFileChange}
-                className="text-sm text-dark-bg"
+                className="hidden"
                 data-testid="todo-form-image"
               />
-              {imageUploading && (
-                <p className="text-sm text-secondary-dark-bg">Uploading...</p>
+              {!image && (
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={imageUploading}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-dashed border-secondary-bg hover:border-accent hover:bg-accent/10 text-secondary-dark-bg hover:text-dark-bg transition-colors focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {imageUploading ? (
+                    <>
+                      <Upload size={16} className="animate-bounce" />
+                      <span className="text-sm">Uploading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <ImagePlus size={16} />
+                      <span className="text-sm">Choose image</span>
+                    </>
+                  )}
+                </button>
               )}
               {imageError && (
                 <p className="text-red-500 text-sm">{imageError}</p>
@@ -200,9 +224,10 @@ const TodoForm: React.FC<FormProps> = ({ onAddTodo }) => {
                   <button
                     type="button"
                     onClick={handleRemoveImage}
-                    className="text-sm text-red-500 hover:text-red-700 underline"
+                    className="w-6 h-6 flex items-center justify-center shrink-0 rounded-lg text-secondary-dark-bg hover:text-red-500 transition-colors outline-none cursor-pointer"
+                    aria-label="Remove image"
                   >
-                    Remove
+                    <Trash2 size={20} />
                   </button>
                 </div>
               )}

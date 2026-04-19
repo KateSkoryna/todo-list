@@ -6,6 +6,7 @@ import Input from '../elements/Input';
 import Button from '../elements/Button';
 import Text from '../elements/Text';
 import DetailsSelect from '../elements/DetailsSelect';
+import DatePickerInput from '../elements/DatePickerInput';
 import {
   PRIORITY_OPTIONS,
   CATEGORY_OPTIONS,
@@ -87,7 +88,7 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
           {...register('name', { required: 'Todo list name cannot be empty.' })}
           type="text"
           placeholder="Enter list name..."
-          className={`flex-1 px-4 py-3 rounded-lg border-2 ${
+          className={`flex-1 px-4 py-2 rounded-lg border-2 ${
             errors.name ? 'border-red-500' : 'border-secondary-bg'
           } focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent bg-base-bg text-dark-bg placeholder-secondary-dark-bg`}
           inputTestId="todolist-form-input"
@@ -96,13 +97,13 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
         <Button
           type="button"
           onClick={() => setShowMore((v) => !v)}
-          className="px-4 py-3 bg-secondary-bg text-dark-bg font-medium rounded-lg hover:bg-accent hover:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
+          className="px-4 py-2 bg-secondary-bg text-dark-bg font-medium rounded hover:bg-accent hover:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-accent"
         >
           {showMore ? 'Less ▲' : 'More ▼'}
         </Button>
         <Button
           type="submit"
-          className="px-6 py-3 bg-accent text-black font-semibold rounded-lg hover:bg-dark-bg hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
+          className="px-6 py-2 bg-accent text-black font-semibold rounded hover:bg-dark-bg hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
           disabled={isSubmitting}
           dataTestId="todolist-form-submit-button"
         >
@@ -173,11 +174,16 @@ const TodoListForm: React.FC<TodoListFormProps> = ({
             >
               Due Date
             </label>
-            <input
-              id="list-due-date"
-              type="date"
-              {...register('dueDate')}
-              className="px-3 py-2 rounded-lg border-2 border-secondary-bg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent bg-base-bg text-dark-bg"
+            <Controller
+              name="dueDate"
+              control={control}
+              render={({ field }) => (
+                <DatePickerInput
+                  id="list-due-date"
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
             />
           </div>
 
