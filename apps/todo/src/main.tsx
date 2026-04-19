@@ -1,3 +1,4 @@
+import './app/i18n/i18n';
 import { StrictMode, ReactElement, useEffect } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';

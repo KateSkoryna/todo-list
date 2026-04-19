@@ -1,0 +1,197 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "vitalTasks": "Vital Tasks",
+    "myTasks": "My Tasks",
+    "statistics": "Statistics",
+    "settings": "Settings",
+    "help": "Help",
+    "logout": "Logout"
+  },
+  "header": {
+    "searchPlaceholder": "Search your task here..."
+  },
+  "auth": {
+    "login": {
+      "title": "Sign In",
+      "emailPlaceholder": "Enter Email",
+      "passwordPlaceholder": "Enter Password",
+      "rememberMe": "Remember Me",
+      "button": "Login",
+      "signingIn": "Signing in\u2026",
+      "continueWithGoogle": "Continue with Google",
+      "noAccount": "Don't have an account?",
+      "createOne": "Create One",
+      "error": "Sign in failed. Check your email or password.",
+      "googleError": "Google sign-in failed. Please try again."
+    },
+    "register": {
+      "title": "Sign Up",
+      "firstNamePlaceholder": "Enter First Name",
+      "lastNamePlaceholder": "Enter Last Name",
+      "usernamePlaceholder": "Enter Username",
+      "emailPlaceholder": "Enter Email",
+      "passwordPlaceholder": "Enter Password",
+      "confirmPasswordPlaceholder": "Confirm Password",
+      "agreeToTerms": "I agree to all terms and conditions",
+      "button": "Register",
+      "creatingAccount": "Creating account\u2026",
+      "continueWithGoogle": "Continue with Google",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign In",
+      "googleError": "Google sign-up failed. Please try again."
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "description": "Enter your email and we'll send you a reset link.",
+      "emailPlaceholder": "you@example.com",
+      "sendButton": "Send Reset Link",
+      "sending": "Sending\u2026",
+      "successMessage": "If that email exists, a reset link has been sent. Check your inbox.",
+      "backToSignIn": "Back to Sign In",
+      "error": "Something went wrong. Please try again."
+    }
+  },
+  "dashboard": {
+    "todo": "To-Do",
+    "calendar": "Calendar",
+    "today": "Today",
+    "noTasksForDay": "No tasks for this day.",
+    "taskStatus": "Task Status",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "notStarted": "Not Started",
+    "completedTask": "Completed Task",
+    "noCompletedTasks": "No completed tasks yet.",
+    "status": "Status:",
+    "relativeToday": "Today",
+    "relativeDayAgo": "1 day ago",
+    "relativeDaysAgo": "{{count}} days ago"
+  },
+  "tasks": {
+    "myTasks": "My Tasks",
+    "newList": "New List",
+    "selectTask": "Select a task to view details",
+    "editTask": "Edit Task",
+    "name": "Name:",
+    "status": "Status:",
+    "dueDate": "Due date:",
+    "location": "Location:",
+    "locationPlaceholder": "Optional location...",
+    "notes": "Notes:",
+    "notesPlaceholder": "Optional notes...",
+    "listName": "List name:",
+    "priority": "Priority:",
+    "category": "Category:",
+    "image": "Image:",
+    "chooseImage": "Choose image",
+    "uploading": "Uploading...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "list": "List:",
+    "created": "Created:",
+    "due": "Due:",
+    "status_pending": "In Progress",
+    "status_successful": "Completed",
+    "status_failed": "Not Started",
+    "priority_none": "None",
+    "priority_low": "Low",
+    "priority_medium": "Medium",
+    "priority_high": "High",
+    "category_none": "None",
+    "category_home": "Home",
+    "category_education": "Education",
+    "category_work": "Work",
+    "category_family": "Family",
+    "category_health": "Health"
+  },
+  "todoForm": {
+    "todoName": "Todo Name:",
+    "addPlaceholder": "Add a new todo...",
+    "add": "Add",
+    "titleEmpty": "Title cannot be empty.",
+    "moreOptions": "More options",
+    "hideOptions": "Hide options",
+    "dueDate": "Due date:",
+    "location": "Location:",
+    "locationPlaceholder": "Optional location...",
+    "notes": "Notes:",
+    "notesPlaceholder": "Optional notes...",
+    "image": "Image:",
+    "chooseImage": "Choose image",
+    "uploading": "Uploading..."
+  },
+  "todoList": {
+    "addTask": "Add Task",
+    "due": "Due:",
+    "priority": "Priority:",
+    "category": "Category:",
+    "noTasksBefore": "No tasks yet. Click",
+    "noTasksAfter": "to get started!"
+  },
+  "todoListForm": {
+    "createNewList": "Create New List",
+    "listName": "List Name:",
+    "listNamePlaceholder": "Enter list name...",
+    "more": "More \u25bc",
+    "less": "Less \u25b2",
+    "create": "Create List",
+    "creating": "Creating...",
+    "priority": "Priority",
+    "noPriority": "No priority",
+    "category": "Category",
+    "noCategory": "No category",
+    "dueDate": "Due Date",
+    "notes": "Notes",
+    "notesPlaceholder": "Optional notes...",
+    "nameEmpty": "Todo list name cannot be empty."
+  },
+  "todoLists": {
+    "loading": "Loading todo lists...",
+    "emptyBefore": "No task lists yet. Click",
+    "emptyNewList": "New List",
+    "emptyAfter": "to get started!"
+  },
+  "vitalTask": {
+    "description": "Showing high-priority task lists."
+  },
+  "settings": {
+    "title": "Settings",
+    "comingSoon": "Coming soon."
+  },
+  "help": {
+    "title": "Help",
+    "comingSoon": "Coming soon."
+  },
+  "error": {
+    "title": "Something went wrong!",
+    "tryAgain": "Try again"
+  },
+  "common": {
+    "loading": "Loading\u2026"
+  },
+  "statistics": {
+    "title": "Statistics",
+    "loading": "Loading statistics\u2026",
+    "week": "Week",
+    "month": "Month",
+    "year": "Year",
+    "numberOfTodos": "Number of Todos",
+    "totalDoneFailed": "Total / Done / Failed",
+    "statusBreakdown": "Status Breakdown",
+    "completionRate": "{{rate}}% completion rate",
+    "noData": "No data",
+    "todosPerWeekday": "Todos per Weekday",
+    "totalDone": "Total / Done",
+    "todoListStats": "Todo List Stats",
+    "totalTodos": "Total Todos",
+    "daysTracked": "Days Tracked",
+    "completion": "Completion",
+    "byCategory": "By Category",
+    "noCategoryData": "No category data yet",
+    "done": "Done",
+    "pending": "Pending",
+    "failed": "Failed",
+    "total": "Total"
+  }
+}

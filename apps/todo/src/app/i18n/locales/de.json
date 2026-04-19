@@ -1,0 +1,197 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "vitalTasks": "Wichtige Aufgaben",
+    "myTasks": "Meine Aufgaben",
+    "statistics": "Statistiken",
+    "settings": "Einstellungen",
+    "help": "Hilfe",
+    "logout": "Abmelden"
+  },
+  "header": {
+    "searchPlaceholder": "Suchen Sie hier Ihre Aufgabe..."
+  },
+  "auth": {
+    "login": {
+      "title": "Anmelden",
+      "emailPlaceholder": "E-Mail eingeben",
+      "passwordPlaceholder": "Passwort eingeben",
+      "rememberMe": "Angemeldet bleiben",
+      "button": "Anmelden",
+      "signingIn": "Anmeldung läuft...",
+      "continueWithGoogle": "Mit Google fortfahren",
+      "noAccount": "Noch kein Konto?",
+      "createOne": "Konto erstellen",
+      "error": "Anmeldung fehlgeschlagen. Überprüfen Sie E-Mail oder Passwort.",
+      "googleError": "Google-Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut."
+    },
+    "register": {
+      "title": "Registrieren",
+      "firstNamePlaceholder": "Vorname eingeben",
+      "lastNamePlaceholder": "Nachname eingeben",
+      "usernamePlaceholder": "Benutzername eingeben",
+      "emailPlaceholder": "E-Mail eingeben",
+      "passwordPlaceholder": "Passwort eingeben",
+      "confirmPasswordPlaceholder": "Passwort bestätigen",
+      "agreeToTerms": "Ich stimme allen Geschäftsbedingungen zu",
+      "button": "Registrieren",
+      "creatingAccount": "Konto wird erstellt...",
+      "continueWithGoogle": "Mit Google fortfahren",
+      "haveAccount": "Bereits ein Konto?",
+      "signIn": "Anmelden",
+      "googleError": "Google-Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut."
+    },
+    "forgotPassword": {
+      "title": "Passwort vergessen",
+      "description": "Geben Sie Ihre E-Mail ein und wir senden Ihnen einen Link zum Zurücksetzen.",
+      "emailPlaceholder": "beispiel@beispiel.de",
+      "sendButton": "Link senden",
+      "sending": "Wird gesendet...",
+      "successMessage": "Falls diese E-Mail existiert, wurde ein Link gesendet. Prüfen Sie Ihr Postfach.",
+      "backToSignIn": "Zurück zur Anmeldung",
+      "error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+    }
+  },
+  "dashboard": {
+    "todo": "Aufgaben",
+    "calendar": "Kalender",
+    "today": "Heute",
+    "noTasksForDay": "Keine Aufgaben für diesen Tag.",
+    "taskStatus": "Aufgabenstatus",
+    "completed": "Abgeschlossen",
+    "inProgress": "In Bearbeitung",
+    "notStarted": "Nicht begonnen",
+    "completedTask": "Abgeschlossene Aufgabe",
+    "noCompletedTasks": "Noch keine abgeschlossenen Aufgaben.",
+    "status": "Status:",
+    "relativeToday": "Heute",
+    "relativeDayAgo": "vor einem Tag",
+    "relativeDaysAgo": "vor {{count}} Tagen"
+  },
+  "tasks": {
+    "myTasks": "Meine Aufgaben",
+    "newList": "Neue Liste",
+    "selectTask": "Aufgabe wählen, um Details anzuzeigen",
+    "editTask": "Aufgabe bearbeiten",
+    "name": "Name:",
+    "status": "Status:",
+    "dueDate": "Fällig am:",
+    "location": "Ort:",
+    "locationPlaceholder": "Optionaler Ort...",
+    "notes": "Notizen:",
+    "notesPlaceholder": "Optionale Notizen...",
+    "listName": "Listenname:",
+    "priority": "Priorität:",
+    "category": "Kategorie:",
+    "image": "Bild:",
+    "chooseImage": "Bild auswählen",
+    "uploading": "Wird hochgeladen...",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "list": "Liste:",
+    "created": "Erstellt:",
+    "due": "Fällig:",
+    "status_pending": "In Bearbeitung",
+    "status_successful": "Abgeschlossen",
+    "status_failed": "Nicht begonnen",
+    "priority_none": "Keine",
+    "priority_low": "Niedrig",
+    "priority_medium": "Mittel",
+    "priority_high": "Hoch",
+    "category_none": "Keine",
+    "category_home": "Zuhause",
+    "category_education": "Bildung",
+    "category_work": "Arbeit",
+    "category_family": "Familie",
+    "category_health": "Gesundheit"
+  },
+  "todoForm": {
+    "todoName": "Aufgabenname:",
+    "addPlaceholder": "Neue Aufgabe hinzufügen...",
+    "add": "Hinzufügen",
+    "titleEmpty": "Titel darf nicht leer sein.",
+    "moreOptions": "Mehr Optionen",
+    "hideOptions": "Optionen ausblenden",
+    "dueDate": "Fällig am:",
+    "location": "Ort:",
+    "locationPlaceholder": "Optionaler Ort...",
+    "notes": "Notizen:",
+    "notesPlaceholder": "Optionale Notizen...",
+    "image": "Bild:",
+    "chooseImage": "Bild auswählen",
+    "uploading": "Wird hochgeladen..."
+  },
+  "todoList": {
+    "addTask": "Aufgabe hinzufügen",
+    "due": "Fällig:",
+    "priority": "Priorität:",
+    "category": "Kategorie:",
+    "noTasksBefore": "Noch keine Aufgaben. Klicken Sie auf",
+    "noTasksAfter": "um zu beginnen!"
+  },
+  "todoListForm": {
+    "createNewList": "Neue Liste erstellen",
+    "listName": "Listenname:",
+    "listNamePlaceholder": "Listenname eingeben...",
+    "more": "Mehr",
+    "less": "Weniger",
+    "create": "Liste erstellen",
+    "creating": "Wird erstellt...",
+    "priority": "Priorität",
+    "noPriority": "Keine Priorität",
+    "category": "Kategorie",
+    "noCategory": "Keine Kategorie",
+    "dueDate": "Fälligkeitsdatum",
+    "notes": "Notizen",
+    "notesPlaceholder": "Optionale Notizen...",
+    "nameEmpty": "Name der Aufgabenliste darf nicht leer sein."
+  },
+  "todoLists": {
+    "loading": "Aufgabenlisten werden geladen...",
+    "emptyBefore": "Noch keine Listen. Klicken Sie auf",
+    "emptyNewList": "Neue Liste",
+    "emptyAfter": "um zu beginnen!"
+  },
+  "vitalTask": {
+    "description": "Anzeige von Listen mit hoher Priorität."
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "comingSoon": "Demnächst verfügbar."
+  },
+  "help": {
+    "title": "Hilfe",
+    "comingSoon": "Demnächst verfügbar."
+  },
+  "error": {
+    "title": "Etwas ist schiefgelaufen!",
+    "tryAgain": "Erneut versuchen"
+  },
+  "common": {
+    "loading": "Wird geladen..."
+  },
+  "statistics": {
+    "title": "Statistiken",
+    "loading": "Statistiken werden geladen...",
+    "week": "Woche",
+    "month": "Monat",
+    "year": "Jahr",
+    "numberOfTodos": "Anzahl der Aufgaben",
+    "totalDoneFailed": "Gesamt / Erledigt / Fehlgeschlagen",
+    "statusBreakdown": "Status-Aufschlüsselung",
+    "completionRate": "{{rate}}% Abschlussrate",
+    "noData": "Keine Daten",
+    "todosPerWeekday": "Aufgaben pro Wochentag",
+    "totalDone": "Gesamt / Erledigt",
+    "todoListStats": "Statistiken der Listen",
+    "totalTodos": "Aufgaben gesamt",
+    "daysTracked": "Nachverfolgte Tage",
+    "completion": "Abschluss",
+    "byCategory": "Nach Kategorie",
+    "noCategoryData": "Noch keine Kategoriedaten",
+    "done": "Erledigt",
+    "pending": "Ausstehend",
+    "failed": "Fehlgeschlagen",
+    "total": "Gesamt"
+  }
+}

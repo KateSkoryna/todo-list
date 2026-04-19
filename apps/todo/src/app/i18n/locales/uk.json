@@ -1,0 +1,197 @@
+{
+  "nav": {
+    "dashboard": "Панель приладів",
+    "vitalTasks": "Важливі завдання",
+    "myTasks": "Мої завдання",
+    "statistics": "Статистика",
+    "settings": "Налаштування",
+    "help": "Допомога",
+    "logout": "Вийти"
+  },
+  "header": {
+    "searchPlaceholder": "Шукайте завдання тут..."
+  },
+  "auth": {
+    "login": {
+      "title": "Вхід",
+      "emailPlaceholder": "Введіть Email",
+      "passwordPlaceholder": "Введіть пароль",
+      "rememberMe": "Запам'ятати мене",
+      "button": "Увійти",
+      "signingIn": "Вхід...",
+      "continueWithGoogle": "Продовжити з Google",
+      "noAccount": "Немає акаунту?",
+      "createOne": "Створити",
+      "error": "Помилка входу. Перевірте email або пароль.",
+      "googleError": "Помилка входу через Google. Спробуйте ще раз."
+    },
+    "register": {
+      "title": "Реєстрація",
+      "firstNamePlaceholder": "Введіть ім'я",
+      "lastNamePlaceholder": "Введіть прізвище",
+      "usernamePlaceholder": "Введіть ім'я користувача",
+      "emailPlaceholder": "Введіть Email",
+      "passwordPlaceholder": "Введіть пароль",
+      "confirmPasswordPlaceholder": "Підтвердьте пароль",
+      "agreeToTerms": "Я погоджуюся з усіма умовами та правилами",
+      "button": "Зареєструватися",
+      "creatingAccount": "Створення акаунту...",
+      "continueWithGoogle": "Продовжити з Google",
+      "haveAccount": "Вже маєте акаунт?",
+      "signIn": "Увійти",
+      "googleError": "Помилка реєстрації через Google. Спробуйте ще раз."
+    },
+    "forgotPassword": {
+      "title": "Забули пароль",
+      "description": "Введіть ваш email, і ми надішлемо вам посилання для відновлення.",
+      "emailPlaceholder": "you@example.com",
+      "sendButton": "Надіслати посилання",
+      "sending": "Надсилання...",
+      "successMessage": "Якщо цей email існує, посилання для відновлення було надіслано. Перевірте пошту.",
+      "backToSignIn": "Назад до входу",
+      "error": "Щось пішло не так. Спробуйте ще раз."
+    }
+  },
+  "dashboard": {
+    "todo": "Список справ",
+    "calendar": "Календар",
+    "today": "Сьогодні",
+    "noTasksForDay": "На цей день немає завдань.",
+    "taskStatus": "Статус завдань",
+    "completed": "Завершено",
+    "inProgress": "У процесі",
+    "notStarted": "Не розпочато",
+    "completedTask": "Завершене завдання",
+    "noCompletedTasks": "Ще немає завершених завдань.",
+    "status": "Статус:",
+    "relativeToday": "Сьогодні",
+    "relativeDayAgo": "1 день тому",
+    "relativeDaysAgo": "{{count}} дні тому"
+  },
+  "tasks": {
+    "myTasks": "Мої завдання",
+    "newList": "Новий список",
+    "selectTask": "Виберіть завдання, щоб переглянути деталі",
+    "editTask": "Редагувати завдання",
+    "name": "Назва:",
+    "status": "Статус:",
+    "dueDate": "Термін:",
+    "location": "Місце:",
+    "locationPlaceholder": "Місце (необов'язково)...",
+    "notes": "Нотатки:",
+    "notesPlaceholder": "Нотатки (необов'язково)...",
+    "listName": "Назва списку:",
+    "priority": "Пріоритет:",
+    "category": "Категорія:",
+    "image": "Зображення:",
+    "chooseImage": "Вибрати зображення",
+    "uploading": "Завантаження...",
+    "cancel": "Скасувати",
+    "save": "Зберегти",
+    "list": "Список:",
+    "created": "Створено:",
+    "due": "Термін:",
+    "status_pending": "У процесі",
+    "status_successful": "Завершено",
+    "status_failed": "Не розпочато",
+    "priority_none": "Немає",
+    "priority_low": "Низький",
+    "priority_medium": "Середній",
+    "priority_high": "Високий",
+    "category_none": "Немає",
+    "category_home": "Дім",
+    "category_education": "Освіта",
+    "category_work": "Робота",
+    "category_family": "Сім'я",
+    "category_health": "Здоров'я"
+  },
+  "todoForm": {
+    "todoName": "Назва справи:",
+    "addPlaceholder": "Додати нову справу...",
+    "add": "Додати",
+    "titleEmpty": "Назва не може бути порожньою.",
+    "moreOptions": "Більше параметрів",
+    "hideOptions": "Приховати параметри",
+    "dueDate": "Термін:",
+    "location": "Місце:",
+    "locationPlaceholder": "Місце (необов'язково)...",
+    "notes": "Нотатки:",
+    "notesPlaceholder": "Нотатки (необов'язково)...",
+    "image": "Зображення:",
+    "chooseImage": "Вибрати зображення",
+    "uploading": "Завантаження..."
+  },
+  "todoList": {
+    "addTask": "Додати завдання",
+    "due": "Термін:",
+    "priority": "Пріоритет:",
+    "category": "Категорія:",
+    "noTasksBefore": "Завдань ще немає. Натисніть",
+    "noTasksAfter": ", щоб почати!"
+  },
+  "todoListForm": {
+    "createNewList": "Створити новий список",
+    "listName": "Назва списку:",
+    "listNamePlaceholder": "Введіть назву списку...",
+    "more": "Більше ▼",
+    "less": "Менше ▲",
+    "create": "Створити список",
+    "creating": "Створення...",
+    "priority": "Пріоритет",
+    "noPriority": "Без пріоритету",
+    "category": "Категорія",
+    "noCategory": "Без категорії",
+    "dueDate": "Термін виконання",
+    "notes": "Нотатки",
+    "notesPlaceholder": "Нотатки (необов'язково)...",
+    "nameEmpty": "Назва списку справ не може бути порожньою."
+  },
+  "todoLists": {
+    "loading": "Завантаження списків справ...",
+    "emptyBefore": "Списків завдань ще немає. Натисніть",
+    "emptyNewList": "Новий список",
+    "emptyAfter": ", щоб почати!"
+  },
+  "vitalTask": {
+    "description": "Показ списків з високим пріоритетом."
+  },
+  "settings": {
+    "title": "Налаштування",
+    "comingSoon": "Незабаром."
+  },
+  "help": {
+    "title": "Допомога",
+    "comingSoon": "Незабаром."
+  },
+  "error": {
+    "title": "Щось пішло не так!",
+    "tryAgain": "Спробувати знову"
+  },
+  "common": {
+    "loading": "Завантаження..."
+  },
+  "statistics": {
+    "title": "Статистика",
+    "loading": "Завантаження статистики...",
+    "week": "Тиждень",
+    "month": "Місяць",
+    "year": "Рік",
+    "numberOfTodos": "Кількість справ",
+    "totalDoneFailed": "Всього / Виконано / Провалено",
+    "statusBreakdown": "Розподіл за статусом",
+    "completionRate": "{{rate}}% рівень виконання",
+    "noData": "Немає даних",
+    "todosPerWeekday": "Справи за днями тижня",
+    "totalDone": "Всього / Виконано",
+    "todoListStats": "Статистика списків справ",
+    "totalTodos": "Всього справ",
+    "daysTracked": "Відстежено днів",
+    "completion": "Виконання",
+    "byCategory": "За категоріями",
+    "noCategoryData": "Даних за категоріями ще немає",
+    "done": "Виконано",
+    "pending": "У процесі",
+    "failed": "Провалено",
+    "total": "Всього"
+  }
+}
