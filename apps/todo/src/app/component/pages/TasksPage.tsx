@@ -15,6 +15,7 @@ import {
   Tag,
 } from 'lucide-react';
 import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
 import {
   TodoItem,
   TodoList,
@@ -30,7 +31,6 @@ import { uploadImage } from '../../lib/imageUtils';
 import TodoListForm from '../todo/TodoListForm';
 import TodoLists from '../todo/TodoLists';
 import DatePickerInput from '../elements/DatePickerInput';
-import { CATEGORY_LABELS } from '../../constants/todolist.constants';
 
 type CreateListOpts = {
   priority?: TodoListPriority;
@@ -43,13 +43,6 @@ type SelectedTask = {
   todo: TodoItem;
   list: TodoList;
 };
-
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'In Progress',
-  successful: 'Completed',
-  failed: 'Not Started',
-};
-
 
 // ─── Edit Panel ───────────────────────────────────────────────────────────────
 
@@ -75,6 +68,7 @@ function TodoEditPanel({
   onSave: (todoUpdates: UpdateTodoItem, listUpdates: UpdateTodoList) => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
   const userId = useAuthStore((s) => s.user?.firebaseUid);
   const [editImage, setEditImage] = useState<string | null>(todo.image ?? null);
   const [imageError, setImageError] = useState<string | null>(null);
@@ -144,11 +138,13 @@ function TodoEditPanel({
       onSubmit={handleSubmit(onFormSubmit)}
       className="flex flex-col h-full p-6"
     >
-      <h2 className="text-xl font-bold text-dark-bg mb-5">Edit Task</h2>
+      <h2 className="text-xl font-bold text-dark-bg mb-5">
+        {t('tasks.editTask')}
+      </h2>
 
       <div className="flex-1 space-y-3 overflow-y-auto">
         <div className="flex items-center gap-2">
-          <label className={labelClass}>Name:</label>
+          <label className={labelClass}>{t('tasks.name')}</label>
           <input
             {...register('name')}
             type="text"
@@ -158,20 +154,20 @@ function TodoEditPanel({
         </div>
 
         <div className="flex items-center gap-2">
-          <label className={labelClass}>Status:</label>
+          <label className={labelClass}>{t('tasks.status')}</label>
           <select
             {...register('status')}
             className="px-2 py-2 rounded-lg border border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg text-sm min-w-[160px]"
             data-testid={'edit-todo-status-' + todo.id}
           >
-            <option value="pending">In Progress</option>
-            <option value="successful">Completed</option>
-            <option value="failed">Not Started</option>
+            <option value="pending">{t('tasks.status_pending')}</option>
+            <option value="successful">{t('tasks.status_successful')}</option>
+            <option value="failed">{t('tasks.status_failed')}</option>
           </select>
         </div>
 
         <div className="flex items-center gap-2">
-          <label className={labelClass}>Due date:</label>
+          <label className={labelClass}>{t('tasks.dueDate')}</label>
           <Controller
             name="dueDate"
             control={control}
@@ -186,21 +182,21 @@ function TodoEditPanel({
         </div>
 
         <div className="flex items-center gap-2">
-          <label className={labelClass}>Location:</label>
+          <label className={labelClass}>{t('tasks.location')}</label>
           <input
             type="text"
             {...register('location')}
-            placeholder="Optional location..."
+            placeholder={t('tasks.locationPlaceholder')}
             className={inputClass}
             data-testid={'edit-todo-location-' + todo.id}
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <label className={labelClass}>Notes:</label>
+          <label className={labelClass}>{t('tasks.notes')}</label>
           <textarea
             {...register('notes')}
-            placeholder="Optional notes..."
+            placeholder={t('tasks.notesPlaceholder')}
             rows={3}
             className={`${inputClass} resize-none`}
             data-testid={'edit-todo-notes-' + todo.id}
@@ -209,7 +205,7 @@ function TodoEditPanel({
 
         <div className="border-t border-secondary-bg pt-3 mt-1 space-y-3">
           <div className="flex items-center gap-2">
-            <label className={labelClass}>List name:</label>
+            <label className={labelClass}>{t('tasks.listName')}</label>
             <input
               {...register('listName')}
               type="text"
@@ -218,36 +214,36 @@ function TodoEditPanel({
           </div>
 
           <div className="flex items-center gap-2">
-            <label className={labelClass}>Priority:</label>
+            <label className={labelClass}>{t('tasks.priority')}</label>
             <select
               {...register('priority')}
               className="px-2 py-2 rounded-lg border border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg text-sm min-w-[160px]"
             >
-              <option value="">None</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              <option value="">{t('tasks.priority_none')}</option>
+              <option value="low">{t('tasks.priority_low')}</option>
+              <option value="medium">{t('tasks.priority_medium')}</option>
+              <option value="high">{t('tasks.priority_high')}</option>
             </select>
           </div>
 
           <div className="flex items-center gap-2">
-            <label className={labelClass}>Category:</label>
+            <label className={labelClass}>{t('tasks.category')}</label>
             <select
               {...register('category')}
               className="px-2 py-2 rounded-lg border border-secondary-bg focus:border-accent focus:outline-none bg-white text-dark-bg text-sm min-w-[160px]"
             >
-              <option value="">None</option>
-              <option value="home">Home</option>
-              <option value="education">Education</option>
-              <option value="work">Work</option>
-              <option value="family">Family</option>
-              <option value="health">Health</option>
+              <option value="">{t('tasks.category_none')}</option>
+              <option value="home">{t('tasks.category_home')}</option>
+              <option value="education">{t('tasks.category_education')}</option>
+              <option value="work">{t('tasks.category_work')}</option>
+              <option value="family">{t('tasks.category_family')}</option>
+              <option value="health">{t('tasks.category_health')}</option>
             </select>
           </div>
         </div>
 
         <div className="flex items-start gap-2">
-          <label className={`${labelClass} pt-2`}>Image:</label>
+          <label className={`${labelClass} pt-2`}>{t('tasks.image')}</label>
           <div className="flex flex-col gap-2">
             <input
               type="file"
@@ -267,12 +263,12 @@ function TodoEditPanel({
                 {imageUploading ? (
                   <>
                     <Upload size={16} className="animate-bounce" />
-                    <span className="text-sm">Uploading...</span>
+                    <span className="text-sm">{t('tasks.uploading')}</span>
                   </>
                 ) : (
                   <>
                     <ImagePlus size={16} />
-                    <span className="text-sm">Choose image</span>
+                    <span className="text-sm">{t('tasks.chooseImage')}</span>
                   </>
                 )}
               </button>
@@ -307,7 +303,7 @@ function TodoEditPanel({
           aria-label="Cancel todo edit"
           data-testid={'cancel-todo-edit-button-' + todo.id}
         >
-          Cancel
+          {t('tasks.cancel')}
         </button>
         <button
           type="submit"
@@ -315,7 +311,7 @@ function TodoEditPanel({
           aria-label="Save todo edit"
           data-testid={'save-todo-edit-button-' + todo.id}
         >
-          Save
+          {t('tasks.save')}
         </button>
       </div>
     </form>
@@ -347,6 +343,8 @@ function TaskDetailPanel({
   onDelete: (id: string) => void;
   onStartEdit: () => void;
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col h-full p-6">
       <div className="flex-1 overflow-y-auto">
@@ -361,7 +359,7 @@ function TaskDetailPanel({
               <div className="flex items-center gap-2">
                 <ClipboardList className="w-4 h-4 shrink-0 text-secondary-dark-bg" />
                 <span>
-                  List:{' '}
+                  {t('tasks.list')}{' '}
                   <span className="font-medium text-dark-bg">{list.name}</span>
                 </span>
               </div>
@@ -369,14 +367,17 @@ function TaskDetailPanel({
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 shrink-0 text-secondary-dark-bg" />
                   <span>
-                    Created: {dayjs(list.createdAt).format('DD/MM/YYYY')}
+                    {t('tasks.created')}{' '}
+                    {dayjs(list.createdAt).format('DD/MM/YYYY')}
                   </span>
                 </div>
               )}
               {todo.dueDate && (
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 shrink-0 text-secondary-dark-bg" />
-                  <span>Due: {dayjs(todo.dueDate).format('DD/MM/YYYY')}</span>
+                  <span>
+                    {t('tasks.due')} {dayjs(todo.dueDate).format('DD/MM/YYYY')}
+                  </span>
                 </div>
               )}
               {todo.location && (
@@ -388,11 +389,11 @@ function TaskDetailPanel({
               <div className="flex items-center gap-2">
                 <CircleDot className="w-4 h-4 shrink-0 text-secondary-dark-bg" />
                 <span>
-                  Status:{' '}
+                  {t('tasks.status')}{' '}
                   <span
                     className={`font-medium ${STATUS_TEXT_COLORS[todo.status]}`}
                   >
-                    {STATUS_LABELS[todo.status]}
+                    {t(`tasks.status_${todo.status}`)}
                   </span>
                 </span>
               </div>
@@ -400,14 +401,13 @@ function TaskDetailPanel({
                 <div className="flex items-center gap-2">
                   <Flag className="w-4 h-4 shrink-0 text-secondary-dark-bg" />
                   <span>
-                    Priority:{' '}
+                    {t('tasks.priority')}{' '}
                     <span
                       className={`font-medium ${
                         PRIORITY_TEXT_COLORS[list.priority]
                       }`}
                     >
-                      {list.priority.charAt(0).toUpperCase() +
-                        list.priority.slice(1)}
+                      {t(`tasks.priority_${list.priority}`)}
                     </span>
                   </span>
                 </div>
@@ -416,9 +416,9 @@ function TaskDetailPanel({
                 <div className="flex items-center gap-2">
                   <Tag className="w-4 h-4 shrink-0 text-secondary-dark-bg" />
                   <span>
-                    Category:{' '}
+                    {t('tasks.category')}{' '}
                     <span className="font-medium text-triadic-blue">
-                      {CATEGORY_LABELS[list.category] ?? list.category}
+                      {t(`tasks.category_${list.category}`)}
                     </span>
                   </span>
                 </div>
@@ -439,7 +439,9 @@ function TaskDetailPanel({
           <div className="border-t border-secondary-bg pt-4 mt-4">
             <div className="flex items-center gap-2 mb-2">
               <FileText className="w-4 h-4 text-secondary-dark-bg" />
-              <span className="text-sm font-semibold text-dark-bg">Notes</span>
+              <span className="text-sm font-semibold text-dark-bg">
+                {t('tasks.notes')}
+              </span>
             </div>
             <p className="text-sm text-secondary-dark-bg leading-relaxed whitespace-pre-wrap">
               {todo.notes}
@@ -472,6 +474,7 @@ function TaskDetailPanel({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 function TasksPage() {
+  const { t } = useTranslation();
   const {
     todoLists,
     isLoading,
@@ -534,7 +537,9 @@ function TasksPage() {
         <div className="p-6 pb-4">
           <div className="flex items-center justify-between mb-1">
             <div>
-              <h2 className="text-2xl font-bold text-dark-bg">My Tasks</h2>
+              <h2 className="text-2xl font-bold text-dark-bg">
+                {t('tasks.myTasks')}
+              </h2>
               <div className="h-0.5 w-14 bg-triadic-orange mt-1.5" />
             </div>
             <button
@@ -542,7 +547,7 @@ function TasksPage() {
               className="flex items-center gap-1.5 px-4 py-2 bg-triadic-orange text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity"
             >
               <Plus className="w-4 h-4" />
-              New List
+              {t('tasks.newList')}
             </button>
           </div>
 
@@ -595,7 +600,7 @@ function TasksPage() {
           <div className="flex flex-col items-center justify-center h-full text-secondary-dark-bg gap-3 p-6">
             <ClipboardList className="w-16 h-16 opacity-20" />
             <p className="text-base font-medium opacity-40">
-              Select a task to view details
+              {t('tasks.selectTask')}
             </p>
           </div>
         )}

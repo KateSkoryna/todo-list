@@ -4,6 +4,8 @@ import { PieChart, Pie, Cell } from 'recharts';
 import { ClipboardList, CheckSquare, CalendarDays } from 'lucide-react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/src/style.css';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useTodoListsQuery } from '../../fetchers/api';
 import { TodoItem, TodoList } from '@shared/types';
 import { useDateStore } from '../../store/dateStore';
@@ -32,12 +34,15 @@ function isToday(d: Dayjs): boolean {
   return d.isSame(dayjs(), 'day');
 }
 
-function relativeDate(dateStr: string | null | undefined): string {
+function relativeDate(
+  dateStr: string | null | undefined,
+  t: TFunction
+): string {
   if (!dateStr) return '';
   const diff = dayjs().diff(dayjs(dateStr), 'day');
-  if (diff === 0) return 'Today';
-  if (diff === 1) return '1 day ago';
-  return `${diff} days ago`;
+  if (diff === 0) return t('dashboard.relativeToday');
+  if (diff === 1) return t('dashboard.relativeDayAgo');
+  return t('dashboard.relativeDaysAgo', { count: diff });
 }
 
 // ─── flat item type ──────────────────────────────────────────────────────────
@@ -112,6 +117,8 @@ function DonutChart({
 // ─── completed card ───────────────────────────────────────────────────────────
 
 function CompletedCard({ item }: { item: FlatItem }) {
+  const { t } = useTranslation();
+
   return (
     <div className="rounded-xl border border-secondary-bg bg-white p-4">
       <div className="flex items-start gap-3">
@@ -124,12 +131,14 @@ function CompletedCard({ item }: { item: FlatItem }) {
             </p>
           )}
           <p className="text-xs mt-2 text-secondary-dark-bg">
-            Status:{' '}
-            <span className="font-medium text-green-500">Completed</span>
+            {t('dashboard.status')}{' '}
+            <span className="font-medium text-green-500">
+              {t('dashboard.completed')}
+            </span>
           </p>
           {item.completedAt && (
             <p className="text-xs text-secondary-dark-bg">
-              {relativeDate(item.completedAt)}
+              {relativeDate(item.completedAt, t)}
             </p>
           )}
         </div>
@@ -147,6 +156,7 @@ function TodoPanel({
   items: FlatItem[];
   selectedDate: Dayjs;
 }) {
+  const { t, i18n } = useTranslation();
   const dayLabel = selectedDate.format('D MMMM');
   const setSelectedDate = useDateStore((s) => s.setSelectedDate);
   const [pickerDate, setPickerDate] = useState<Date | undefined>(
@@ -154,6 +164,13 @@ function TodoPanel({
   );
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarRef = useRef<HTMLDivElement>(null);
+
+  const locale =
+    i18n.language === 'de'
+      ? 'de-DE'
+      : i18n.language === 'uk'
+      ? 'uk-UA'
+      : 'en-US';
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -175,7 +192,7 @@ function TodoPanel({
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2 text-triadic-orange">
           <ClipboardList className="w-5 h-5" />
-          <h3 className="font-bold text-lg">To-Do</h3>
+          <h3 className="font-bold text-lg">{t('dashboard.todo')}</h3>
         </div>
 
         <div className="relative" ref={calendarRef}>
@@ -194,7 +211,9 @@ function TodoPanel({
               style={{ width: 378 }}
             >
               <div className="flex items-center justify-between px-[14px] pt-4 pb-2">
-                <span className="font-bold text-dark-bg">Calendar</span>
+                <span className="font-bold text-dark-bg">
+                  {t('dashboard.calendar')}
+                </span>
                 <button
                   onClick={() => setCalendarOpen(false)}
                   className="text-secondary-dark-bg hover:text-dark-bg transition-colors"
@@ -206,7 +225,7 @@ function TodoPanel({
 
               {pickerDate && (
                 <div className="mx-[14px] mb-2 px-3 py-2 rounded-lg border border-secondary-bg text-sm text-dark-bg">
-                  {pickerDate.toLocaleDateString('en-US', {
+                  {pickerDate.toLocaleDateString(locale, {
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',
@@ -241,14 +260,14 @@ function TodoPanel({
         {isToday(selectedDate) && (
           <>
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-triadic-orange" />
-            Today
+            {t('dashboard.today')}
           </>
         )}
       </p>
 
       {items.length === 0 ? (
         <p className="text-secondary-dark-bg text-sm flex-1">
-          No tasks for this day.
+          {t('dashboard.noTasksForDay')}
         </p>
       ) : (
         <div className="space-y-3 overflow-y-auto flex-1">
@@ -272,11 +291,13 @@ function TaskStatusPanel({
   failed: number;
   total: number;
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white rounded-xl border border-secondary-bg p-5">
       <div className="flex items-center gap-2 text-triadic-orange mb-5">
         <ClipboardList className="w-5 h-5" />
-        <h3 className="font-bold text-lg">Task Status</h3>
+        <h3 className="font-bold text-lg">{t('dashboard.taskStatus')}</h3>
       </div>
       <div className="flex justify-around">
         <DonutChart
@@ -284,21 +305,21 @@ function TaskStatusPanel({
           total={total}
           color="#22c55e"
           dotColor="#22c55e"
-          label="Completed"
+          label={t('dashboard.completed')}
         />
         <DonutChart
           value={pending}
           total={total}
           color="#4aabeb"
           dotColor="#4aabeb"
-          label="In Progress"
+          label={t('dashboard.inProgress')}
         />
         <DonutChart
           value={failed}
           total={total}
           color="#eb4a4a"
           dotColor="#eb4a4a"
-          label="Not Started"
+          label={t('dashboard.notStarted')}
         />
       </div>
     </div>
@@ -306,15 +327,17 @@ function TaskStatusPanel({
 }
 
 function CompletedPanel({ items }: { items: FlatItem[] }) {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white rounded-xl border border-secondary-bg p-5">
       <div className="flex items-center gap-2 text-triadic-orange mb-4">
         <CheckSquare className="w-5 h-5" />
-        <h3 className="font-bold text-lg">Completed Task</h3>
+        <h3 className="font-bold text-lg">{t('dashboard.completedTask')}</h3>
       </div>
       {items.length === 0 ? (
         <p className="text-secondary-dark-bg text-sm">
-          No completed tasks yet.
+          {t('dashboard.noCompletedTasks')}
         </p>
       ) : (
         <div className="space-y-3 max-h-72 overflow-y-auto">

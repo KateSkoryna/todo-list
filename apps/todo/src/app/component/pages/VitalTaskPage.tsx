@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { useTodoListsData } from '../../hooks/useTodoListsData';
 import TodoLists from '../todo/TodoLists';
 
 function VitalTaskPage() {
+  const { t } = useTranslation();
   const {
     todoLists,
     isLoading,
@@ -17,7 +19,7 @@ function VitalTaskPage() {
   return (
     <div className="space-y-4">
       <p className="text-secondary-dark-bg text-sm">
-        Showing high-priority task lists.
+        {t('vitalTask.description')}
       </p>
       <TodoLists
         todoLists={vitalLists}

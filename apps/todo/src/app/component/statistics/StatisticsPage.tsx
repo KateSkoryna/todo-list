@@ -14,6 +14,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
 import Container from '../elements/Container';
 import { useTodoListsQuery } from '../../fetchers/api';
 import {
@@ -27,12 +28,6 @@ import {
   getDaysTracked,
 } from './statsUtils';
 
-const PERIODS: { label: string; value: Period }[] = [
-  { label: 'Week', value: 'week' },
-  { label: 'Month', value: 'month' },
-  { label: 'Year', value: 'year' },
-];
-
 function PeriodSelector({
   value,
   onChange,
@@ -40,7 +35,15 @@ function PeriodSelector({
   value: Period;
   onChange: (p: Period) => void;
 }) {
-  const activeIndex = PERIODS.findIndex((p) => p.value === value);
+  const { t } = useTranslation();
+
+  const periods: { label: string; value: Period }[] = [
+    { label: t('statistics.week'), value: 'week' },
+    { label: t('statistics.month'), value: 'month' },
+    { label: t('statistics.year'), value: 'year' },
+  ];
+
+  const activeIndex = periods.findIndex((p) => p.value === value);
 
   return (
     <div className="relative flex bg-white border border-secondary-bg rounded-lg p-1">
@@ -48,11 +51,11 @@ function PeriodSelector({
       <span
         className="absolute top-1 bottom-1 rounded-md bg-triadic-blue transition-transform duration-300 ease-in-out"
         style={{
-          width: `calc((100% - 8px) / ${PERIODS.length})`,
+          width: `calc((100% - 8px) / ${periods.length})`,
           transform: `translateX(calc(${activeIndex} * 100%))`,
         }}
       />
-      {PERIODS.map((p) => (
+      {periods.map((p) => (
         <button
           key={p.value}
           onClick={() => onChange(p.value)}
@@ -97,6 +100,7 @@ const chartCardClass =
   'bg-white rounded-2xl border border-secondary-bg pt-5 px-5 pb-5 shadow-sm';
 
 export default function StatisticsPage() {
+  const { t } = useTranslation();
   const [period, setPeriod] = useState<Period>('month');
   const { data: todoLists = [], isLoading } = useTodoListsQuery();
 
@@ -142,7 +146,7 @@ export default function StatisticsPage() {
   if (isLoading) {
     return (
       <Container>
-        <p className="text-dark-bg">Loading statistics…</p>
+        <p className="text-dark-bg">{t('statistics.loading')}</p>
       </Container>
     );
   }
@@ -150,7 +154,9 @@ export default function StatisticsPage() {
   return (
     <Container className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h2 className="text-2xl font-bold text-dark-bg">Statistics</h2>
+        <h2 className="text-2xl font-bold text-dark-bg">
+          {t('statistics.title')}
+        </h2>
         <PeriodSelector value={period} onChange={setPeriod} />
       </div>
 
@@ -159,10 +165,10 @@ export default function StatisticsPage() {
         {/* Area chart – 2/3 width */}
         <div className={`${chartCardClass} lg:col-span-2`}>
           <p className="text-sm font-semibold text-dark-bg mb-1">
-            Number of Todos
+            {t('statistics.numberOfTodos')}
           </p>
           <p className="text-xs text-secondary-dark-bg mb-4">
-            Total / Done / Failed
+            {t('statistics.totalDoneFailed')}
           </p>
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart
@@ -234,7 +240,7 @@ export default function StatisticsPage() {
                 stroke={CHART_COLORS.total}
                 fill="url(#gradTotal)"
                 strokeWidth={2}
-                name="Total"
+                name={t('statistics.total')}
               />
               <Area
                 type="monotone"
@@ -242,7 +248,7 @@ export default function StatisticsPage() {
                 stroke={CHART_COLORS.successful}
                 fill="url(#gradDone)"
                 strokeWidth={2}
-                name="Done"
+                name={t('statistics.done')}
               />
               <Area
                 type="monotone"
@@ -250,7 +256,7 @@ export default function StatisticsPage() {
                 stroke={CHART_COLORS.failed}
                 fill="url(#gradFailed)"
                 strokeWidth={2}
-                name="Failed"
+                name={t('statistics.failed')}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -259,10 +265,10 @@ export default function StatisticsPage() {
         {/* Pie + summary numbers */}
         <div className={`${cardClass} flex flex-col`}>
           <p className="text-sm font-semibold text-dark-bg mb-1">
-            Status Breakdown
+            {t('statistics.statusBreakdown')}
           </p>
           <p className="text-xs text-secondary-dark-bg mb-2">
-            {completionRate}% completion rate
+            {t('statistics.completionRate', { rate: completionRate })}
           </p>
           <div className="flex-1 flex items-center justify-center">
             {statusData.length > 0 ? (
@@ -292,22 +298,24 @@ export default function StatisticsPage() {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-secondary-dark-bg text-sm">No data</p>
+              <p className="text-secondary-dark-bg text-sm">
+                {t('statistics.noData')}
+              </p>
             )}
           </div>
           <div className="grid grid-cols-3 divide-x divide-secondary-bg border-t border-secondary-bg mt-2">
             <StatCard
-              label="Done"
+              label={t('statistics.done')}
               value={successfulCount}
               color={CHART_COLORS.successful}
             />
             <StatCard
-              label="Pending"
+              label={t('statistics.pending')}
               value={pendingCount}
               color={CHART_COLORS.pending}
             />
             <StatCard
-              label="Failed"
+              label={t('statistics.failed')}
               value={failedCount}
               color={CHART_COLORS.failed}
             />
@@ -320,9 +328,11 @@ export default function StatisticsPage() {
         {/* Bar chart per weekday */}
         <div className={chartCardClass}>
           <p className="text-sm font-semibold text-dark-bg mb-1">
-            Todos per Weekday
+            {t('statistics.todosPerWeekday')}
           </p>
-          <p className="text-xs text-secondary-dark-bg mb-4">Total / Done</p>
+          <p className="text-xs text-secondary-dark-bg mb-4">
+            {t('statistics.totalDone')}
+          </p>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart
               data={weekdayData}
@@ -358,13 +368,13 @@ export default function StatisticsPage() {
                 dataKey="total"
                 fill={CHART_COLORS.total}
                 radius={[3, 3, 0, 0]}
-                name="Total"
+                name={t('statistics.total')}
               />
               <Bar
                 dataKey="successful"
                 fill={CHART_COLORS.successful}
                 radius={[3, 3, 0, 0]}
-                name="Done"
+                name={t('statistics.done')}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -375,7 +385,7 @@ export default function StatisticsPage() {
           className={`${cardClass} flex flex-col items-center justify-center bg-dark-bg text-accent`}
         >
           <p className="text-xs uppercase tracking-widest text-secondary-dark-bg mb-3">
-            Todo List Stats
+            {t('statistics.todoListStats')}
           </p>
           <p
             className="text-6xl font-black leading-none"
@@ -384,7 +394,7 @@ export default function StatisticsPage() {
             {totalCount}
           </p>
           <p className="text-sm font-semibold text-secondary-bg mt-1 uppercase tracking-wider">
-            Total Todos
+            {t('statistics.totalTodos')}
           </p>
           <div className="border-t border-secondary-dark-bg w-16 my-4" />
           <p
@@ -394,7 +404,7 @@ export default function StatisticsPage() {
             {daysTracked}
           </p>
           <p className="text-sm font-semibold text-secondary-bg mt-1 uppercase tracking-wider">
-            Days Tracked
+            {t('statistics.daysTracked')}
           </p>
           <div className="border-t border-secondary-dark-bg w-16 my-4" />
           <p
@@ -404,14 +414,18 @@ export default function StatisticsPage() {
             {completionRate}%
           </p>
           <p className="text-sm font-semibold text-secondary-bg mt-1 uppercase tracking-wider">
-            Completion
+            {t('statistics.completion')}
           </p>
         </div>
 
         {/* Horizontal bar – by category */}
         <div className={chartCardClass}>
-          <p className="text-sm font-semibold text-dark-bg mb-1">By Category</p>
-          <p className="text-xs text-secondary-dark-bg mb-4">Total / Done</p>
+          <p className="text-sm font-semibold text-dark-bg mb-1">
+            {t('statistics.byCategory')}
+          </p>
+          <p className="text-xs text-secondary-dark-bg mb-4">
+            {t('statistics.totalDone')}
+          </p>
           {categoryData.length > 0 ? (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart
@@ -452,19 +466,19 @@ export default function StatisticsPage() {
                   dataKey="total"
                   fill={CHART_COLORS.total}
                   radius={[0, 3, 3, 0]}
-                  name="Total"
+                  name={t('statistics.total')}
                 />
                 <Bar
                   dataKey="successful"
                   fill={CHART_COLORS.successful}
                   radius={[0, 3, 3, 0]}
-                  name="Done"
+                  name={t('statistics.done')}
                 />
               </BarChart>
             </ResponsiveContainer>
           ) : (
             <p className="text-secondary-dark-bg text-sm mt-6">
-              No category data yet
+              {t('statistics.noCategoryData')}
             </p>
           )}
         </div>
