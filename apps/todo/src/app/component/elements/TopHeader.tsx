@@ -1,21 +1,92 @@
+import { useRef, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Search, Bell, Globe, SunMoon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-const ROUTE_TITLES: Record<string, string> = {
-  '/': 'Dashboard',
-  '/vital': 'Vital Tasks',
-  '/tasks': 'My Tasks',
-  '/statistics': 'Statistics',
-  '/settings': 'Settings',
-  '/help': 'Help',
+const ROUTE_TITLE_KEYS: Record<string, string> = {
+  '/': 'nav.dashboard',
+  '/vital': 'nav.vitalTasks',
+  '/tasks': 'nav.myTasks',
+  '/statistics': 'nav.statistics',
+  '/settings': 'nav.settings',
+  '/help': 'nav.help',
 };
 
-function TopHeader() {
-  const { pathname } = useLocation();
-  const title = ROUTE_TITLES[pathname] ?? 'Dashboard';
+const LANGUAGES = [
+  { code: 'en', label: 'EN' },
+  { code: 'de', label: 'DE' },
+  { code: 'uk', label: 'UK' },
+];
 
+const LOCALE_MAP: Record<string, string> = {
+  en: 'en-US',
+  de: 'de-DE',
+  uk: 'uk-UA',
+};
+
+function LanguageSwitcher() {
+  const { i18n } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const currentLang =
+    LANGUAGES.find((l) => i18n.language.startsWith(l.code))?.code ?? 'en';
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setIsOpen((v) => !v)}
+        aria-label="Language"
+        className="w-9 h-9 flex items-center justify-center rounded-xl bg-triadic-orange text-white hover:opacity-90 transition-opacity"
+      >
+        <Globe className="w-4 h-4" />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-11 z-50 bg-white rounded-xl shadow-lg border border-secondary-bg overflow-hidden min-w-[64px]">
+          {LANGUAGES.map(({ code, label }) => (
+            <button
+              key={code}
+              onClick={() => {
+                i18n.changeLanguage(code);
+                setIsOpen(false);
+              }}
+              className={`w-full px-4 py-2 text-sm font-medium text-left transition-colors ${
+                currentLang === code
+                  ? 'bg-accent text-dark-bg'
+                  : 'text-dark-bg hover:bg-gray-50'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TopHeader() {
+  const { t, i18n } = useTranslation();
+  const { pathname } = useLocation();
+  const title = t(ROUTE_TITLE_KEYS[pathname] ?? 'nav.dashboard');
+
+  const locale =
+    LOCALE_MAP[i18n.language] ??
+    LOCALE_MAP[i18n.language.split('-')[0]] ??
+    'en-US';
   const today = new Date();
-  const dayName = today.toLocaleDateString('en-US', { weekday: 'long' });
+  const dayName = today.toLocaleDateString(locale, { weekday: 'long' });
   const day = String(today.getDate()).padStart(2, '0');
   const month = String(today.getMonth() + 1).padStart(2, '0');
   const year = today.getFullYear();
@@ -31,7 +102,7 @@ function TopHeader() {
         <div className="flex items-center gap-2 w-full max-w-xl">
           <input
             type="text"
-            placeholder="Search your task here..."
+            placeholder={t('header.searchPlaceholder')}
             className="flex-1 px-4 py-2 rounded-lg bg-gray-100 text-sm text-dark-bg placeholder:text-secondary-dark-bg focus:outline-none shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
           />
           <button
@@ -44,12 +115,7 @@ function TopHeader() {
       </div>
 
       <div className="flex items-center gap-3 pr-6">
-        <button
-          aria-label="Language"
-          className="w-9 h-9 flex items-center justify-center rounded-xl bg-triadic-orange text-white hover:opacity-90 transition-opacity"
-        >
-          <Globe className="w-4 h-4" />
-        </button>
+        <LanguageSwitcher />
 
         <button
           aria-label="Notifications"

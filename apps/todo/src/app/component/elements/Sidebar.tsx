@@ -8,18 +8,25 @@ import {
   HelpCircle,
   LogOut,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store/authStore';
 
 const NAV_ITEMS = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
-  { to: '/vital', label: 'Vital Tasks', icon: Flame, end: false },
-  { to: '/tasks', label: 'My Tasks', icon: ListTodo, end: false },
-  { to: '/statistics', label: 'Statistics', icon: BarChart2, end: false },
-  { to: '/settings', label: 'Settings', icon: Settings, end: false },
-  { to: '/help', label: 'Help', icon: HelpCircle, end: false },
+  { to: '/', labelKey: 'nav.dashboard', icon: LayoutDashboard, end: true },
+  { to: '/vital', labelKey: 'nav.vitalTasks', icon: Flame, end: false },
+  { to: '/tasks', labelKey: 'nav.myTasks', icon: ListTodo, end: false },
+  {
+    to: '/statistics',
+    labelKey: 'nav.statistics',
+    icon: BarChart2,
+    end: false,
+  },
+  { to: '/settings', labelKey: 'nav.settings', icon: Settings, end: false },
+  { to: '/help', labelKey: 'nav.help', icon: HelpCircle, end: false },
 ];
 
 function Sidebar() {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
@@ -50,7 +57,7 @@ function Sidebar() {
 
       {/* Nav links */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
+        {NAV_ITEMS.map(({ to, labelKey, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
@@ -70,7 +77,7 @@ function Sidebar() {
                     isActive ? 'text-dark-bg' : 'text-triadic-orange'
                   }`}
                 />
-                {label}
+                {t(labelKey)}
               </>
             )}
           </NavLink>
@@ -84,7 +91,7 @@ function Sidebar() {
           className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-white hover:bg-white/10 transition-colors w-full"
         >
           <LogOut className="w-4 h-4 shrink-0 text-triadic-orange" />
-          Logout
+          {t('nav.logout')}
         </button>
       </div>
     </div>
